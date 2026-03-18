@@ -13,4 +13,11 @@ Go diciptakan di Google untuk menyelesaikan masalah "Scale". Karakteristiknya me
 3. **Memory Efficiency**: Menangani ribuan koneksi dengan RAM minimal.
 
 ---
+
+## 🌐 Architectural Nexus (Jembatan Master Plan)
+Materi di Rak ini terhubung langsung dengan komponen lain dalam ekosistem [Master Plan Senior](../../catatan/Master-Plan-Senior.md):
+- **Cloud Orchestration**: Lihat [Docker-K8s Container Lab](../../catatan/06-Infrastructure-Hubs/Docker-K8s-Container-Lab.md) untuk deployment Go.
+- **Server Runtime**: Memahami interaksi binari Go di [Server Runtime Knowledge Base](../../catatan/02-Execution-Hubs/Server-Runtime-Knowledge-Base.md).
+
+---
 *Kembali ke [Documentation Hub](../docs/README.md)*
