@@ -6,9 +6,9 @@ Dokumen ini adalah cetak biru (blueprint) modular yang mendekomposisi **seluruh*
 
 ---
 
-## 🏗 Justifikasi Teknis (The 5-Rack Logic)
+## 🏗 Justifikasi Teknis (Source-Driven Architecture)
 
-Arsitektur ini didesain berdasarkan **filosofi teknis Go** yang memisahkan antara sintaks, model eksekusi, dan keandalan sistem skala besar. Pemisahan ini mencerminkan struktur internal toolchain dan runtime Go.
+Arsitektur ini didesain menggunakan pendekatan **Source-Driven Architecture**, di mana dekomposisi Rak disesuaikan secara organik dengan struktur sumber dokumentasi resmi Go. Filosofi teknisnya memisahkan antara sintaks, model eksekusi, dan keandalan sistem skala besar.
 
 ### 1. RAK-01: Setup & Onboarding (The Zero-Entry Barrier)
 - **Justifikasi**: Go didesain untuk "Get Productive Fast". Berbeda dengan ekosistem lain yang membutuhkan konfigurasi lingkungan yang kompleks, Go mengandalkan **Single Toolchain** (`go` command). Rak ini membedah fondasi toolchain, manajemen dependensi modern (`go.mod`), dan tutorial awal yang menjadi gerbang utama efisiensi pengembang.
@@ -72,9 +72,12 @@ Arsitektur ini didesain berdasarkan **filosofi teknis Go** yang memisahkan antar
 
 ---
 
-## 🔄 Protokol Sinkronisasi (6-Month Sync Rule)
+## 🛠 Protokol PPM V4 (Rules & Steps)
 
-Mengingat rilis Golang yang sangat aktif (rata-rata setiap 6 bulan), repository plan ini wajib mengikuti protokol pembaruan berikut untuk menjaga relevansi materi:
+Untuk menjaga kualitas "Gold Standard", setiap pengembangan dalam repository ini wajib mengikuti protokol PPM V4:
+
+1.  **Hierarchy Consistency**: Struktur folder wajib mengikuti urutan `Rak -> Sub-Rak -> Buku -> Bab -> Section`.
+2.  **6-Month Sync Rule**: Mengingat rilis Golang yang sangat aktif (rata-rata setiap 6 bulan), repository plan ini wajib mengikuti protokol pembaruan berikut:
 
 1.  **Audit Bi-Annual**: Setiap rilis minor Go baru (e.g., v1.23, v1.24), `repository-plan` harus diaudit ulang terhadap [Official Go Release Notes](https://go.dev/doc/devel/release).
 2.  **Modular Update**: Jika ada fitur baru (seperti *Generics* atau *Fuzzing* di masa lalu), tentukan penempatan Rak & Buku yang paling logis tanpa merombak total struktur yang ada.
