@@ -5,7 +5,7 @@ Pusat dokumentasi ini menyimpan seluruh cetak biru, standar kualitas, dan pandua
 ## Daftar Dokumen Utama
 
 1.  **[Architecture Standards](./standards/architecture.md)**: Definisi analogi "The Gopher Factory" dan aturan pewajiban file per tingkatan.
-2.  **[Repository Plan](./repository-plan/README.md)**: Dekomposisi total dari dokumentasi resmi Go (`go.dev/doc`) ke dalam struktur 8-Rack disertai justifikasi teknis modular.
+2.  **[Repository Plan](./repository-plan/README.md)**: Dekomposisi total dari dokumentasi resmi Go (`go.dev/doc`) ke dalam struktur 9-Rack disertai justifikasi teknis modular.
 3.  **[Golang History](./golang-history.md)**: Sejarah kelahiran Go dari rasa frustrasi di Google hingga era cloud-native.
 4.  **[Philosophy & Essence](./golang-philosophy.md)**: Membedah filosofi "Less is More" dan model CSP.
 5.  **[Why Golang?](./why-golang.md)**: Rasionalitas teknis kapan harus memilih Go untuk sistem skala besar.
