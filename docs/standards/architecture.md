@@ -9,7 +9,7 @@ Berikut adalah pemetaannya ke dalam direktori bertingkat:
 | Tingkatan | Analogi | Contoh Direktori | Keterangan |
 | :--- | :--- | :--- | :--- |
 | **Level 1** | **Pabrik (Factory)** | `/` (root) | Seluruh sistem proyek (Go Engine). |
-| **Level 2** | **Rak (Shelf)** | `RAK-01-foundations/` | Pengelompokan besar domain ilmu. |
+| **Level 2** | **Rak (Shelf)** | `RAK-01-get-started/` | Pengelompokan besar domain ilmu. |
 | **Level 3** | **Sub-Rak (Sub-shelf)** | `SR-01_Intro/` | Grup materi berbasis area spesifik. |
 | **Level 4** | **Buku (Book)** | `BK-01_GoTutorial/` | Koleksi bab yang membentuk satu topik besar. |
 | **Level 5** | **Bab (Chapter)** | `CH-01_Overview/` | Unit terkecil wajib (Folder Bab). |

@@ -40,17 +40,23 @@ Repositori ini menggunakan standar **PPM (Perpustakaan Pribadi Modular)** dengan
 graph TD
     Root["Golang Knowledge Base"]
     
-    RAK01["RAK-01-foundations<br/>(The Gateway)"]
-    RAK02["RAK-02-core-language<br/>(The Heart)"]
-    RAK03["RAK-03-concurrency<br/>(The Engine)"]
-    RAK04["RAK-04-engineering<br/>(The Brain)"]
-    RAK05["RAK-05-ecosystem<br/>(The Allies)"]
+    RAK01["RAK-01-get-started<br/>(The Entry)"]
+    RAK02["RAK-02-the-handbook<br/>(The Core)"]
+    RAK03["RAK-03-reference<br/>(The Rules)"]
+    RAK04["RAK-04-concurrency<br/>(The Engine)"]
+    RAK05["RAK-05-modules<br/>(The Ecosystem)"]
+    RAK06["RAK-06-tooling<br/>(The Workbench)"]
+    RAK07["RAK-07-practices<br/>(The Quality)"]
+    RAK08["RAK-08-evolution<br/>(The Pulse)"]
     
     Root --> RAK01
     Root --> RAK02
     Root --> RAK03
     Root --> RAK04
     Root --> RAK05
+    Root --> RAK06
+    Root --> RAK07
+    Root --> RAK08
     
     style Root fill:#00ADD8,stroke:#333,stroke-width:4px,color:#fff
     style RAK01 fill:#bbf,stroke:#333
@@ -58,6 +64,9 @@ graph TD
     style RAK03 fill:#bfb,stroke:#333
     style RAK04 fill:#bfb,stroke:#333
     style RAK05 fill:#fbb,stroke:#333
+    style RAK06 fill:#fbb,stroke:#333
+    style RAK07 fill:#eee,stroke:#333
+    style RAK08 fill:#eee,stroke:#333
 ```
 
 ---
@@ -66,11 +75,14 @@ graph TD
 
 | Rak | Deskripsi | Status |
 | :--- | :--- | :--- |
-| `RAK-01-foundations/` | Intro, Syntax, Tutorial, & First Principles | *Planned* |
-| `RAK-02-core-language/` | Logic, Data Structures, Abstraction, & Errors | *Planned* |
-| `RAK-03-concurrency/` | Goroutines, Channels, Context, & Sync | *Planned* |
-| `RAK-04-engineering/` | Tooling (go mod, test), Profiling, & Layout | *Planned* |
-| `RAK-05-ecosystem/` | Std Lib (HTTP, SQL), Serialization, & Releases | *Planned* |
+| `RAK-01-get-started/` | Installation, Hello World, & Workspaces | *Planned* |
+| `RAK-02-the-handbook/` | Syntax, Structures, Logic, & Idioms | *Planned* |
+| `RAK-03-reference/` | Language Spec & Memory Model | *Planned* |
+| `RAK-04-concurrency/` | Goroutines, Channels, Sync, & Context | *Planned* |
+| `RAK-05-modules/` | Std Lib & Dependency Management | *Planned* |
+| `RAK-06-tooling/` | CLI, Profiling, Tracing, & Fuzzing | *Planned* |
+| `RAK-07-practices/` | Testing, Layout, & Documentation | *Planned* |
+| `RAK-08-evolution/` | Release Logs & Proposals | *Planned* |
 
 ## Visi Aktif
 Repositori ini bertindak sebagai **"The Gopher Factory"** dalam *Master Plan: Polyglot Senior Architect*. Fokus materi murni pada **Golang Language & Tooling**.

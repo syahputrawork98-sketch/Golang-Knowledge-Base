@@ -6,7 +6,7 @@ Untuk menjaga keteraturan "Pabrik Gopher", setiap file dan folder harus mengikut
 
 | Level | Prefix | Format | Contoh |
 | :--- | :--- | :--- | :--- |
-| Rak | `RAK-` | `RAK-<00>-<slug>` | `RAK-01-foundations` |
+| Rak | `RAK-` | `RAK-<00>-<slug>` | `RAK-01-get-started` |
 | Sub-Rak | `SR-` | `SR-<00>_<Slug>` | `SR-01_Foundations` |
 | Buku | `BK-` | `BK-<00>_<Slug>` | `BK-01_GoSyntax` |
 | Bab | `CH-` | `CH-<00>_<Slug>` | `CH-01_Overview` |
