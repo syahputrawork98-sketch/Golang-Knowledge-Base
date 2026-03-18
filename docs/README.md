@@ -1,6 +1,6 @@
 # Golang Knowledge Base: Documentation Hub
 
-Pusat dokumentasi ini menyimpan seluruh cetak biru, standar kualitas, dan panduan meta untuk membangun repository ini secara konsisten.
+Pusat dokumentasi ini menyimpan seluruh cetak biru, standar kualitas, dan panduan meta untuk membangun repository ini secara konsisten mengikuti standar *go.dev/doc*.
 
 ## Daftar Dokumen Utama
 
@@ -13,7 +13,7 @@ Pusat dokumentasi ini menyimpan seluruh cetak biru, standar kualitas, dan pandua
 - **[Core Contribution](./standards/core-contribution.md)**: Standar teknis materi inti Go.
 
 ### 2. Cetak Biru (Blueprints)
-- **[Repository Plan](./repository-plan/README.md)**: Dekomposisi total dari dokumentasi resmi Go (`go.dev/doc`) ke dalam struktur 9-Rack.
+- **[Repository Plan](./repository-plan/README.md)**: Dekomposisi total dari dokumentasi resmi Go ke dalam struktur 9-Rack.
 
 ### 3. Narasi & Esensi
 - **[Golang Origins](./golang-origins.md)**: Kisah di balik layar mengapa Google menciptakan bahasa Go.

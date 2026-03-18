@@ -27,6 +27,17 @@ Guna memudahkan navigasi, setiap tingkatan direktori **WAJIB** memiliki file `RE
 
 ---
 
+## Karakteristik & Autentisitas (Branding)
+
+Untuk menjaga "nyawa" dan keunikan bahasa Go, setiap konten wajib mengikuti pedoman berikut:
+
+- **Analogi Utama**: **Pabrik Gopher (The Gopher Factory)**.
+- **Tone Suara**: **Pragmatis, Sederhana, dan Lugas**. Hindari penjelasan yang terlalu berbunga-bunga; Go adalah tentang efisiensi.
+- **Filosofi Penulisan**: Fokus pada *simplicity* dan *pragmatism*. Jelaskan fitur sebagai alat untuk menyelesaikan masalah nyata, bukan sebagai keajaiban teoretis.
+- **Visual**: Gunakan estetika "Gopher Blue" dan ikonografi yang mencerminkan kesederhanaan mesin.
+
+---
+
 ## Kriteria "Gold Standard" (100% Complete)
 
 Sebuah unit dianggap **Completed** jika memenuhi 4 pilar kualitas:
