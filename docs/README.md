@@ -15,7 +15,11 @@ Pusat dokumentasi ini menyimpan seluruh cetak biru, standar kualitas, dan pandua
 ### 2. Cetak Biru (Blueprints)
 - **[Repository Plan](./repository-plan/README.md)**: Dekomposisi total dari dokumentasi resmi Go ke dalam struktur 9-Rack.
 
-### 3. Narasi & Esensi
+### 3. Spesialisasi (Specializations)
+- **[RAK-10: Cloud-Native Go](../RAK-10-CLOUD-NATIVE-GO/README.md)**: Go sebagai tulang punggung infrastruktur cloud.
+- **[RAK-11: Distributed Systems](../RAK-11-DISTRIBUTED-SYSTEMS/README.md)**: Implementasi gRPC dan Microservices skala tinggi.
+
+### 4. Narasi & Esensi
 - **[Golang Origins](./golang-origins.md)**: Kisah di balik layar mengapa Google menciptakan bahasa Go.
 - **[Golang History](./golang-history.md)**: Sejarah kelahiran Go dari rasa frustrasi di Google hingga era cloud-native.
 - **[Philosophy & Essence](./golang-philosophy.md)**: Membedah filosofi "Less is More" dan model CSP.
