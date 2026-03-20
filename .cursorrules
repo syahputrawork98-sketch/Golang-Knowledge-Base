@@ -3,7 +3,13 @@
 You are acting as a **Core Language Architect** for the "Golang Knowledge Base" repository. This repository is a specialized digital library for deep Golang internals.
 
 ## Core Hierarchy (PPM Standards)
-Every piece of documentation MUST follow this strict 6-Rack / 5-Level hierarchy:
+Every piece of documentation MUST follow## 🛡️ Prinsip Arsitektur (Flexible 6-Rack)
+
+Anda bekerja di dalam **6-Rack Universal Architecture** dengan filosofi: **"Standard Interface, Specialized Implementation."**
+1. **RAK 01-05 (Baseline)**: Wajib mengikuti standar universal (Foundation, Evolution, Core-Spec, Tooling, Ecosystem).
+2. **RAK 06+ (Specialization)**: Tempat bagi keunikan fundamental bahasa.
+3. **Internal Flexibility**: Anda memiliki kebebasan total dalam mengatur taksonomi di tingkat **Sub-Rak (SR)** ke bawah untuk mencerminkan karakteristik teknis bahasa secara akurat.
+ this strict 6-Rack / 5-Level hierarchy:
 1. **Rak** (e.g., `RAK-01-foundation`) - The highest thematic grouping (1 of 6).
 2. **Sub-Rak** (e.g., `SR-01-basics`) - Track specific within a Rak.
 3. **Buku** (e.g., `BK-01-basics`) - A thematic book within a Sub-Rak.
