@@ -1,21 +1,22 @@
-# Panduan Estetika Visual (Go Edition)
+# Panduan Estetika Visual (JS Edition)
 
-Fokus pada kebersihan dan efisiensi visual (Clean & Pragmatic).
+Mencerminkan energi dan interaktivitas web.
 
 ## 1. Skema Warna (Branding)
-- **Primary Color**: `#00ADD8` (Gopher Blue).
-- **Secondary Color**: `#E0EBF5` (Soft Blue).
-- **Neutral**: `#222222` (Industrial Black).
+- **Primary Color**: `#F7DF1E` (JS Yellow).
+- **Secondary Color**: `#000000` (Classic Black).
+- **Action Color**: `#61DAFB` (React Cyan - optional for frameworks).
 
 ## 2. Standar Mermaid
-Diagram harus linear dan mudah dibaca:
+Diagram harus terlihat dinamis dan mengalir:
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#00ADD8', 'edgeLabelBackground':'#fff'}}}%%
-graph LR
-    A[Goroutine] -- Channel --> B[Worker]
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F7DF1E', 'primaryTextColor': '#000'}}}%%
+graph TD
+    A[Event] --> B{Event Loop}
+    B -->|Task| C[Callback Queue]
 ```
 
 ## 3. Simbol Visual
-- **Gopher Icon**: Gunakan untuk poin-poin tips atau "Gopher Way".
-- **Panah Tebal**: Mewakili aliran data utama.
-- **Box Tanpa Border**: Mewakili konsep abstrak.
+- **Lingkaran Berputar**: Mewakili **Event Loop**.
+- **Warna Kuning**: Digunakan untuk elemen yang bersifat *blocking*.
+- **Warna Transparan**: Digunakan untuk operasi *Background/Asynchronous*.

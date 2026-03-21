@@ -1,21 +1,37 @@
-# Protokol Pembaruan Status (Go Edition)
+# Protokol Pembaruan Status (Unified Edition)
 
-Progress pengerjaan proyek Golang Knowledge Base dihitung secara otomatis (bubbling up) dari unit terkecil.
+Progress pengerjaan repositori dihitung secara otomatis (bubbling up) dari unit terkecil untuk memastikan akurasi data.
 
-## 1. Level Bab (Chapter)
-Status dicatat di `docs/status.md` pada level **Buku**.
-- `Draft`: Narasi sedang ditulis.
-- `Partial`: Kode atau Diagram belum lengkap.
-- `Sync`: Mencapai Gold Standard.
+## 1. Unit Dasar: Bab (Chapter) & Section
+Status dicatat langsung di dalam `README.md` pada folder masing-masing.
+- `[ ] Draft`: Narasi awal (Stage 1).
+- `[/] Partial`: Pengerjaan lab/visual (Stage 2-3).
+- `[x] Complete`: Lulus audit Sentinel (Gold Standard).
 
-## 2. Level Buku
-Setiap Buku wajib memiliki `docs/status.md` yang merangkum progress seluruh Bab di dalamnya.
-Format: `(Σ Bab Sync) / (Total Bab)`.
+## 2. Unit Menengah: Buku (Book)
+Status Buku ditentukan oleh persentase penyelesaian Bab di dalamnya.
+- **Rumus**: `(Σ Bab Complete) / (Total Bab)`.
+- Dicatat pada `README.md` di level Buku.
 
-## 3. Level Rak & Global
-Progress dari level Buku dilaporkan ke:
-1. `RAK-XX/README.md`
-2. `docs/README.md` (Global Status Table)
+## 3. Unit Utama: Rak (Rack) & Global
+Global progress dipusatkan pada file `status.md` di root repositori.
+- **Pembaruan**: Dilakukan setiap kali Sub-Rak atau Rak mencapai milestone signifikan.
+- **Dashboard**: Gunakan tabel status di root `status.md` sebagai sumber kebenaran (Source of Truth).
 
 ---
-*Peringatan: Dokumentasi dianggap "Published" hanya jika statusnya `Sync`.*
+
+## Mekanisme "Bubbling Up"
+
+```mermaid
+graph BT
+    SEC["Section (L6)"] --> CH["Bab (L5)"]
+    CH --> BK["Buku (L4)"]
+    BK --> SR["Sub-Rak (L3)"]
+    SR --> RK["Rak (L2)"]
+    RK --> ROOT["Library (L1)"]
+```
+
+Setiap perubahan di tingkat terbawah (Section/Bab) harus "menguap" hingga memperbarui angka persentase di tingkat Global (Root).
+
+---
+*Status: Gold Standard hanya dicapai jika seluruh checklist PPM V4 terpenuhi.*

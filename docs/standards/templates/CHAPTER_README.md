@@ -1,32 +1,32 @@
-# Template: Chapter README (PPM V4)
+# Template: Chapter/Section README (PPM V4)
 
-Sesuai standar [PPM V4](../workflow.md), gunakan format ini untuk setiap Bab baru.
+Sesuai standar [PPM V4](../workflow.md), gunakan format ini untuk setiap Bab (**CH**) atau Section (**SEC**) baru.
 
 ---
 
-# [JUDUL BAB - SENIOR TERMINOLOGY]
+# [JUDUL UNIT - SENIOR TERMINOLOGY]
 
 **[Sub-judul Analogi Singkat]**
-*Target: Memahami konsep [Nama Bab] dalam waktu < 2 menit.*
+*Target: Memahami konsep [Nama Unit] dalam waktu < 2 menit.*
 
-## 1. Definisi & Konsep
-[Tuliskan apa itu fitur/materi ini. Gunakan istilah dari dokumentasi resmi.]
+## 1. Definisi & Konsep (The Logic)
+[Tuliskan apa itu fitur/materi ini. Gunakan istilah dari dokumentasi resmi (Digital Mirroring).]
 
 ### Terminologi Utama (Senior Terms)
 - **[Term 1]**: [Penjelasan]
 - **[Term 2]**: [Penjelasan]
 
 ## 2. Rasionalitas (Why & How?)
-[Mengapa fitur ini ada? Masalah apa yang diselesaikan?]
+[Mengapa fitur ini ada? Masalah apa yang diselesaikan? Bagaimana mekanismenya secara internal?]
 
 ### Analogi Mendalam
-[Gunakan analogi yang relevan dengan filosofi bahasa untuk membongkar mekanisme kerja under-the-hood.]
+[Gunakan analogi yang relevan untuk membongkar mekanisme kerja under-the-hood.]
 
-## 3. Implementasi Utama
-[Penjelasan singkat tentang kode yang ada di folder `examples/`.]
+## 3. Implementasi Utama (The Lab)
+Lihat pembuktian kode fungsional di [examples/](./examples/).
 
-## 4. Model Mental Visual
-[Penjelasan singkat tentang diagram yang ada di folder `assets/`.]
+## 4. Model Mental Visual (The Assets)
+Lihat visualisasi alur atau arsitektur di [assets/](./assets/).
 
 ---
-*Back to [Nama Buku](../README.md)*
+*Back to Parent Directory*
