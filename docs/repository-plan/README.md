@@ -1,57 +1,45 @@
-# Golang Knowledge Base: 6-Rack Universal Plan
+# Golang Knowledge Base: Universal Deconstruction Plan
 
-> **Status**: Universal Standard (6-Rack Architecture)
-> **Last Updated**: 2026-03-20
-> **Blueprint Mirror**: [go.dev/doc](https://go.dev/doc/)
+> **Status**: Gold Standard (6-Level Hierarchy)
+> **Last Updated**: 2026-03-22
 
-Rencana ini menggunakan **6-Rack Universal Architecture** untuk mentransformasi dokumentasi resmi Go menjadi unit pelajaran yang manusiawi.
-
----
-
-## 🏗 Struktur 6-Rack Universal
-
-### 1. RAK-01-foundation (Entry Point)
-*Mirror: Getting Started, Learning Go (The Tour, User Manual).*
-- **Goal**: Membangun fondasi kuat bagi para Gophers.
-
-### 2. RAK-02-evolution (History & Future)
-*Mirror: Evolution & Proposals.*
-- **Goal**: Memahami arah perkembangan bahasa dan sejarah rilis (v1.0 → v1.24).
-
-### 3. RAK-03-core-spec (The Internal Logic)
-*Mirror: Language Specification.*
-- **Goal**: Menguasai aturan formal dan tata bahasa Go.
-
-### 4. RAK-04-tooling (The Workshop)
-*Mirror: Diagnostics & Tooling, Engineering Practices (Testing, Benchmarking).*
-- **Goal**: Penguasaan alur kerja profesional (Build, Test, Profile).
-
-### 5. RAK-05-ecosystem (The Real World)
-*Mirror: The Standard Library & Modules Reference.*
-- **Goal**: Implementasi di dunia nyata dengan paket standar dan manajemen dependensi.
-
-### 6. RAK-06-specialization (Concurrency & Memory)
-*Mirror: The Go Memory Model.*
-- **Goal**: Menguasai model sinkronisasi dan aturan visibilitas memori yang unik di Go.
+Rencana ini menggunakan **Unified Gold Standard** untuk mentransformasi dokumen teknis menjadi unit pelajaran yang presisi melalui hirarki **6-Level Depth**.
 
 ---
 
-## 📜 Hierarki Kedalaman (The 5-Level Depth)
+## 1. Arsitektur 6-Rak (The Universe Blueprint)
 
-Setiap Rak mengikuti hierarki standar:
-1. **RAK** (Domain)
-2. **SR** (Track)
-3. **BK** (Book)
-4. **CH** (Chapter)
-5. **Section** (README/Content)
+Pemisahan secara abstraksi dari mulai akar filosofi hingga jeroan kompilernya:
+
+### I. RAK-01-anatomy (The Landscape)
+Sejarah kompilator, filosofi desain (Simple & Concurrent), use-case (Cloud Native), serta limitasi dan penafian arsitektur (Tidak ada "Nil Content").
+
+### II. RAK-02-foundation (The Standard Book)
+Mempelajari sintaks dasar secara bertahap (Variabel, Kontrol Alur, Tipe Data, Struct, Interface) bersumber dari dokumentasi resmi Go.
+
+### III. RAK-03-evolution (History & Future)
+Mendokumentasikan evolusi versi Go dan migrasi rilis secara kronologis.
+
+### IV. RAK-04-core-mechanics (The Internal Logic)
+Rasionalitas di balik mekanika inti Go, termasuk sistem error handling, pointer, dan pattern bawaannya.
+
+### V. RAK-05-standard-library (The Environment)
+Eksplorasi utilitas dan library ekosistem "Batteries Included" bawaan Go: `fmt`, `net/http`, `io/fs`, `sync`, dll.
+
+### VI. RAK-06-compiler-runtime (The Machine Room)
+Deep dive ke dalam jeroan *Go compiler*, M:P:G Goroutine Scheduler, dan Garbage Collection.
 
 ---
-*Log Perubahan: Migrasi dari 9-Rack ke 6-Rack Universal pada 2026-03-20.*
+
+## 2. Hirarki Kedalaman (Digital Mirroring)
+
+Setiap materi didekonstruksi hingga 6 level kedalaman jika diperlukan:
+1. **Root** (Pusat Hub)
+2. **RAK** (Domain)
+3. **SR** (Track)
+4. **BK** (Book)
+5. **CH** (Chapter)
+6. **SEC** (Section)
 
 ---
-
-## 📜 Log Sinkronisasi (Spec-Log)
-
-| Versi Go | Tanggal Audit | Perubahan Arsitektur | Status |
-| :--- | :--- | :--- | :--- |
-| **v1.24** | 2026-03-19 | Migrasi ke 9-Rack (Full Source Mirroring). | ✅ Synced |
+*Referensi Utama: Unified Gold Standard v1 (docs/standards).*
