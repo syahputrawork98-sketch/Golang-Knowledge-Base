@@ -1,0 +1,32 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="#f8fafc" rx="10"/>
+  
+  <!-- INTERFACE (The Lock) -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="200" height="200" fill="#ffffff" stroke="#6366f1" stroke-width="4" rx="10"/>
+    <text x="100" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#6366f1">INTERFACE: Speaker</text>
+    
+    <!-- Method Slots -->
+    <rect x="20" y="70" width="160" height="30" fill="#e0e7ff" rx="5"/>
+    <text x="100" y="90" font-family="Arial" font-size="12" text-anchor="middle" fill="#4338ca">Speak() string</text>
+    
+    <path d="M 190 85 L 230 85" stroke="#6366f1" stroke-width="2" stroke-dasharray="4"/>
+  </g>
+  
+  <!-- STRUCT (The Key) -->
+  <g transform="translate(350, 50)">
+    <rect x="0" y="0" width="200" height="200" fill="#ffffff" stroke="#10b981" stroke-width="4" rx="10"/>
+    <text x="100" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#10b981">STRUCT: Human</text>
+    
+    <!-- Matching Methods -->
+    <rect x="20" y="70" width="160" height="30" fill="#dcfce7" rx="5"/>
+    <text x="100" y="90" font-family="Arial" font-size="12" text-anchor="middle" fill="#059669">Speak() string</text>
+    
+    <text x="100" y="140" font-family="Arial" font-size="12" text-anchor="middle" fill="#64748b">Implicit Connection</text>
+    <path d="M 10 85 L -30 85" stroke="#10b981" stroke-width="2" stroke-dasharray="4"/>
+  </g>
+
+  <!-- Connection Status -->
+  <text x="300" y="270" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle" fill="#10b981">CONTRACT SATISFIED!</text>
+  <text x="300" y="290" font-family="Arial" font-size="12" text-anchor="middle" fill="#94a3b8">No "implements" keyword needed.</text>
+</svg>
