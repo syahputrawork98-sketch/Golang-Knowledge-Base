@@ -12,4 +12,4 @@ Buku ini membawa kita ke "bawah kap" (under the hood) untuk melihat bagaimana Go
     - Menggunakan Type Assertion dan Switch secara aman dan performan.
 
 ---
-*Status: [ ] In Progress (Gold Standard - PPM V4)*
+*Status: [x] Complete (Gold Standard - PPM V4)*

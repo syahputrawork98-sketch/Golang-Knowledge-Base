@@ -14,4 +14,4 @@ Buku ini membedah fitur paling ditunggu dalam sejarah Go: Type Parameters. Kita 
     - Mekanisme kompilasi dan batas-batas desain.
 
 ---
-*Status: [ ] In Progress (Gold Standard - PPM V4)*
+*Status: [x] Complete (Gold Standard - PPM V4)*

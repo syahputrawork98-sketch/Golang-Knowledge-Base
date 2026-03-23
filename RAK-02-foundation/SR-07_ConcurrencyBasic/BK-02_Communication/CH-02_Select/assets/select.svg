@@ -1,0 +1,46 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="#f8fafc" rx="10"/>
+  
+  <!-- INPUT CHANNELS -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="120" height="40" fill="#e0e7ff" stroke="#6366f1" rx="5"/>
+    <text x="60" y="25" font-family="Arial" font-size="12" text-anchor="middle" fill="#4338ca">Channel A</text>
+    
+    <rect x="0" y="80" width="120" height="40" fill="#dcfce7" stroke="#10b981" rx="5"/>
+    <text x="60" y="105" font-family="Arial" font-size="12" text-anchor="middle" fill="#047857">Channel B</text>
+    
+    <rect x="0" y="160" width="120" height="40" fill="#fee2e2" stroke="#ef4444" rx="5"/>
+    <text x="60" y="185" font-family="Arial" font-size="12" text-anchor="middle" fill="#991b1b">time.After()</text>
+  </g>
+
+  <!-- SELECT SWITCHBOARD -->
+  <g transform="translate(250, 80)">
+    <rect x="0" y="0" width="150" height="150" fill="#1e293b" rx="10"/>
+    <text x="75" y="40" font-family="Arial" font-size="20" font-weight="bold" text-anchor="middle" fill="#ffffff">SELECT</text>
+    
+    <!-- Switch light -->
+    <circle cx="75" cy="80" r="10" fill="#fbbf24">
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <text x="75" y="120" font-family="Arial" font-size="10" text-anchor="middle" fill="#cbd5e1">Listening...</text>
+  </g>
+
+  <!-- OUTPUT PATH -->
+  <g transform="translate(450, 135)">
+    <path d="M -50 0 L 0 0" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrowGray)"/>
+    <text x="10" y="5" font-family="Arial" font-size="14" font-weight="bold" fill="#1e293b">First Arrival wins!</text>
+  </g>
+
+  <!-- Connecting Lines -->
+  <path d="M 170 70 L 250 120" stroke="#6366f1" stroke-width="2" stroke-dasharray="4"/>
+  <path d="M 170 150 L 250 155" stroke="#10b981" stroke-width="2" stroke-dasharray="4"/>
+  <path d="M 170 230 L 250 190" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+
+  <defs>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1e293b" />
+    </marker>
+  </defs>
+
+  <text x="300" y="280" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">MULTIPLEXING: Non-deterministic branch selection</text>
+</svg>

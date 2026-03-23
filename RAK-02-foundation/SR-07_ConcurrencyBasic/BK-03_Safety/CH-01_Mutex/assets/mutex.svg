@@ -1,0 +1,57 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#f8fafc" rx="10"/>
+  
+  <!-- DATA RACE SCENARIO -->
+  <g transform="translate(50, 50)">
+    <text x="0" y="-10" font-family="Arial" font-size="14" font-weight="bold" fill="#ef4444">1. Data Race (Danger!)</text>
+    <rect x="0" y="0" width="220" height="120" fill="#ffffff" stroke="#ef4444" stroke-width="2" rx="5"/>
+    
+    <rect x="85" y="40" width="50" height="40" fill="#fee2e2" stroke="#ef4444"/>
+    <text x="110" y="65" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">X = 1</text>
+    
+    <!-- Concurrent Access -->
+    <path d="M 30 60 L 80 60" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+    <text x="30" y="50" font-family="Arial" font-size="9" text-anchor="middle" fill="#ef4444">G1++</text>
+    
+    <path d="M 190 60 L 140 60" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+    <text x="190" y="50" font-family="Arial" font-size="9" text-anchor="middle" fill="#ef4444">G2++</text>
+
+    <text x="110" y="100" font-family="Arial" font-size="10" text-anchor="middle" fill="#991b1b">Value becomes unpredictable!</text>
+  </g>
+
+  <!-- MUTEX SCENARIO -->
+  <g transform="translate(330, 50)">
+    <text x="0" y="-10" font-family="Arial" font-size="14" font-weight="bold" fill="#10b981">2. sync.Mutex (Safe)</text>
+    <rect x="0" y="0" width="220" height="120" fill="#ffffff" stroke="#10b981" stroke-width="2" rx="5"/>
+    
+    <rect x="85" y="40" width="50" height="40" fill="#dcfce7" stroke="#10b981"/>
+    <text x="110" y="65" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">X = 2</text>
+    
+    <!-- Lock Icon -->
+    <rect x="100" y="25" width="20" height="20" fill="#10b981" rx="2"/>
+    <circle cx="110" cy="35" r="3" fill="#ffffff"/>
+
+    <path d="M 30 60 L 80 60" stroke="#10b981" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <text x="210" y="65" font-family="Arial" font-size="9" text-anchor="middle" fill="#94a3b8">G2 Waiting...</text>
+  </g>
+
+  <!-- MEMORY SAFETY BARRIER -->
+  <g transform="translate(50, 210)">
+    <rect x="0" y="0" width="500" height="150" fill="#f1f5f9" stroke="#94a3b8" rx="10" stroke-dasharray="8,4"/>
+    <text x="20" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#475569">Memory Integrity Rules:</text>
+    
+    <text x="40" y="60" font-family="Arial" font-size="11" fill="#64748b">1. Only ONE goroutine can 'Lock' at a time.</text>
+    <text x="40" y="85" font-family="Arial" font-size="11" fill="#64748b">2. Others are put into 'Waiting' state by the Scheduler.</text>
+    <text x="40" y="110" font-family="Arial" font-size="11" fill="#64748b">3. Atomic operation ensures no 2 CPU instructions overlap on same memory.</text>
+    <text x="40" y="135" font-family="Arial" font-size="11" font-weight="bold" fill="#0284c7">Recommendation: Use Channels first. Use Mutex for shared state/performance.</text>
+  </g>
+
+  <defs>
+    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+</svg>

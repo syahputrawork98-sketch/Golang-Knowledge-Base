@@ -1,0 +1,49 @@
+<svg width="600" height="350" viewBox="0 0 600 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="350" fill="#f8fafc" rx="10"/>
+  
+  <!-- OS LAYER -->
+  <rect x="50" y="270" width="500" height="50" fill="#cbd5e1" stroke="#475569" stroke-width="2" rx="5"/>
+  <text x="300" y="300" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">OS KERNEL THREADS (M)</text>
+
+  <!-- SCHEDULER LAYER -->
+  <g transform="translate(100, 160)">
+    <!-- Processor P -->
+    <rect x="0" y="0" width="100" height="80" fill="#bae6fd" stroke="#0284c7" stroke-width="2" rx="10"/>
+    <text x="50" y="45" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#0284c7">P</text>
+    <text x="50" y="65" font-family="Arial" font-size="9" text-anchor="middle" fill="#0369a1">(Logical Proc)</text>
+    
+    <!-- Link to M -->
+    <path d="M 50 80 L 50 110" stroke="#0284c7" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  </g>
+
+  <!-- GOROUTINES RUNNING -->
+  <g transform="translate(115, 70)">
+    <circle cx="35" cy="35" r="30" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+    <text x="35" y="40" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#ffffff">G</text>
+  </g>
+  
+  <!-- GOROUTINES QUEUE -->
+  <g transform="translate(250, 160)">
+    <rect x="0" y="0" width="180" height="80" fill="#f1f5f9" stroke="#94a3b8" rx="5" stroke-dasharray="4"/>
+    <text x="90" y="30" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#475569">Local Run Queue (LRQ)</text>
+    
+    <circle cx="40" cy="55" r="15" fill="#fca5a5" stroke="#ef4444"/>
+    <circle cx="80" cy="55" r="15" fill="#fca5a5" stroke="#ef4444"/>
+    <circle cx="120" cy="55" r="15" fill="#fca5a5" stroke="#ef4444"/>
+    <text x="145" y="60" font-family="Arial" font-size="14" fill="#ef4444">...</text>
+  </g>
+
+  <!-- Arrow P to Queue -->
+  <path d="M 200 200 L 250 200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowGray)"/>
+
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0284c7" />
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
+    </marker>
+  </defs>
+
+  <text x="50" y="30" font-family="Arial" font-size="14" font-weight="bold" fill="#1e293b">MPG MODEL (M:N Scheduling)</text>
+</svg>
