@@ -1,0 +1,41 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#f8fafc" rx="10"/>
+  
+  <!-- STACK FRAME -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="200" height="60" fill="#ffffff" stroke="#94a3b8" rx="5"/>
+    <text x="100" y="35" font-family="Arial" font-size="12" text-anchor="middle">Main Function</text>
+
+    <rect x="0" y="80" width="200" height="60" fill="#ffffff" stroke="#94a3b8" rx="5"/>
+    <text x="100" y="115" font-family="Arial" font-size="12" text-anchor="middle">Service Layer</text>
+    
+    <rect x="0" y="160" width="200" height="60" fill="#fee2e2" stroke="#ef4444" stroke-width="2" rx="5"/>
+    <text x="100" y="195" font-family="Arial" font-size="12" font-weight="bold" fill="#ef4444">PANIC! (Nil Pointer)</text>
+  </g>
+
+  <!-- PANIC PROPAGATION -->
+  <path d="M 150 220 L 150 280" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,3" marker-end="url(#panicArrow)"/>
+  <text x="160" y="260" font-family="Arial" font-size="10" fill="#ef4444">Propagating Up...</text>
+
+  <!-- RECOVER NET -->
+  <g transform="translate(300, 280)">
+    <rect x="0" y="0" width="250" height="80" fill="#ecfdf5" stroke="#10b981" stroke-width="3" rx="10"/>
+    <text x="125" y="30" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#10b981">DEFER + RECOVER()</text>
+    <text x="125" y="55" font-family="Arial" font-size="11" text-anchor="middle" fill="#065f46">"Catching the panic here"</text>
+  </g>
+
+  <!-- RESTORED FLOW -->
+  <path d="M 425 280 Q 425 220 520 220" fill="none" stroke="#10b981" stroke-width="3" marker-end="url(#safeArrow)"/>
+  <text x="480" y="210" font-family="Arial" font-size="11" font-weight="bold" fill="#10b981">Program Survives</text>
+
+  <defs>
+    <marker id="panicArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
+    </marker>
+    <marker id="safeArrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <text x="300" y="385" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#475569">RECOVERY MECHANISM: Defer stack executes even DURING panic.</text>
+</svg>

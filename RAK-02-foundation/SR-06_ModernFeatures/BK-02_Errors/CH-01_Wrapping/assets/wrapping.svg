@@ -1,0 +1,44 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="#f8fafc" rx="10"/>
+  
+  <!-- INNER ERROR -->
+  <g transform="translate(50, 100)">
+    <rect x="0" y="0" width="120" height="100" fill="#fee2e2" stroke="#ef4444" stroke-width="3" rx="10"/>
+    <text x="60" y="45" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#ef4444">ROOT ERROR</text>
+    <text x="60" y="70" font-family="Arial" font-size="10" text-anchor="middle" fill="#991b1b">sql.ErrNoRows</text>
+  </g>
+
+  <!-- ARROW 1 -->
+  <path d="M 170 150 L 210 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- WRAPPED ERROR 1 -->
+  <g transform="translate(210, 75)">
+    <rect x="0" y="0" width="160" height="150" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="3" rx="10"/>
+    <text x="80" y="30" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#0ea5e9">WRAPPED ERROR</text>
+    <text x="80" y="55" font-family="Arial" font-size="10" text-anchor="middle" fill="#0369a1">"fetching user..."</text>
+    
+    <!-- Visual nesting -->
+    <rect x="25" y="70" width="110" height="60" fill="none" stroke="#0ea5e9" stroke-dasharray="4"/>
+    <text x="80" y="105" font-family="Arial" font-size="9" text-anchor="middle" fill="#0369a1">[ holds ROOT ]</text>
+  </g>
+
+  <!-- ARROW 2 -->
+  <path d="M 370 150 L 410 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- WRAPPED ERROR 2 (Outer) -->
+  <g transform="translate(410, 50)">
+    <rect x="0" y="0" width="160" height="200" fill="#ecfdf5" stroke="#10b981" stroke-width="3" rx="10"/>
+    <text x="80" y="30" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle" fill="#10b981">API ERROR (Outer)</text>
+    <text x="80" y="55" font-family="Arial" font-size="10" text-anchor="middle" fill="#065f46">"404 Not Found"</text>
+    <rect x="25" y="75" width="110" height="100" fill="none" stroke="#10b981" stroke-dasharray="4"/>
+    <text x="80" y="130" font-family="Arial" font-size="9" text-anchor="middle" fill="#065f46">[ holds ALL ]</text>
+  </g>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8" />
+    </marker>
+  </defs>
+
+  <text x="300" y="280" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">ERROR CHAIN: Recursive Inspection with errors.Is/As</text>
+</svg>
