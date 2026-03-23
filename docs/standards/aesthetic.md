@@ -1,22 +1,23 @@
-# Panduan Estetika Visual (JS Edition)
+# Panduan Estetika Visual (Go Edition)
 
-Mencerminkan energi dan interaktivitas web.
+Mencerminkan efisiensi, skalabilitas, dan ketangguhan sistem cloud-native.
 
 ## 1. Skema Warna (Branding)
-- **Primary Color**: `#F7DF1E` (JS Yellow).
+- **Primary Color**: `#00ADD8` (Go Blue / Gopher Blue).
 - **Secondary Color**: `#000000` (Classic Black).
-- **Action Color**: `#61DAFB` (React Cyan - optional for frameworks).
+- **Action Color**: `#5DC9E1` (Light Blue - for contrast).
 
 ## 2. Standar Mermaid
-Diagram harus terlihat dinamis dan mengalir:
+Diagram harus terlihat terstruktur, paralel, dan efisien:
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F7DF1E', 'primaryTextColor': '#000'}}}%%
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#00ADD8', 'primaryTextColor': '#FFF'}}}%%
 graph TD
-    A[Event] --> B{Event Loop}
-    B -->|Task| C[Callback Queue]
+    A[Request] --> B{Scheduler}
+    B -->|M:P:G| C[Goroutine]
 ```
 
 ## 3. Simbol Visual
-- **Lingkaran Berputar**: Mewakili **Event Loop**.
-- **Warna Kuning**: Digunakan untuk elemen yang bersifat *blocking*.
-- **Warna Transparan**: Digunakan untuk operasi *Background/Asynchronous*.
+- **Gopher**: Mewakili **Runtime & Kerja Paralel**.
+- **Warna Biru**: Digunakan untuk elemen yang bersifat *concurrent/fast*.
+- **Warna Abu-abu**: Digunakan untuk operasi *Blocking/I/O* (sebelum dipindah ke Netpoller).
+- **Warna Transparan/Dotted**: Digunakan untuk representasi *Memory Allocation (Heap vs Stack)*.
