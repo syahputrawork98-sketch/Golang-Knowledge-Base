@@ -1,0 +1,56 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="400" fill="#0f172a" rx="12" />
+  
+  <!-- Title -->
+  <text x="300" y="40" text-anchor="middle" fill="#f8fafc" font-family="Arial, sans-serif" font-size="20" font-weight="bold">Go Module Proxy Handshake</text>
+  <text x="300" y="65" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="14">Secure verification flow between Client, Proxy, and SumDB</text>
+
+  <!-- Client -->
+  <rect x="50" y="150" width="100" height="150" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+  <text x="100" y="230" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Go CLI</text>
+  <text x="100" y="255" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="12">(Client)</text>
+
+  <!-- Proxy -->
+  <rect x="250" y="100" width="100" height="100" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+  <text x="300" y="150" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">GOPROXY</text>
+  <text x="300" y="175" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="10">proxy.golang.org</text>
+
+  <!-- SumDB -->
+  <rect x="450" y="150" width="100" height="150" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2" />
+  <text x="500" y="230" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">GOSUMDB</text>
+  <text x="500" y="255" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="10">sum.golang.org</text>
+
+  <!-- Step 1: Request -->
+  <path d="M 150 180 Q 200 150 250 150" stroke="#3b82f6" stroke-width="2" fill="none" stroke-dasharray="4" marker-end="url(#arrow-blue)" />
+  <text x="200" y="155" text-anchor="middle" fill="#3b82f6" font-family="Arial, sans-serif" font-size="10" font-weight="bold">1. go get</text>
+  
+  <!-- Step 2: Delivery -->
+  <path d="M 250 180 Q 200 210 150 210" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)" />
+  <text x="200" y="225" text-anchor="middle" fill="#10b981" font-family="Arial, sans-serif" font-size="10" font-weight="bold">2. delivery.zip</text>
+
+  <!-- Step 3: Verification Request -->
+  <path d="M 150 250 L 450 250" stroke="#f59e0b" stroke-width="2" fill="none" stroke-dasharray="4" marker-end="url(#arrow-orange)" />
+  <text x="300" y="245" text-anchor="middle" fill="#f59e0b" font-family="Arial, sans-serif" font-size="10" font-weight="bold">3. checksum check</text>
+
+  <!-- Step 4: Verification Result -->
+  <path d="M 450 280 L 150 280" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arrow-orange)" />
+  <text x="300" y="295" text-anchor="middle" fill="#f59e0b" font-family="Arial, sans-serif" font-size="10" font-weight="bold">4. integrity confirmed</text>
+
+  <!-- Security Badge -->
+  <rect x="180" y="320" width="240" height="50" rx="25" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+  <text x="300" y="350" text-anchor="middle" fill="#34d399" font-family="Arial, sans-serif" font-size="14" font-weight="bold">🛡️ Secure Supply Chain Verified</text>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+  </defs>
+</svg>
