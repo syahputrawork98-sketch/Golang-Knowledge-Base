@@ -7,19 +7,19 @@ Selamat datang di jantung spesifikasi bahasa Go. Rak ini membedah **bagaimana** 
 ### [SR-01: Basics](./SR-01-basics/) (The Atoms)
 Identitas (Variabel/Konstanta) dan Sistem Tipe Data.
 
-### [SR-02: Control Flow](./SR-02_ControlFlow/) (The Pulse)
+### [SR-02: Control Flow](./SR-02-control-flow/) (The Pulse)
 Mekanisme pengambilan keputusan dan perulangan.
 
-### [SR-03: Data Collections](./SR-03_DataCollections/) (The Organizers)
+### [SR-03: Data Collections](./SR-03-data-collections/) (The Organizers)
 Array, Slice, dan Map secara mendalam.
 
-### [SR-04: Object Orientation](./SR-04_ObjectOrientation/) (The Blueprints)
+### [SR-04: Object Orientation](./SR-04-object-orientation/) (The Blueprints)
 Struct, Method, dan Embedding (Go-style OOP).
 
-### [SR-05: Interfaces](./SR-05_Interfaces/) (The Contracts)
+### [SR-05: Interfaces](./SR-05-interfaces/) (The Contracts)
 Abstraksi dan Polimorfisme.
 
-### [SR-06: Modern Features](./SR-06_ModernFeatures/) (The Evolution)
+### [SR-06: Modern Features](./SR-06-modern-features/) (The Evolution)
 Generics dan Advance Error Handling.
 
 ### [SR-07: Concurrency Basic](./SR-07-concurrency-basic/) (The Engine)
