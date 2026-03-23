@@ -32,8 +32,19 @@ Hierarki ini mencerminkan struktur sumber primer (The Go Programming Language Sp
 - **Filosofi**: Fokus pada konkurensi, keamanan memori, dan kesederhanaan desain Go.
 
 ---
-
-## 4. Kriteria Kelulusan Standar (Gold Standard)
+ 
+ ## 4. Pemisahan Batasan (POV-Based Separation)
+ Untuk mencegah tumpang tindih materi antar Rak, repositori ini membagi materi teknis berdasarkan Sudut Pandang (POV):
+ 
+ | Rak | Sudut Pandang (POV) | Cakupan Teknis | Tujuan |
+ | :--- | :--- | :--- | :--- |
+ | **RAK-02** | **Engineer Intuition** | Efek mekanisme pada performa/keamanan kode praktis. | Penulisan kode idiomatik & efisien. |
+ | **RAK-04** | **Architectural Rationale** | Filosofi desain, abstraksi sistemik, & pola desain. | Pemahaman arsitektur & struktur Go. |
+ | **RAK-06** | **Low-Level Implementation** | Bedah source code runtime, compiler, & assembly. | Kontribusi ke Go/Pemahaman mendalam. |
+ 
+ ---
+ 
+ ## 5. Kriteria Kelulusan Standar (Gold Standard)
 Sebuah unit materi (CH/SEC) dianggap **Complete** secara berurutan dan terstruktur jika menyajikan 5 representasi ini di dalam `README.md`:
 1. **Source Link** (Akurasi Spec Go / Go Blog).
 2. **Dual Definition** (Definisi Formal + Analogi Model Mental).

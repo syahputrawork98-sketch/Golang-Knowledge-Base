@@ -22,8 +22,14 @@ Abstraksi dan Polimorfisme.
 ### [SR-06: Modern Features](./SR-06_ModernFeatures/) (The Evolution)
 Generics dan Advance Error Handling.
 
-### [SR-07: Concurrency Basic](./SR-07_ConcurrencyBasic/) (The Engine)
+### [SR-07: Concurrency Basic](./SR-07-concurrency-basic/) (The Engine)
 Goroutines, Channels, dan Select.
 
 ---
-*Status: [ ] In Progress (SR-01 Complete)*
+
+> [!NOTE]
+> **Batasan Teknis (Boundary Note)**:
+> Materi dalam RAK-02 (Foundation) menyajikan mekanisme "Tahap 4" dengan sudut pandang **Engineer's Intuition**. Tujuannya adalah membangun intuisi senior tentang bagaimana kode diperlakukan oleh sistem (e.g. *Escape Analysis*, *Branch Prediction*) demi penulisan kode yang lebih efisien, bukan untuk membedah source code runtime secara mendalam (yang merupakan domain RAK-04/RAK-06).
+
+---
+*Status: [ ] In Progress (SR-01 & SR-02 Complete)*

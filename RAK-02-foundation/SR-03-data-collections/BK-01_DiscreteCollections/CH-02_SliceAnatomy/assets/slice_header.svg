@@ -1,0 +1,49 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="300" fill="#f8f9fa" rx="10"/>
+  
+  <!-- Slice Header Container -->
+  <rect x="50" y="50" width="180" height="200" fill="#ffffff" stroke="#00ADD8" stroke-width="3" rx="8"/>
+  <text x="140" y="35" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#00ADD8">SLICE HEADER (24 Bytes)</text>
+  
+  <!-- Header Fields -->
+  <rect x="60" y="70" width="160" height="50" fill="#e3f2fd" stroke="#1976d2" rx="4"/>
+  <text x="140" y="90" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1976d2">Data Pointer</text>
+  <text x="140" y="110" font-family="Arial" font-size="12" text-anchor="middle" fill="#555">(uintptr - 8 bytes)</text>
+  
+  <rect x="60" y="130" width="160" height="50" fill="#fff9c4" stroke="#fbc02d" rx="4"/>
+  <text x="140" y="150" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#f57f17">Length (Len)</text>
+  <text x="140" y="170" font-family="Arial" font-size="12" text-anchor="middle" fill="#555">(int - 8 bytes)</text>
+  
+  <rect x="60" y="190" width="160" height="50" fill="#f1f8e9" stroke="#689f38" rx="4"/>
+  <text x="140" y="210" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#33691e">Capacity (Cap)</text>
+  <text x="140" y="230" font-family="Arial" font-size="12" text-anchor="middle" fill="#555">(int - 8 bytes)</text>
+  
+  <!-- Arrow to Backing Array -->
+  <path d="M 220 95 L 340 95" stroke="#1976d2" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2" />
+    </marker>
+  </defs>
+  
+  <!-- Backing Array -->
+  <text x="460" y="35" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">BACKING ARRAY (Memory)</text>
+  <g transform="translate(350, 70)">
+    <rect x="0" y="0" width="60" height="50" fill="#bbdefb" stroke="#1976d2" stroke-width="2"/>
+    <text x="30" y="30" font-family="Arial" font-size="14" text-anchor="middle">10</text>
+    <rect x="60" y="0" width="60" height="50" fill="#bbdefb" stroke="#1976d2" stroke-width="2"/>
+    <text x="90" y="30" font-family="Arial" font-size="14" text-anchor="middle">20</text>
+    <rect x="120" y="0" width="60" height="50" fill="#bbdefb" stroke="#1976d2" stroke-width="2"/>
+    <text x="150" y="30" font-family="Arial" font-size="14" text-anchor="middle">30</text>
+    <rect x="180" y="0" width="30" height="50" fill="#eeeeee" stroke="#999" stroke-dasharray="2" stroke-width="2"/>
+    <text x="195" y="30" font-family="Arial" font-size="12" text-anchor="middle">...</text>
+  </g>
+  
+  <!-- Brackets for Len vs Cap -->
+  <path d="M 350 130 L 350 140 L 530 140 L 530 130" stroke="#f57f17" stroke-width="2" fill="none"/>
+  <text x="440" y="160" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#f57f17">LEN = 3 Elements accessible</text>
+  
+  <path d="M 350 180 L 350 190 L 560 190 L 560 180" stroke="#33691e" stroke-width="2" fill="none"/>
+  <text x="455" y="210" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#33691e">CAP = Max space in array</text>
+</svg>
