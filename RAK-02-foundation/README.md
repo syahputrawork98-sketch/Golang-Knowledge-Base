@@ -1,31 +1,29 @@
-# RAK-02: Foundation (The Standard Book)
+# RAK-02: Foundation (Go Language Specification)
 
-Selamat datang di **The Standard Book**. Rak ini merupakan panduan komprehensif mengenai sintaksis dan aturan main bahasa pemrograman Go berdasarkan spesifikasi resmi.
+Selamat datang di jantung spesifikasi bahasa Go. Rak ini membedah **bagaimana** menggunakan fitur-fitur Go secara idiomatik dan efisien sesuai dengan standar industri.
 
-## 🏛️ Struktur Sub-Rak (Tracks)
+## 🗺️ Peta Navigasi Sub-Rak
 
-Untuk memudahkan navigasi, materi dasar dibagi menjadi 7 jalur utama:
+### [SR-01: Basics](./SR-01-basics/) (The Atoms)
+Identitas (Variabel/Konstanta) dan Sistem Tipe Data.
 
-### 1. [SR-01: Basics](./SR-01_Basics/)
-Elemen fundamental: Variabel, Konstanta, dan Sistem Tipe Data.
+### [SR-02: Control Flow](./SR-02_ControlFlow/) (The Pulse)
+Mekanisme pengambilan keputusan dan perulangan.
 
-### 2. [SR-02: Control Flow](./SR-02_ControlFlow/)
-Alur logika: Percabangan, Perulangan, dan mekanisme Defer.
+### [SR-03: Data Collections](./SR-03_DataCollections/) (The Organizers)
+Array, Slice, dan Map secara mendalam.
 
-### 3. [SR-03: Data Collections](./SR-03_DataCollections/)
-Pengelolaan data majemuk: Array, Slice, dan Map.
+### [SR-04: Object Orientation](./SR-04_ObjectOrientation/) (The Blueprints)
+Struct, Method, dan Embedding (Go-style OOP).
 
-### 4. [SR-04: Object Orientation](./SR-04_ObjectOrientation/)
-Struktur data dan perilaku: Structs, Functions, dan Methods.
+### [SR-05: Interfaces](./SR-05_Interfaces/) (The Contracts)
+Abstraksi dan Polimorfisme.
 
-### 5. [SR-05: Interfaces](./SR-05_Interfaces/)
-Abstraksi dan Kontrak: Implementasi implisit dan Polimorfisme.
+### [SR-06: Modern Features](./SR-06_ModernFeatures/) (The Evolution)
+Generics dan Advance Error Handling.
 
-### 6. [SR-06: Modern Features](./SR-06_ModernFeatures/)
-Fitur mutakhir: Generics dan Manajemen Error modern.
-
-### 7. [SR-07: Concurrency Basic](./SR-07_ConcurrencyBasic/)
-Dasar sinkronisasi: Goroutines, Channels, dan Select.
+### [SR-07: Concurrency Basic](./SR-07_ConcurrencyBasic/) (The Engine)
+Goroutines, Channels, dan Select.
 
 ---
-*Status: [ ] In Progress (Building Foundations)*
+*Status: [ ] In Progress (SR-01 Complete)*
