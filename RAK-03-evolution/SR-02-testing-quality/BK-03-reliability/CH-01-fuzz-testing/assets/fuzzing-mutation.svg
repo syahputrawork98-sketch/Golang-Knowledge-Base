@@ -1,0 +1,113 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="grad-core" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#020617;stop-opacity:0" />
+    </radialGradient>
+    <linearGradient id="grad-gold-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b45309;stop-opacity:1" />
+    </linearGradient>
+    <filter id="neon-gold" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="#020617" rx="16" />
+  
+  <!-- Subtle Grid -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="1" />
+  </pattern>
+  <rect width="600" height="400" fill="url(#grid)" opacity="0.4" />
+
+  <!-- Central Glow -->
+  <circle cx="300" cy="220" r="180" fill="url(#grad-core)" />
+
+  <!-- Title Section -->
+  <text x="300" y="45" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, Tahoma" font-size="24" font-weight="900" letter-spacing="1">FUZZ ENGINE ARCHITECTURE</text>
+  <text x="300" y="65" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="10" letter-spacing="4">INSTRUMENTED MUTATION PIPELINE</text>
+
+  <!-- 1. Selection Stage (Left) -->
+  <g transform="translate(40, 140)">
+    <rect width="130" height="160" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
+    <text x="65" y="25" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="11" font-weight="900">1. SELECTION</text>
+    
+    <rect x="15" y="45" width="100" height="30" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+    <text x="65" y="64" text-anchor="middle" fill="#3b82f6" font-family="monospace" font-size="10">Corpus[0]</text>
+    
+    <rect x="15" y="85" width="100" height="30" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+    <text x="65" y="104" text-anchor="middle" fill="#3b82f6" font-family="monospace" font-size="10">Corpus[1]</text>
+    
+    <text x="65" y="145" text-anchor="middle" fill="#334155" font-family="Segoe UI" font-size="9" font-style="italic">Picking Seed...</text>
+  </g>
+
+  <!-- 2. Mutation Core (Center) -->
+  <g transform="translate(240, 160)">
+    <!-- Rotating Ring Effect (Static SVG version) -->
+    <circle cx="60" cy="60" r="75" fill="none" stroke="url(#grad-gold-stroke)" stroke-width="2" stroke-dasharray="20,10" filter="url(#neon-gold)">
+      <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="20s" repeatCount="indefinite" />
+    </circle>
+    
+    <circle cx="60" cy="60" r="55" fill="#0f172a" stroke="#f59e0b" stroke-width="4" />
+    <text x="60" y="58" text-anchor="middle" fill="#fbbf24" font-family="Segoe UI" font-size="14" font-weight="900">MUTATE</text>
+    <text x="60" y="72" text-anchor="middle" fill="#d97706" font-family="Segoe UI" font-size="8" font-weight="bold">BIT-FLIP</text>
+    
+    <!-- Mutation Tags -->
+    <text x="-30" y="0" fill="#f59e0b" font-family="Segoe UI" font-size="8" font-weight="bold" opacity="0.6">Arithmetic</text>
+    <text x="120" y="20" fill="#f59e0b" font-family="Segoe UI" font-size="8" font-weight="bold" opacity="0.6">Keywords</text>
+    <text x="40" y="140" fill="#f59e0b" font-family="Segoe UI" font-size="8" font-weight="bold" opacity="0.6">Dictionary</text>
+  </g>
+
+  <!-- 3. Validation Stage (Right) -->
+  <g transform="translate(430, 100)">
+    <rect width="140" height="240" rx="12" fill="#0f172a" stroke="#334155" />
+    <text x="70" y="25" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="11" font-weight="900">2. EXECUTION</text>
+
+    <!-- Normal Case -->
+    <rect x="15" y="45" width="110" height="40" rx="6" fill="#064e3b" stroke="#10b981" />
+    <text x="25" y="63" fill="#34d399" font-family="monospace" font-size="10">"A\x00B"</text>
+    <text x="120" y="70" text-anchor="end" fill="#10b981" font-family="Segoe UI" font-size="8">PASS</text>
+
+    <!-- Edge Case -->
+    <rect x="15" y="100" width="110" height="40" rx="6" fill="#1e1b4b" stroke="#6366f1" />
+    <text x="25" y="118" fill="#818cf8" font-family="monospace" font-size="10">"\xff\xff"</text>
+    <text x="120" y="125" text-anchor="end" fill="#6366f1" font-family="Segoe UI" font-size="8">+ NEW PATH</text>
+
+    <!-- Crash Case -->
+    <rect x="15" y="155" width="110" height="60" rx="6" fill="#450a0a" stroke="#ef4444" filter="url(#neon-gold)" />
+    <text x="70" y="180" text-anchor="middle" fill="#fca5a5" font-family="monospace" font-size="10" font-weight="bold">BUG DETECTED!</text>
+    <text x="70" y="195" text-anchor="middle" fill="#ef4444" font-family="Segoe UI" font-size="8" font-weight="bold">PANIC: index out of range</text>
+  </g>
+
+  <!-- Connection Lines (Cyber Style) -->
+  <path d="M 170 220 L 230 220" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <path d="M 370 220 L 430 220" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-gold)" />
+
+  <!-- Feedback Loop -->
+  <path d="M 500 100 Q 500 20 300 20 Q 105 20 105 140" stroke="#10b981" stroke-width="1.5" stroke-dasharray="10,5" marker-end="url(#arrow-green)" />
+  <text x="300" y="15" text-anchor="middle" fill="#10b981" font-family="Segoe UI" font-size="10" font-weight="bold" filter="url(#neon-gold)">ENERGY-SAVING FEEDBACK: CORPUS ENLARGEMENT</text>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+
+  <!-- Data Stream Text (Decoration) -->
+  <text x="20" y="380" fill="#1e293b" font-family="monospace" font-size="8">01011101010101101010101010110101010101</text>
+  <text x="20" y="390" fill="#1e293b" font-family="monospace" font-size="8">11101010101111010101011110101010101101</text>
+</svg>

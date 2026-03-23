@@ -33,6 +33,8 @@ Lihat pembuktian kode fungsional di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Table-Driven Expansion](./assets/table-driven-expansion.svg)
+
 ### Table-Driven Flow
 ```mermaid
 graph TD

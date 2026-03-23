@@ -1,5 +1,7 @@
 # SR-02: Testing & Quality Excellence
 
+![Testing Quality Hero](./assets/hero-testing-quality.png)
+
 ## Overview
 Modul ini mentransformasi paradigma pengujian Anda dari sekadar "menjalankan kode" menjadi "menjamin arsitektur dan kualitas produksi". Kita akan mengeksplorasi teknik pengujian Go dari tingkat dasar hingga standar industri modern.
 
