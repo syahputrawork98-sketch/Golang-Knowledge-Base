@@ -1,0 +1,47 @@
+<svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#eef2f7" rx="10"/>
+  
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold" fill="#2c3e50">Defer Mechanism (LIFO Stack)</text>
+
+  <!-- Function Flow -->
+  <line x1="100" y1="80" x2="100" y2="380" stroke="#00ADD8" stroke-width="4" marker-end="url(#flow-arrow)"/>
+  <text x="120" y="100" font-family="Arial" font-size="14" fill="#00ADD8" font-weight="bold">Function Entry</text>
+  <text x="120" y="380" font-family="Arial" font-size="14" fill="#00ADD8" font-weight="bold">Function Return</text>
+
+  <!-- Defer Registration -->
+  <text x="110" y="150" font-family="Arial" font-size="12" fill="#333">1. defer CloseDB()</text>
+  <path d="M120 155 L350 155" stroke="#ccc" stroke-dasharray="4,2"/>
+  
+  <text x="110" y="220" font-family="Arial" font-size="12" fill="#333">2. defer CloseFile()</text>
+  <path d="M120 225 L350 225" stroke="#ccc" stroke-dasharray="4,2"/>
+
+  <text x="110" y="290" font-family="Arial" font-size="12" fill="#333">3. defer LogFinish()</text>
+  <path d="M120 295 L350 295" stroke="#ccc" stroke-dasharray="4,2"/>
+
+  <!-- The Stack -->
+  <rect x="400" y="100" width="250" height="300" fill="none" stroke="#2c3e50" stroke-width="3" rx="5"/>
+  <text x="525" y="420" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#2c3e50">DEFER STACK</text>
+  
+  <!-- Stack Items -->
+  <rect x="410" y="330" width="230" height="60" fill="#fff" stroke="#00ADD8" rx="5"/>
+  <text x="525" y="365" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">#1 CloseDB()</text>
+  
+  <rect x="410" y="260" width="230" height="60" fill="#fff" stroke="#00ADD8" rx="5"/>
+  <text x="525" y="295" text-anchor="middle" font-family="Arial" font-size="14" fill="#333">#2 CloseFile()</text>
+
+  <rect x="410" y="190" width="230" height="60" fill="#d1f2ff" stroke="#00ADD8" rx="5"/>
+  <text x="525" y="225" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#00ADD8">#3 LogFinish()</text>
+
+  <!-- Execution Arrow (Upwards) -->
+  <path d="M680 390 L680 200" fill="none" stroke="#e67e22" stroke-width="6" marker-end="url(#exec-arrow)"/>
+  <text x="690" y="300" font-family="Arial" font-size="16" font-weight="bold" fill="#e67e22" writing-mode="vertical-rl">EXECUTION ORDER</text>
+
+  <defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#00ADD8" />
+    </marker>
+    <marker id="exec-arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#e67e22" />
+    </marker>
+  </defs>
+</svg>

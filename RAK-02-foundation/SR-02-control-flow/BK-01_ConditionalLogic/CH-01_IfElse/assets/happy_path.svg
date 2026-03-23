@@ -1,0 +1,41 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#f8f9fa" rx="10"/>
+  
+  <defs>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#28a745" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#dc3545" />
+    </marker>
+  </defs>
+
+  <!-- Left Column: Happy Path (Good) -->
+  <text x="150" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#28a745">Happy Path (Go Way)</text>
+  <path d="M150 70 L150 350" stroke="#28a745" stroke-width="4" stroke-dasharray="8,4" marker-end="url(#arrow-green)"/>
+  
+  <rect x="50" y="80" width="200" height="40" fill="#fff" stroke="#28a745" rx="5"/>
+  <text x="60" y="105" font-family="Arial" font-size="14">if err != nil { return }</text>
+  
+  <rect x="50" y="150" width="200" height="40" fill="#fff" stroke="#28a745" rx="5"/>
+  <text x="60" y="175" font-family="Arial" font-size="14">if val != ok { return }</text>
+  
+  <rect x="50" y="240" width="200" height="80" fill="#e8f5e9" stroke="#28a745" rx="5"/>
+  <text x="65" y="275" font-family="Arial" font-size="14" font-weight="bold">Main Logic Stays Left</text>
+  <text x="85" y="295" font-family="Arial" font-size="12">(Clean &amp; Flat)</text>
+
+  <!-- Right Column: Nested Hell (Bad) -->
+  <text x="550" y="40" font-family="Arial" font-size="18" font-weight="bold" fill="#dc3545">Nested Hell (Anti-Pattern)</text>
+  <path d="M550 70 L550 110 L600 110 L600 150 L650 150 L650 250" fill="none" stroke="#dc3545" stroke-width="4" marker-end="url(#arrow-red)"/>
+  
+  <rect x="450" y="80" width="200" height="40" fill="#fff" stroke="#dc3545" rx="5"/>
+  <text x="460" y="105" font-family="Arial" font-size="14">if err == nil {</text>
+  
+  <rect x="500" y="140" width="200" height="40" fill="#fff" stroke="#dc3545" rx="5"/>
+  <text x="510" y="165" font-family="Arial" font-size="14">  if val == ok {</text>
+  
+  <rect x="550" y="200" width="200" height="80" fill="#ffebee" stroke="#dc3545" rx="5"/>
+  <text x="565" y="235" font-family="Arial" font-size="14" font-weight="bold">Main Logic Pushed Right</text>
+  <text x="595" y="255" font-family="Arial" font-size="12">(Hard to read)</text>
+</svg>

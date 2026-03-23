@@ -2,6 +2,9 @@
 
 > **"Defer is the elegant way to ensure resources are cleaned up, no matter how a function exits."**
 
+### Physical Representation (Premium Asset)
+![Defer LIFO Stack](./assets/defer_stack.svg)
+
 ---
 
 ## 1. Tahap 1: Source Alignments & Judul
@@ -50,6 +53,7 @@ graph TD
 Kapan argumen fitur `defer` dievaluasi?
 - **Penting**: Nilai argumen dalam fungsi `defer` dievaluasi **saat itu juga** (ketika `defer` dipanggil), bukan saat fungsi dijalankan di akhir.
 - **Detail Teknis**: Go compiler menyiapkan parameter fungsi `defer` pada saat pendaftaran. Ini berarti jika Anda mempassing variabel yang nilainya berubah nanti, fungsi `defer` akan tetap menggunakan nilai variabel saat `defer` didefinisikan.
+- **Open-coded Defer (Go 1.13+)**: Sejak Go 1.13, compiler mencoba mengoptimalkan `defer` menjadi instruksi inline jika memungkinkan (*open-coded*). Ini mengurangi overhead performa yang sebelumnya ada pada `defer` di versi Go lama, sehingga penggunaan `defer` kini hampir "gratis" di sebagian besar skenario.
 - **Heap vs Stack**: Go Runtime menyimpan daftar panggul defer dalam sebuah struktur link-list yang dikelola secara internal untuk memastikan integritas pemanggilan LIFO.
 
 ---

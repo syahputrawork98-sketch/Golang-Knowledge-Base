@@ -14,6 +14,8 @@
 ### Definisi ("Apa itu?")
 `for range` adalah varian khusus dari perulangan yang digunakan untuk mengekstrak elemen demi elemen dari tipe data koleksi (Slice, Array, Map, Channel, atau String) secara otomatis.
 
+### Physical Representation (Premium Asset)
+![Go 1.22 Loop Variable Fix](./assets/go122_fix.svg)
 ### Rasionalitas ("Why & How?")
 - **Safety & Clarity**: Menghapus kebutuhan untuk mengelola index secara manual (`i++`), yang seringkali menyebabkan bug *index out of bounds*.
 - **The Copy Behavior**: Secara default, `range` memberikan **salinan** dari nilai elemen, bukan alamatnya. Mengubah variabel iterasi tidak akan mengubah isi asli koleksi tersebut.

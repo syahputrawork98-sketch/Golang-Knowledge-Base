@@ -1,0 +1,60 @@
+<svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#fcfcfc" rx="10"/>
+  
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold" fill="#333">Loop Variable Evolution (Go 1.22)</text>
+
+  <!-- OLD Behavior -->
+  <rect x="50" y="80" width="340" height="340" fill="#fff0f0" stroke="#ff5c5c" rx="10"/>
+  <text x="220" y="110" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#ff5c5c">Legacy (Pre 1.22)</text>
+  
+  <!-- Shared Memory Slot -->
+  <rect x="120" y="150" width="200" height="50" fill="#fff" stroke="#ff5c5c" stroke-width="3"/>
+  <text x="220" y="180" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">Shared Variable 'v'</text>
+  
+  <!-- Pointers -->
+  <circle cx="100" cy="280" r="10" fill="#333"/>
+  <path d="M100 280 L200 190" stroke="#333" stroke-width="2" marker-end="url(#dot)"/>
+  <text x="70" y="310" font-family="Arial" font-size="12">G1</text>
+  
+  <circle cx="220" cy="280" r="10" fill="#333"/>
+  <path d="M220 280 L220 200" stroke="#333" stroke-width="2" marker-end="url(#dot)"/>
+  <text x="210" y="310" font-family="Arial" font-size="12">G2</text>
+
+  <circle cx="340" cy="280" r="10" fill="#333"/>
+  <path d="M340 280 L240 190" stroke="#333" stroke-width="2" marker-end="url(#dot)"/>
+  <text x="330" y="310" font-family="Arial" font-size="12">G3</text>
+  
+  <text x="220" y="350" text-anchor="middle" font-family="Arial" font-size="14" fill="#ff5c5c" font-style="italic">"Everyone points to the same box"</text>
+
+  <!-- NEW Behavior -->
+  <rect x="410" y="80" width="340" height="340" fill="#f0fff0" stroke="#28a745" rx="10"/>
+  <text x="580" y="110" text-anchor="middle" font-family="Arial" font-size="18" font-weight="bold" fill="#28a745">Modern (1.22+)</text>
+  
+  <!-- Individual Slots -->
+  <rect x="480" y="140" width="60" height="40" fill="#fff" stroke="#28a745" stroke-width="2"/>
+  <text x="510" y="165" text-anchor="middle" font-family="Arial" font-size="14">v1</text>
+  
+  <rect x="550" y="140" width="60" height="40" fill="#fff" stroke="#28a745" stroke-width="2"/>
+  <text x="580" y="165" text-anchor="middle" font-family="Arial" font-size="14">v2</text>
+  
+  <rect x="620" y="140" width="60" height="40" fill="#fff" stroke="#28a745" stroke-width="2"/>
+  <text x="650" y="165" text-anchor="middle" font-family="Arial" font-size="14">v3</text>
+
+  <!-- Pointers -->
+  <circle cx="510" cy="280" r="10" fill="#333"/>
+  <path d="M510 280 L510 180" stroke="#333" stroke-width="2"/>
+  
+  <circle cx="580" cy="280" r="10" fill="#333"/>
+  <path d="M580 280 L580 180" stroke="#333" stroke-width="2"/>
+
+  <circle cx="650" cy="280" r="10" fill="#333"/>
+  <path d="M650 280 L650 180" stroke="#333" stroke-width="2"/>
+  
+  <text x="580" y="350" text-anchor="middle" font-family="Arial" font-size="14" fill="#28a745" font-style="italic">"Each gets its own private box"</text>
+
+  <defs>
+    <marker id="dot" markerWidth="6" markerHeight="6" refX="3" refY="3">
+      <circle cx="3" cy="3" r="3" fill="#333" />
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,34 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#2c3e50" rx="10"/>
+  
+  <!-- CPU Pipeline -->
+  <text x="50" y="50" font-family="Arial" font-size="20" fill="#fff" font-weight="bold">CPU Branch Prediction (if A &amp;&amp; B)</text>
+  
+  <!-- Logic Gate -->
+  <rect x="350" y="150" width="100" height="100" fill="#34495e" stroke="#00ADD8" stroke-width="3" rx="10"/>
+  <text x="375" y="205" font-family="Arial" font-size="24" fill="#00ADD8" font-weight="bold">AND</text>
+  
+  <!-- Condition A -->
+  <circle cx="200" cy="150" r="40" fill="#e74c3c"/>
+  <text x="185" y="155" font-family="Arial" font-size="16" fill="#fff" font-weight="bold">FALSE</text>
+  <text x="180" y="210" font-family="Arial" font-size="14" fill="#fff">Condition A</text>
+  
+  <!-- Condition B (Speculative) -->
+  <circle cx="200" cy="250" r="40" fill="#95a5a6" stroke-dasharray="5,5" stroke="#fff"/>
+  <text x="165" y="255" font-family="Arial" font-size="12" fill="#fff">Not Checked</text>
+  <text x="180" y="310" font-family="Arial" font-size="14" fill="#fff">Condition B</text>
+  
+  <!-- Connector with "Stop" symbol -->
+  <line x1="240" y1="150" x2="350" y2="190" stroke="#e74c3c" stroke-width="4"/>
+  <circle cx="295" cy="170" r="15" fill="#fff" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="288" y1="163" x2="302" y2="177" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="302" y1="163" x2="288" y2="177" stroke="#e74c3c" stroke-width="3"/>
+  
+  <!-- Explanation -->
+  <rect x="500" y="120" width="250" height="160" fill="rgba(255,255,255,0.1)" stroke="#00ADD8" rx="10"/>
+  <text x="515" y="155" font-family="Arial" font-size="16" fill="#00ADD8" font-weight="bold">Short-Circuit Effect:</text>
+  <text x="515" y="185" font-family="Arial" font-size="14" fill="#fff">1. A is checked and found FALSE.</text>
+  <text x="515" y="210" font-family="Arial" font-size="14" fill="#fff">2. CPU skips B entirely.</text>
+  <text x="515" y="235" font-family="Arial" font-size="14" fill="#fff">3. Pipeline Stalls avoided.</text>
+  <text x="515" y="260" font-family="Arial" font-size="14" fill="#fff">4. Branches predicted early.</text>
+</svg>

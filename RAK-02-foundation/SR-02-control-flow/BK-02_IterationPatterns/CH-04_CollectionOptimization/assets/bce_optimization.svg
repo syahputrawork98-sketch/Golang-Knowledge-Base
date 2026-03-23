@@ -1,0 +1,43 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#fffef0" rx="10"/>
+  <text x="400" y="40" text-anchor="middle" font-family="Arial" font-size="22" font-weight="bold" fill="#333">BCE: Bounds Check Elimination</text>
+
+  <!-- Normal Check Case -->
+  <g transform="translate(50, 80)">
+    <rect width="340" height="280" fill="#fff" stroke="#ccc" rx="10"/>
+    <text x="170" y="30" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold">Unoptimized Loop</text>
+    
+    <rect x="20" y="60" width="300" height="40" fill="#f8f9fa" stroke="#dc3545" rx="5"/>
+    <text x="170" y="85" text-anchor="middle" font-family="Arial" font-size="12" fill="#dc3545">CHECK: is index &lt; length?</text>
+    
+    <rect x="20" y="110" width="300" height="40" fill="#e7f3ff" rx="5"/>
+    <text x="170" y="135" text-anchor="middle" font-family="Arial" font-size="12">Execute Instruction</text>
+    
+    <path d="M170 150 L170 200 L50 200 L50 70" fill="none" stroke="#ccc" marker-end="url(#arrow)"/>
+    <text x="100" y="190" font-family="Arial" font-size="10">Repeat N times</text>
+  </g>
+
+  <!-- Optimized Check Case -->
+  <g transform="translate(410, 80)">
+    <rect width="340" height="280" fill="#e8f5e9" stroke="#28a745" rx="10"/>
+    <text x="170" y="30" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#28a745">Optimized with BCE</text>
+    
+    <rect x="20" y="60" width="300" height="40" fill="#fff" stroke="#28a745" stroke-dasharray="5,5" rx="5"/>
+    <text x="170" y="85" text-anchor="middle" font-family="Arial" font-size="12" fill="#28a745">Bounds check removed (Redundant)</text>
+    
+    <rect x="20" y="110" width="300" height="80" fill="#fff" stroke="#28a745" rx="5"/>
+    <text x="170" y="150" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#28a745">Direct CPU Access</text>
+    <text x="170" y="170" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">(Pure Speed)</text>
+
+    <path d="M170 190 L170 240 L50 240 L50 120" fill="none" stroke="#28a745" stroke-width="2" marker-end="url(#arrow-green)"/>
+  </g>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#ccc" />
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#28a745" />
+    </marker>
+  </defs>
+</svg>

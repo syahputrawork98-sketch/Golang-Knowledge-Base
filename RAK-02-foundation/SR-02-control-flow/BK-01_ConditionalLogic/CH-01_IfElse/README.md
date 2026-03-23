@@ -14,7 +14,8 @@
 ### Definisi ("Apa itu?")
 `if` adalah struktur kontrol kondisional paling dasar di Go yang mengeksekusi blok kode hanya jika ekspresi boolean di dalamnya bernilai `true`. Go tidak menggunakan tanda kurung `()` di sekitar kondisi, namun mewajibkan tanda kurung kurawal `{}`.
 
-### Rasionalitas ("Why & How?")
+### Physical Representation (Premium Asset)
+![Happy Path vs Nested Hell](./assets/happy_path.svg)
 - **Clean Namespace**: Go mendukung *short statement* sebelum kondisi (e.g., `if err := call(); err != nil`). Ini memungkinkan kita mendeklarasikan variabel sementara yang hanya hidup di dalam blok `if`, menjaga agar *namespace* fungsi tidak dikotori oleh variabel yang tidak diperlukan di tempat lain.
 - **Early Return Pattern**: Senior Go Engineer lebih memilih pola "Happy Path on the Left", di mana kondisi error ditangani secepat mungkin (early return) untuk menjaga agar logika utama tetap rata di sisi kiri identasi.
 
@@ -44,6 +45,7 @@ graph TD
 ## 4. Tahap 4: Mekanisme Pembuktian (Scoped Initialization)
 
 Bagaimana Go mengelola variabel di dalam `if`?
+- **Cyclomatic Complexity**: Sebagai senior engineer, kita menggunakan `if` secara bijak untuk menjaga skor kompleksitas kode tetap rendah. Pola `if-else if-else` yang terlalu dalam meningkatkan risiko bug karena setiap tingkat percabangan menambah beban kognitif saat membaca kode.
 - **Lexical Block**: Variabel yang dideklarasikan di bagian *initialization* `if` (misal: `if v := get(); ...`) memiliki scope yang mencakup seluruh blok `if` beserta `else if` atau `else` terkait.
 - **Detail Teknis**: Begitu program keluar dari seluruh struktur `if/else`, variabel `v` akan segera dihapus dari visibilitas *stack frame*, membebaskan memori lebih cepat dan mencegah bug "salah variabel" di baris selanjutnya.
 
