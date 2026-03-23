@@ -1,0 +1,35 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="#f8fafc" rx="10"/>
+  
+  <!-- INTERFACE (The Contract) -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="220" height="200" fill="#ffffff" stroke="#6366f1" stroke-width="4" rx="10"/>
+    <text x="110" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#6366f1">INTERFACE (CONTRACT)</text>
+    
+    <!-- Method Slots -->
+    <rect x="25" y="70" width="170" height="35" fill="#e0e7ff" rx="5" stroke="#4338ca" stroke-dasharray="3"/>
+    <text x="110" y="92" font-family="Arial" font-size="12" text-anchor="middle" fill="#4338ca">Move() string</text>
+    
+    <rect x="25" y="115" width="170" height="35" fill="#e0e7ff" rx="5" stroke="#4338ca" stroke-dasharray="3"/>
+    <text x="110" y="137" font-family="Arial" font-size="12" text-anchor="middle" fill="#4338ca">Stop()</text>
+  </g>
+  
+  <!-- Connection Bridge -->
+  <path d="M 270 150 L 330 150" stroke="#94a3b8" stroke-width="3" stroke-dasharray="5"/>
+  <text x="300" y="135" font-family="Arial" font-size="12" text-anchor="middle" fill="#64748b">IMPLICIT</text>
+
+  <!-- IMPLEMENTOR (The Reality) -->
+  <g transform="translate(330, 50)">
+    <rect x="0" y="0" width="220" height="200" fill="#ffffff" stroke="#10b981" stroke-width="4" rx="10"/>
+    <text x="110" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle" fill="#10b981">CONCRETE STRUCT</text>
+    
+    <!-- Implementation Keys -->
+    <rect x="25" y="70" width="170" height="35" fill="#dcfce7" rx="5" stroke="#059669"/>
+    <text x="110" y="92" font-family="Arial" font-size="12" text-anchor="middle" fill="#059669">Move() string { ... }</text>
+    
+    <rect x="25" y="115" width="170" height="35" fill="#dcfce7" rx="5" stroke="#059669"/>
+    <text x="110" y="137" font-family="Arial" font-size="12" text-anchor="middle" fill="#059669">Stop() { ... }</text>
+  </g>
+
+  <text x="300" y="280" font-family="Arial" font-size="18" font-weight="bold" text-anchor="middle" fill="#6366f1">PLATINUM GOLD STANDARD: STRUCTURAL TYPING</text>
+</svg>

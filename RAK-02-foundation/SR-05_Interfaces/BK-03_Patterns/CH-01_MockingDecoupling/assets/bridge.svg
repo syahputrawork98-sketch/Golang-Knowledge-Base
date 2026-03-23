@@ -1,0 +1,39 @@
+<svg width="600" height="300" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="300" fill="#f8fafc" rx="10"/>
+  
+  <!-- CONSUMER (Top Level) -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="180" height="80" fill="#ffffff" stroke="#6366f1" stroke-width="3" rx="8"/>
+    <text x="90" y="45" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#6366f1">Business Logic (Service)</text>
+  </g>
+
+  <!-- INTERFACE (The Bridge) -->
+  <g transform="translate(230, 110)">
+    <rect x="0" y="0" width="140" height="80" fill="#e0e7ff" stroke="#4338ca" stroke-width="2" rx="40"/>
+    <text x="70" y="45" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#4338ca">INTERFACE</text>
+  </g>
+
+  <!-- PRODUCERS (Bottom Level) -->
+  <g transform="translate(400, 40)">
+    <rect x="0" y="0" width="150" height="60" fill="#ffffff" stroke="#10b981" stroke-width="2" rx="5"/>
+    <text x="75" y="35" font-family="Arial" font-size="12" text-anchor="middle" fill="#10b981">Real SQL Database</text>
+  </g>
+  
+  <g transform="translate(400, 180)">
+    <rect x="0" y="0" width="150" height="60" fill="#ffffff" stroke="#f59e0b" stroke-width="2" rx="5"/>
+    <text x="75" y="35" font-family="Arial" font-size="12" text-anchor="middle" fill="#f59e0b">In-Memory Mock</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 140 130 Q 140 150 230 150" fill="none" stroke="#6366f1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M 370 150 Q 475 150 475 100" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+  <path d="M 370 150 Q 475 150 475 180" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orientation="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6366f1" />
+    </marker>
+  </defs>
+
+  <text x="300" y="270" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1e293b">INVERSION OF CONTROL: "Depend on Abstractions, not Concretions"</text>
+</svg>

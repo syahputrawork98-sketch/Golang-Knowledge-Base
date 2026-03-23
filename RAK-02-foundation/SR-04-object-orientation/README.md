@@ -12,8 +12,5 @@ Dasar pendefinisian data dan perilaku (behavior).
 ### 2. [BK-02: Composition & Embedding](./BK-02_CompositionEmbedding/README.md)
 Membangun sistem yang kompleks melalui penggabungan komponen, bukan warisan.
 
-### 3. [BK-03: Interfaces](./BK-03_Interfaces/README.md)
-Abstraksi dan polimorfisme melalui kontrak implisit.
-
 ---
 *Status: [ ] In Progress (Gold Standard - PPM V4)*
