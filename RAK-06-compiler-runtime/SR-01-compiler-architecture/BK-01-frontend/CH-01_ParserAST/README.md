@@ -18,10 +18,15 @@ Teks resep adalah **Source Code**. Mata dan otak Anda (**Parser**) membaca teks 
 
 ---
 
-## 2. Visualisasi Sistem (Mermaid)
+## 2. Visualisasi Sistem (Mermaid & SVG)
 
+### Struktur Pohon (SVG)
+![Visualisasi: Struktur Hierarki Abstract Syntax Tree (AST)](./assets/ast_tree.svg)
+
+### Alur Kerja (Mermaid)
 ```mermaid
 graph TD
+
     SC[Source Code] -->|Lexing| TK[Tokens]
     TK -->|Parsing| AST[Abstract Syntax Tree]
     

@@ -1,0 +1,29 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  
+  <!-- Root Node -->
+  <rect x="250" y="20" width="120" height="40" rx="5" fill="#2f3542" stroke="#2f3542"/>
+  <text x="265" y="45" font-family="Arial" font-size="14" fill="white" font-weight="bold">File Node</text>
+  
+  <!-- Func Decl -->
+  <path d="M 310 60 L 310 100" stroke="#718093" stroke-width="2"/>
+  <rect x="230" y="100" width="160" height="40" rx="5" fill="#ffa502" stroke="#eccc68"/>
+  <text x="250" y="125" font-family="Arial" font-size="14" font-weight="bold">FuncDecl: main</text>
+  
+  <!-- Body -->
+  <path d="M 310 140 L 310 180" stroke="#718093" stroke-width="2"/>
+  <rect x="250" y="180" width="120" height="40" rx="5" fill="#7bed9f" stroke="#2ed573"/>
+  <text x="270" y="205" font-family="Arial" font-size="14" font-weight="bold">BlockStmt</text>
+  
+  <!-- Call Expr -->
+  <path d="M 310 220 L 200 280" stroke="#718093" stroke-width="2"/>
+  <path d="M 310 220 L 420 280" stroke="#718093" stroke-width="2"/>
+  
+  <rect x="130" y="280" width="140" height="40" rx="5" fill="#1e90ff" stroke="#2f3542"/>
+  <text x="150" y="305" font-family="Arial" font-size="14" fill="white">Ident: println</text>
+  
+  <rect x="350" y="280" width="140" height="40" rx="5" fill="#ffffff" stroke="#ced4da"/>
+  <text x="375" y="305" font-family="Arial" font-size="14">BasicLit: "Hi"</text>
+  
+  <text x="50" y="380" font-family="Arial" font-size="12" font-style="italic" fill="#7f8c8d">Visualisasi: Struktur Hierarki Abstract Syntax Tree (AST)</text>
+</svg>

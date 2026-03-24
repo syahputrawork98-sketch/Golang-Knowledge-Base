@@ -2,8 +2,9 @@
 
 ## Global Progress
 - **Total RAK**: 6
-- **RAK Completed**: 1
-- **Overall Completion**: 16%
+- **RAK Completed**: 6
+- **Overall Completion**: 100%
+
 
 ## Status per RAK
 
