@@ -1,0 +1,31 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  
+  <!-- HChan Struct -->
+  <rect x="50" y="50" width="200" height="250" rx="5" fill="#2c3e50" stroke="#34495e" stroke-width="2"/>
+  <text x="80" y="40" font-family="Arial" font-size="16" font-weight="bold">hchan struct</text>
+  
+  <text x="65" y="80" font-family="Courier" font-size="12" fill="white">qcount: 2</text>
+  <text x="65" y="105" font-family="Courier" font-size="12" fill="white">dataqsiz: 5</text>
+  <text x="65" y="130" font-family="Courier" font-size="12" fill="#7bed9f">buf: ptr --&gt;</text>
+  <text x="65" y="155" font-family="Courier" font-size="12" fill="white">sendx: 2</text>
+  <text x="65" y="180" font-family="Courier" font-size="12" fill="white">recvx: 0</text>
+  <text x="65" y="205" font-family="Courier" font-size="12" fill="#ff4757">sendq: sudog list</text>
+  <text x="65" y="230" font-family="Courier" font-size="12" fill="#1e90ff">recvq: sudog list</text>
+  
+  <!-- Circular Buffer -->
+  <text x="350" y="40" font-family="Arial" font-size="16" font-weight="bold">Circular Buffer</text>
+  <g transform="translate(300, 70)">
+    <circle cx="100" cy="100" r="80" fill="none" stroke="#bdc3c7" stroke-width="20"/>
+    <rect x="90" y="20" width="20" height="25" fill="#4cd137"/>
+    <rect x="155" y="50" width="25" height="20" fill="#4cd137" transform="rotate(45 167, 60)"/>
+    <text x="85" y="105" font-family="Arial" font-size="10">Data 1</text>
+    <text x="145" y="90" font-family="Arial" font-size="10">Data 2</text>
+  </g>
+  
+  <!-- Waiting Queues -->
+  <rect x="300" y="280" width="250" height="40" rx="5" fill="#dfe4ea" stroke="#ced4da"/>
+  <text x="310" y="305" font-family="Arial" font-size="12">Send Queue (Blocked Goroutines)</text>
+  
+  <text x="50" y="380" font-family="Arial" font-size="12" font-style="italic" fill="#7f8c8d">Visualisasi: Go Channel Internal Structure (HChan)</text>
+</svg>

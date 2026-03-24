@@ -1,0 +1,39 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f5f6fa"/>
+  
+  <!-- Jobs Channel -->
+  <rect x="50" y="150" width="150" height="60" rx="10" fill="#2f3640" stroke="#191d21" stroke-width="2"/>
+  <text x="75" y="185" font-family="Arial" font-size="14" fill="white" font-weight="bold">Jobs Channel</text>
+  
+  <!-- Workers -->
+  <g transform="translate(350, 50)">
+    <rect width="150" height="60" rx="5" fill="#fbc531" stroke="#e1b12c"/>
+    <text x="45" y="35" font-family="Arial" font-size="14" font-weight="bold">Worker 1</text>
+  </g>
+  <g transform="translate(350, 150)">
+    <rect width="150" height="60" rx="5" fill="#fbc531" stroke="#e1b12c"/>
+    <text x="45" y="35" font-family="Arial" font-size="14" font-weight="bold">Worker 2</text>
+  </g>
+  <g transform="translate(350, 250)">
+    <rect width="150" height="60" rx="5" fill="#fbc531" stroke="#e1b12c"/>
+    <text x="45" y="35" font-family="Arial" font-size="14" font-weight="bold">Worker 3</text>
+  </g>
+  
+  <!-- Connections -->
+  <path d="M 200 180 L 340 80" stroke="#487eb0" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 200 180 L 340 180" stroke="#487eb0" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 200 180 L 340 280" stroke="#487eb0" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#487eb0" />
+    </marker>
+  </defs>
+  
+  <!-- Data Packets -->
+  <rect x="220" y="120" width="30" height="20" fill="#4cd137"/>
+  <rect x="260" y="145" width="30" height="20" fill="#4cd137"/>
+  <rect x="230" y="220" width="30" height="20" fill="#4cd137"/>
+  
+  <text x="50" y="380" font-family="Arial" font-size="12" font-style="italic" fill="#718093">Visualisasi: Worker Pool Mechanics (Job Distribution)</text>
+</svg>
