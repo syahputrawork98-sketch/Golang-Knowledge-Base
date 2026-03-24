@@ -33,6 +33,8 @@ Lihat teknik manajemen lifecycle di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Test Lifecycle](./assets/test-lifecycle.svg)
+
 ### Test Lifecycle Overview
 ```mermaid
 graph TD

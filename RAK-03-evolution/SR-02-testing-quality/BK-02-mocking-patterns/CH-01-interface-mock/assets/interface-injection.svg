@@ -1,0 +1,56 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0d9488;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="600" height="400" fill="#020617" rx="16"/>
+  <text x="300" y="42" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI" font-size="22" font-weight="900">Interface Injection Pattern</text>
+  <text x="300" y="64" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="12" letter-spacing="2">DEPENDENCY DECOUPLING FOR TESTABILITY</text>
+
+  <!-- Interface Contract (center) -->
+  <rect x="210" y="160" width="180" height="80" rx="10" fill="url(#grad-teal)" filter="url(#glow)"/>
+  <text x="300" y="193" text-anchor="middle" fill="white" font-family="Segoe UI" font-size="14" font-weight="bold">Interface</text>
+  <text x="300" y="212" text-anchor="middle" fill="#ccfbf1" font-family="monospace" font-size="11">Repository</text>
+  <text x="300" y="228" text-anchor="middle" fill="#99f6e4" font-family="monospace" font-size="9">Save(u User) error</text>
+
+  <!-- Service layer -->
+  <rect x="210" y="80" width="180" height="55" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="300" y="105" text-anchor="middle" fill="#818cf8" font-family="Segoe UI" font-size="13" font-weight="bold">Service Logic</text>
+  <text x="300" y="125" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">Accepts Interface, not concrete type</text>
+  <path d="M 300 135 L 300 160" stroke="#6366f1" stroke-width="2" marker-end="url(#ap)"/>
+
+  <!-- Real impl left -->
+  <rect x="30" y="280" width="180" height="80" rx="10" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="306" text-anchor="middle" fill="#3b82f6" font-family="Segoe UI" font-size="13" font-weight="bold">Production</text>
+  <text x="120" y="325" text-anchor="middle" fill="#60a5fa" font-family="monospace" font-size="11">SQLRepository</text>
+  <text x="120" y="345" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">Hits real database</text>
+  <path d="M 210 200 Q 120 200 120 280" stroke="#3b82f6" stroke-width="2" fill="none" stroke-dasharray="4" marker-end="url(#ab)"/>
+  <text x="155" y="245" fill="#3b82f6" font-family="Segoe UI" font-size="9">satisfies</text>
+
+  <!-- Mock impl right -->
+  <rect x="390" y="280" width="180" height="80" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+  <text x="480" y="306" text-anchor="middle" fill="#f59e0b" font-family="Segoe UI" font-size="13" font-weight="bold">Test / Mock</text>
+  <text x="480" y="325" text-anchor="middle" fill="#fde68a" font-family="monospace" font-size="11">MockRepository</text>
+  <text x="480" y="345" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">Returns controlled data</text>
+  <path d="M 390 200 Q 480 200 480 280" stroke="#f59e0b" stroke-width="2" fill="none" stroke-dasharray="4" marker-end="url(#ay)"/>
+  <text x="420" y="245" fill="#f59e0b" font-family="Segoe UI" font-size="9">satisfies</text>
+
+  <defs>
+    <marker id="ap" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#6366f1"/>
+    </marker>
+    <marker id="ab" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#3b82f6"/>
+    </marker>
+    <marker id="ay" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+</svg>

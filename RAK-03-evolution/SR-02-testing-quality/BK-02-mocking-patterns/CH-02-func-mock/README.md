@@ -30,6 +30,8 @@ Lihat teknik mocking fungsional di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Functional Mocking](./assets/func-mock-pattern.svg)
+
 ### Functional Mocking Flow
 ```mermaid
 graph LR

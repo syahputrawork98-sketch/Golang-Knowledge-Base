@@ -1,0 +1,56 @@
+<svg width="600" height="380" viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#c2410c;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="600" height="380" fill="#020617" rx="16"/>
+  <text x="300" y="42" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI" font-size="22" font-weight="900">Functional Mocking Pattern</text>
+  <text x="300" y="64" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="12" letter-spacing="2">HIGHER-ORDER FUNCTION DEPENDENCY INJECTION</text>
+
+  <!-- Service struct -->
+  <rect x="190" y="90" width="220" height="90" rx="10" fill="#0f172a" stroke="#6366f1" stroke-width="2"/>
+  <text x="300" y="118" text-anchor="middle" fill="#818cf8" font-family="Segoe UI" font-size="14" font-weight="bold">Service</text>
+  <rect x="210" y="130" width="180" height="35" rx="6" fill="#1e293b"/>
+  <text x="300" y="152" text-anchor="middle" fill="#94a3b8" font-family="monospace" font-size="11">SaveFn func(s string) error</text>
+
+  <!-- Production side -->
+  <rect x="30" y="240" width="200" height="100" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+  <text x="130" y="270" text-anchor="middle" fill="#34d399" font-family="Segoe UI" font-size="13" font-weight="bold">Production</text>
+  <rect x="50" y="285" width="160" height="40" rx="6" fill="#022c22"/>
+  <text x="130" y="305" text-anchor="middle" fill="#6ee7b7" font-family="monospace" font-size="10">SaveFn = realDB.Save</text>
+  <text x="130" y="325" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">→ Writes to real DB</text>
+
+  <!-- Test side -->
+  <rect x="370" y="240" width="200" height="100" rx="10" fill="#0f172a" stroke="#f97316" stroke-width="2"/>
+  <text x="470" y="270" text-anchor="middle" fill="#fb923c" font-family="Segoe UI" font-size="13" font-weight="bold">Test</text>
+  <rect x="390" y="285" width="160" height="40" rx="6" fill="#431407"/>
+  <text x="470" y="305" text-anchor="middle" fill="#fdba74" font-family="monospace" font-size="10">SaveFn = func(s string)</text>
+  <text x="470" y="325" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">→ Returns controlled error</text>
+
+  <!-- Arrows from Service -->
+  <path d="M 230 180 Q 130 180 130 240" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#ag)"/>
+  <text x="145" y="215" fill="#10b981" font-family="Segoe UI" font-size="9">real fn()</text>
+
+  <path d="M 370 180 Q 470 180 470 240" stroke="#f97316" stroke-width="2" fill="none" marker-end="url(#ao)"/>
+  <text x="395" y="215" fill="#f97316" font-family="Segoe UI" font-size="9">mock fn()</text>
+
+  <!-- t.Cleanup note -->
+  <rect x="190" y="350" width="220" height="24" rx="6" fill="#1e293b" stroke="#64748b"/>
+  <text x="300" y="367" text-anchor="middle" fill="#64748b" font-family="Segoe UI" font-size="9">Use t.Cleanup to restore original fn after test</text>
+
+  <defs>
+    <marker id="ag" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#10b981"/>
+    </marker>
+    <marker id="ao" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#f97316"/>
+    </marker>
+  </defs>
+</svg>

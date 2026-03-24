@@ -1,0 +1,76 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="grad-pulse" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#020617;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="#020617" rx="16" />
+  <circle cx="300" cy="200" r="150" fill="url(#grad-pulse)" />
+
+  <text x="300" y="45" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, Tahoma" font-size="22" font-weight="900">pprof Performance Profiling</text>
+  <text x="300" y="65" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="12" letter-spacing="2">RUNTIME INSPECTION &amp; SAMPLING</text>
+
+  <!-- Go Runtime Container -->
+  <g transform="translate(50, 100)">
+    <rect width="200" height="240" rx="12" fill="#0f172a" stroke="#3b82f6" stroke-width="2" filter="url(#glow)" />
+    <text x="100" y="30" text-anchor="middle" fill="#3b82f6" font-family="Segoe UI" font-size="14" font-weight="bold">GO RUNTIME</text>
+    
+    <!-- Code Blocks -->
+    <rect x="30" y="60" width="140" height="30" rx="4" fill="#1e293b" stroke="#34d399" />
+    <text x="40" y="78" fill="#34d399" font-family="monospace" font-size="10">func simulateWork()</text>
+    <rect x="30" y="100" width="140" height="30" rx="4" fill="#1e293b" stroke="#f59e0b" />
+    <text x="40" y="118" fill="#f59e0b" font-family="monospace" font-size="10">func simulateAlloc()</text>
+
+    <!-- Sampling Pulse -->
+    <circle cx="100" cy="180" r="15" fill="#ef4444" opacity="0.5">
+      <animate attributeName="r" values="5;25;5" dur="1.5s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.5s" repeatCount="indefinite" />
+    </circle>
+    <text x="100" y="220" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="9">SIGPROF Sampling (100Hz)</text>
+  </g>
+
+  <!-- Profile Files -->
+  <g transform="translate(320, 140)">
+    <rect x="0" y="0" width="80" height="100" rx="4" fill="#1e293b" stroke="#94a3b8" />
+    <text x="40" y="45" text-anchor="middle" fill="#fca5a5" font-family="Segoe UI" font-size="14" font-weight="bold">CPU</text>
+    <text x="40" y="65" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="9">.pprof</text>
+    
+    <rect x="100" y="40" width="80" height="100" rx="4" fill="#1e293b" stroke="#94a3b8" />
+    <text x="140" y="85" text-anchor="middle" fill="#93c5fd" font-family="Segoe UI" font-size="14" font-weight="bold">HEAP</text>
+    <text x="140" y="105" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="9">.pprof</text>
+  </g>
+
+  <!-- Output UI -->
+  <g transform="translate(350, 270)">
+    <rect width="180" height="80" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+    <text x="90" y="30" text-anchor="middle" fill="#10b981" font-family="Segoe UI" font-size="12" font-weight="bold">GO TOOL PPROF (Web UI)</text>
+    <!-- Mini Flamegraph Bars -->
+    <rect x="20" y="45" width="140" height="6" fill="#ef4444" rx="1" />
+    <rect x="20" y="54" width="80" height="6" fill="#f59e0b" rx="1" />
+    <rect x="105" y="54" width="55" height="6" fill="#10b981" rx="1" />
+    <rect x="20" y="63" width="40" height="6" fill="#3b82f6" rx="1" />
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 250 200 L 310 200" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 240 L 400 260" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)" />
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+</svg>

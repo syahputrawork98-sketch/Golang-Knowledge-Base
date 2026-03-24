@@ -30,6 +30,8 @@ Lihat deteksi bug konkuren di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Race Detection](./assets/race-detection.svg)
+
 ### Race Detection Flow
 ```mermaid
 graph TD

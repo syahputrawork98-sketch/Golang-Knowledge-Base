@@ -31,6 +31,8 @@ Lihat cara visualisasi coverage di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Coverage Pipeline](./assets/coverage-pipeline.svg)
+
 ### Coverage Pipeline
 ```mermaid
 graph LR

@@ -32,6 +32,8 @@ Lihat teknik pemisahan dependensi di [examples/](./examples/).
 
 ## 4. Model Mental Visual (The Assets)
 
+![Interface Injection](./assets/interface-injection.svg)
+
 ### Interface Injection Pattern
 ```mermaid
 graph LR
