@@ -1,0 +1,29 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  
+  <!-- Old Stack -->
+  <rect x="50" y="50" width="120" height="150" fill="#dfe4ea" stroke="#ced4da" stroke-width="2"/>
+  <text x="55" y="40" font-family="Arial" font-size="12" font-weight="bold">Old Stack (2KB)</text>
+  <rect x="60" y="70" width="100" height="30" fill="#7bed9f" stroke="#2ed573"/>
+  <text x="65" y="90" font-family="Arial" font-size="10">Func A Frame</text>
+  
+  <!-- Copy Arrow -->
+  <path d="M 170 120 L 260 120" stroke="#ff4757" stroke-width="3" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="180" y="110" font-family="Arial" font-size="12" fill="#ff4757" font-weight="bold">Copy & Adjust</text>
+  
+  <!-- New Stack -->
+  <rect x="280" y="50" width="120" height="230" fill="#dfe4ea" stroke="#ced4da" stroke-width="2"/>
+  <text x="285" y="40" font-family="Arial" font-size="12" font-weight="bold">New Stack (4KB)</text>
+  <rect x="290" y="70" width="100" height="30" fill="#7bed9f" stroke="#2ed573"/>
+  <text x="295" y="90" font-family="Arial" font-size="10">Migrated Frame</text>
+  <rect x="290" y="105" width="100" height="30" fill="#1e90ff" stroke="#2f3542"/>
+  <text x="295" y="125" font-family="Arial" font-size="10" fill="white">New Func B Frame</text>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff4757" />
+    </marker>
+  </defs>
+  
+  <text x="50" y="280" font-family="Arial" font-size="12" font-style="italic" fill="#7f8c8d">Visualisasi: Mekanisme Stack Copying (Dynamic Resizing)</text>
+</svg>

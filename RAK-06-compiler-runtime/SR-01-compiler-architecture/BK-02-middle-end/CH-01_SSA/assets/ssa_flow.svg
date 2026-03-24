@@ -1,0 +1,37 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f8f9fa"/>
+  
+  <!-- AST -->
+  <rect x="20" y="100" width="100" height="60" rx="5" fill="#e1b12c" stroke="#cc9f27"/>
+  <text x="50" y="135" font-family="Arial" font-size="14" font-weight="bold" fill="white">AST</text>
+  
+  <!-- Lowering -->
+  <path d="M 120 130 L 180 130" stroke="#718093" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="125" y="120" font-family="Arial" font-size="10">Lowering</text>
+  
+  <!-- SSA Raw -->
+  <rect x="190" y="50" width="180" height="180" rx="5" fill="#ffffff" stroke="#ced4da"/>
+  <text x="250" y="40" font-family="Arial" font-size="12" font-weight="bold">SSA IR (Raw)</text>
+  <text x="200" y="80" font-family="Courier" font-size="10">v1 = Arg: x</text>
+  <text x="200" y="100" font-family="Courier" font-size="10">v2 = Arg: y</text>
+  <text x="200" y="120" font-family="Courier" font-size="10">v3 = Add64 v1 v2</text>
+  
+  <!-- Optimization -->
+  <path d="M 370 130 L 430 130" stroke="#44bd32" stroke-width="2" marker-end="url(#arrow_green)"/>
+  <text x="375" y="120" font-family="Arial" font-size="10" fill="#44bd32">Opt Passes</text>
+  
+  <!-- Optimized Code -->
+  <rect x="440" y="100" width="140" height="60" rx="5" fill="#2f3542" stroke="#2f3542"/>
+  <text x="460" y="135" font-family="Arial" font-size="14" font-weight="bold" fill="white">Machine Code</text>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#718093" />
+    </marker>
+    <marker id="arrow_green" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#44bd32" />
+    </marker>
+  </defs>
+  
+  <text x="50" y="270" font-family="Arial" font-size="12" font-style="italic" fill="#7f8c8d">Visualisasi: Transformasi AST ke SSA dan Kode Mesin</text>
+</svg>

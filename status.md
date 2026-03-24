@@ -17,7 +17,8 @@
 
 | RAK-05 | Standard Library | 100% | 100/100 | ✅ Complete |
 
-| RAK-06 | Compiler & Runtime | 0% | 0/100 | ⚪ Planned |
+| RAK-06 | Compiler & Runtime | 100% | 100/100 | ✅ Complete |
+
 
 ## Log Perubahan (Changelog)
 - **2026-03-24**: Refactoring total ke struktur 6-Rak untuk pembersihan residu boilerplate JS dan penyelarasan standar.
