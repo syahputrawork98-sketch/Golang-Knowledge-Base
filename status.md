@@ -11,7 +11,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | RAK-01 | Anatomy | 100% | 100/100 | ✅ Complete |
 | RAK-02 | Foundation | 100% | 100/100 | ✅ Complete |
-| RAK-03 | Evolution | 20% | 20/100 | 🔵 In Progress |
+| RAK-03 | Evolution | 40% | 40/100 | 🔵 In Progress |
 | RAK-04 | Core Mechanics | 0% | 0/100 | ⚪ Planned |
 | RAK-05 | Standard Library | 0% | 0/100 | ⚪ Planned |
 | RAK-06 | Compiler & Runtime | 0% | 0/100 | ⚪ Planned |

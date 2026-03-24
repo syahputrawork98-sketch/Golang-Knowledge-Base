@@ -34,7 +34,7 @@
 - CH-02: Race Detection in CI/CD.
 - CH-03: Coverage Analysis & Enforcement.
 
-### [SR-04: Advanced Concurrency Patterns]
+### [SR-03: Advanced Concurrency Patterns]
 **BK-01: Low-Level Sync Primitives**
 - CH-01: `sync.Once` & `sync.OnceFunc` (Safe initialization).
 - CH-02: `sync.Pool` (Combating Garbage Collector pressure).
@@ -48,7 +48,7 @@
 - CH-02: `errgroup` (Concurrent error handling).
 - CH-03: `singleflight` (Preventing Cache Stampede).
 
-### [SR-03: Runtime Observability & Optimization]
+### [SR-04: Runtime Observability & Optimization]
 **BK-01: Profiling & Tracing**
 - CH-01: `pprof` (CPU, Memory, Block, Mutex profiling).
 - CH-02: `go tool trace` (Visualizing Goroutine latency).
