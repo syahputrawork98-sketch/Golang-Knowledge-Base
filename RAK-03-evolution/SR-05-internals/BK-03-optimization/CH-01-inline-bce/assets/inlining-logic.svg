@@ -1,0 +1,61 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="#020617" rx="16" />
+  
+  <text x="300" y="45" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, Tahoma" font-size="22" font-weight="900">Go Compiler Inlining Logic</text>
+  <text x="300" y="65" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="12" letter-spacing="2">STATIC ANALYSIS &amp; FUNCTION INTEGRATION</text>
+
+  <!-- Level 1: Source Code -->
+  <g transform="translate(50, 100)">
+    <rect width="180" height="120" rx="10" fill="#0f172a" stroke="#3b82f6" stroke-width="2" />
+    <text x="90" y="25" text-anchor="middle" fill="#3b82f6" font-family="Segoe UI" font-size="12" font-weight="bold">Source Code</text>
+    <rect x="20" y="40" width="140" height="60" rx="4" fill="#1e293b" />
+    <text x="30" y="60" fill="#f8fafc" font-family="monospace" font-size="8">func main() {</text>
+    <text x="40" y="75" fill="#f59e0b" font-family="monospace" font-size="8">  Add(1, 2)</text>
+    <text x="30" y="90" fill="#f8fafc" font-family="monospace" font-size="8">}</text>
+  </g>
+
+  <!-- Decision Point -->
+  <g transform="translate(260, 130)">
+    <rect x="0" y="0" width="80" height="60" rx="4" fill="#020617" stroke="#10b981" transform="rotate(45, 40, 30)" />
+    <text x="40" y="25" text-anchor="middle" fill="#10b981" font-family="Segoe UI" font-size="10" font-weight="bold">Budget OK?</text>
+    <text x="40" y="45" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="8">(Complexity)</text>
+  </g>
+
+  <!-- Level 2: Inlined Code -->
+  <g transform="translate(400, 100)">
+    <rect width="180" height="120" rx="10" fill="#065f46" stroke="#10b981" stroke-width="2" filter="url(#glow)" />
+    <text x="90" y="25" text-anchor="middle" fill="#10b981" font-family="Segoe UI" font-size="12" font-weight="bold">Optimized Output</text>
+    <rect x="20" y="40" width="140" height="60" rx="4" fill="#022c22" />
+    <text x="30" y="60" fill="#f8fafc" font-family="monospace" font-size="8">func main() {</text>
+    <text x="40" y="75" fill="#34d399" font-family="monospace" font-size="8">  1 + 2 // Inlined!</text>
+    <text x="30" y="90" fill="#f8fafc" font-family="monospace" font-size="8">}</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 230 160 L 265 160" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow-blue)" />
+  <path d="M 345 160 L 400 160" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)" />
+  
+  <text x="315" y="260" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="10">No Function Call Overhead</text>
+  <text x="315" y="275" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="10">No Stack Pushing/Popping</text>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+  </defs>
+</svg>

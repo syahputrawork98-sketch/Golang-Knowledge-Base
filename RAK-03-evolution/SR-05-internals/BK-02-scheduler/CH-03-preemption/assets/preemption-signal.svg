@@ -1,0 +1,63 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="#020617" rx="16" />
+  
+  <text x="300" y="45" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, Tahoma" font-size="22" font-weight="900">Asynchronous Preemption (SIGURG)</text>
+  <text x="300" y="65" text-anchor="middle" fill="#475569" font-family="Segoe UI" font-size="12" letter-spacing="2">GO 1.14+ SCHEDULER MECHANICS</text>
+
+  <!-- Sysmon: The Watcher -->
+  <g transform="translate(50, 120)">
+    <rect width="120" height="180" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+    <text x="60" y="30" text-anchor="middle" fill="#10b981" font-family="Segoe UI" font-size="14" font-weight="bold">SYSMON</text>
+    <text x="60" y="50" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI" font-size="9">(System Monitor)</text>
+    
+    <rect x="20" y="80" width="80" height="60" rx="4" fill="#1e293b" />
+    <path d="M 40 110 L 80 110" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow-gold)" />
+    <text x="60" y="100" text-anchor="middle" fill="#f59e0b" font-family="Segoe UI" font-size="9" font-weight="bold">Check > 10ms</text>
+  </g>
+
+  <!-- Signaling Path -->
+  <path d="M 170 210 L 250 210" stroke="#f8fafc" stroke-width="2" stroke-dasharray="8,4" marker-end="url(#arrow-red)" />
+  <text x="210" y="200" text-anchor="middle" fill="#ef4444" font-family="monospace" font-size="10" font-weight="bold">SIGURG</text>
+
+  <!-- OS Thread being Preempted -->
+  <g transform="translate(280, 120)">
+    <rect width="220" height="180" rx="12" fill="#450a0a" stroke="#ef4444" stroke-width="2" filter="url(#glow)" />
+    <text x="110" y="30" text-anchor="middle" fill="#fca5a5" font-family="Segoe UI" font-size="14" font-weight="bold">M (Running GREEDY G)</text>
+    
+    <rect x="20" y="60" width="180" height="40" rx="4" fill="#020617" stroke="#ef4444" stroke-width="1.5" />
+    <text x="110" y="85" text-anchor="middle" fill="#ef4444" font-family="monospace" font-size="10">FOR { I++ } // Hogging</text>
+
+    <!-- Signal Handler -->
+    <rect x="20" y="110" width="180" height="50" rx="4" fill="#1e293b" />
+    <text x="110" y="130" text-anchor="middle" fill="#3b82f6" font-family="Segoe UI" font-size="10" font-weight="bold">Signal Handler Triggers</text>
+    <path d="M 40 145 H 160" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <!-- Re-scheduling -->
+  <path d="M 500 210 Q 550 210 550 150 Q 550 90 400 90" stroke="#3b82f6" stroke-width="2" fill="none" stroke-dasharray="5,5" marker-end="url(#arrow-blue)" />
+  <text x="500" y="90" fill="#3b82f6" font-family="Segoe UI" font-size="10">Reschedule G</text>
+
+  <!-- Markers -->
+  <defs>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+  </defs>
+</svg>
