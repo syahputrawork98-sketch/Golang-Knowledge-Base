@@ -15,7 +15,8 @@
 | RAK-04 | Core Mechanics | 100% | 100/100 | ✅ Complete |
 
 
-| RAK-05 | Standard Library | 0% | 0/100 | ⚪ Planned |
+| RAK-05 | Standard Library | 100% | 100/100 | ✅ Complete |
+
 | RAK-06 | Compiler & Runtime | 0% | 0/100 | ⚪ Planned |
 
 ## Log Perubahan (Changelog)

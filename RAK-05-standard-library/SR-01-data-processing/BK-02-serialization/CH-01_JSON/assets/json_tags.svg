@@ -1,0 +1,33 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f1f2f6"/>
+  
+  <!-- Go Struct -->
+  <rect x="20" y="50" width="220" height="180" rx="5" fill="#2f3542" stroke="#2f3542" stroke-width="2"/>
+  <text x="40" y="40" font-family="Arial" font-size="16" font-weight="bold">Go Struct</text>
+  
+  <text x="40" y="80" font-family="Courier" font-size="14" fill="#7bed9f">type User struct {</text>
+  <text x="60" y="110" font-family="Courier" font-size="14" fill="white">ID int `json:"id"`</text>
+  <text x="60" y="140" font-family="Courier" font-size="14" fill="white">Name string `json:"name"`</text>
+  <text x="40" y="170" font-family="Courier" font-size="14" fill="#7bed9f">}</text>
+  
+  <!-- Mapping Arrows -->
+  <path d="M 240 105 L 350 105" stroke="#ff4757" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#red_arrow)"/>
+  <path d="M 240 135 L 350 135" stroke="#ff4757" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#red_arrow)"/>
+  
+  <!-- JSON Output -->
+  <rect x="360" y="50" width="220" height="180" rx="5" fill="#ffffff" stroke="#ced4da" stroke-width="2"/>
+  <text x="380" y="40" font-family="Arial" font-size="16" font-weight="bold">JSON Format</text>
+  
+  <text x="380" y="80" font-family="Courier" font-size="14" fill="#2f3542">{</text>
+  <text x="400" y="110" font-family="Courier" font-size="14" fill="#ff4757">"id": 1,</text>
+  <text x="400" y="140" font-family="Courier" font-size="14" fill="#ff4757">"name": "Gopher"</text>
+  <text x="380" y="170" font-family="Courier" font-size="14" fill="#2f3542">}</text>
+  
+  <defs>
+    <marker id="red_arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff4757" />
+    </marker>
+  </defs>
+  
+  <text x="50" y="270" font-family="Arial" font-size="12" font-style="italic" fill="#57606f">Visualisasi: Pemetaan Struct Tags ke JSON</text>
+</svg>

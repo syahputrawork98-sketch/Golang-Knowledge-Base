@@ -1,0 +1,34 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f1f2f6"/>
+  
+  <!-- Plaintext -->
+  <rect x="50" y="100" width="100" height="100" fill="#ffffff" stroke="#ced4da" rx="5"/>
+  <text x="65" y="155" font-family="Arial" font-size="14">Plaintext</text>
+  
+  <!-- AES Block -->
+  <rect x="230" y="100" width="140" height="100" fill="#2f3542" stroke="#2f3542" rx="10"/>
+  <text x="250" y="155" font-family="Arial" font-size="16" fill="white" font-weight="bold">AES Block</text>
+  
+  <!-- Key -->
+  <path d="M 300 30 L 300 90" stroke="#ffa502" stroke-width="4" marker-end="url(#key_arrow)"/>
+  <text x="270" y="25" font-family="Arial" font-size="14" fill="#ffa502" font-weight="bold">Secret Key</text>
+  
+  <!-- Ciphertext -->
+  <rect x="450" y="100" width="100" height="100" fill="#747d8c" stroke="#2f3542" rx="5"/>
+  <text x="460" y="155" font-family="Arial" font-size="14" fill="white">Ciphertext</text>
+  
+  <!-- Arrows -->
+  <path d="M 150 150 L 220 150" stroke="#2f3542" stroke-width="2" marker-end="url(#black_arrow)"/>
+  <path d="M 370 150 L 440 150" stroke="#2f3542" stroke-width="2" marker-end="url(#black_arrow)"/>
+  
+  <defs>
+    <marker id="key_arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ffa502" />
+    </marker>
+    <marker id="black_arrow" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2f3542" />
+    </marker>
+  </defs>
+  
+  <text x="50" y="270" font-family="Arial" font-size="12" font-style="italic" fill="#7f8c8d">Visualisasi: Mekanisme AES Block Cipher</text>
+</svg>
