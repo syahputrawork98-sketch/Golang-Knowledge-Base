@@ -28,13 +28,14 @@ Semua pekerjaan wajib merujuk secara mutlak pada dokumen standar di folder `docs
 ---
 
 ## 🏅 3. Ringkasan "Gold Standard" & PPM V4
-*(Berdasarkan `workflow.md` & `architecture.md`)*
-Setiap `README.md` (Tahap Inti) **WAJIB** memuat 5 bagian ini:
-1. **Header & Source Link**: Tautan akurasi ke referensi resmi (Go Spec/Go Tour) & Judul Metafora/Analogi.
-2. **Tahap 1 & 2 (Konsep, Esensi & Rasionalitas)**: Definisi formal, Model Mental (Analogi), "Why & How", serta Terminologi Teknis.
-3. **Tahap 4 (Visualisasi)**: Diagram Mermaid (Aliran Eksekusi/Call Stack/Goroutine).
-4. **Mekanisme & Hubungan**: Jabaran algoritma detil di balik layar eksekusi kompilator/runtime Go.
-5. **Tahap 3 (Lab Praktis)**: Penjelasan yang terhubung ke **multi-file .go** di folder `examples/`.
+Setiap `README.md` (Tahap Inti) **WAJIB** memuat 7 bagian ini:
+1. **Source Link**: Referensi sumber primer (Official Docs).
+2. **Brief & Detailed Explanation**: Penjelasan singkat diikuti penjelasan mendalam.
+3. **Analogy**: Penggunaan analogi untuk mempermudah pamahaman.
+4. **Mermaid Diagram**: Visualisasi (Flowchart, Sequence, ERD, dll).
+5. **Under-the-hood Mechanics**: Mekanisme internal (Bagaimana ia bekerja di level rendah).
+6. **Practical Lab**: Contoh kode yang bisa dijalankan (examples/).
+7. **Pitfalls & Anti-Patterns**: Jebakan umum dan praktik buruk.
 
 *Pengecualian ("Nil Content")*: Jika materi murni naratif awal (sejarah/filosofi), letakkan teks eksplisit penafian lab praktis sesuai aturan di `workflow.md`.
 
