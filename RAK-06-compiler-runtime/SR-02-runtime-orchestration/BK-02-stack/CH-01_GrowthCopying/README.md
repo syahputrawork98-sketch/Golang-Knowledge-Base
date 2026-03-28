@@ -1,49 +1,58 @@
-# CH-01: Stack Growth & Copying (Dynamic Execution)
+# CH-01: Stack Growth and Copying
 
-> **Source Link**: [Go Runtime: Stack Management](https://github.com/golang/go/blob/master/src/runtime/stack.go) | [Go Blog: Contiguous Stacks](https://blog.golang.org/contiguity)
+> **Source Link**: [runtime/stack.go](https://go.dev/src/runtime/stack.go) | [Go Blog: Contiguous stacks](https://go.dev/blog/contiguous-stacks)
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+## Tahap 1: Konsep dan Intuisi
 
-### Definisi ("Apa itu?")
-Stack Management Go adalah mekanisme di mana setiap Goroutine dimulai dengan stack yang sangat kecil (2KB) dan secara dinamis akan tumbuh (*Growth*) atau dipindahkan (*Copying*) ke blok memori baru saat fungsinya membutuhkan ruang lebih besar.
+### Apa itu?
+Setiap goroutine di Go dimulai dengan stack kecil. Saat kebutuhan frame fungsi bertambah, runtime dapat menumbuhkan stack itu dan memindahkan isinya ke blok memori yang lebih besar.
 
-### Rasionalitas ("Why & How?")
-1. **Concurrency Scalability**: Memungkinkan jutaan Goroutine aktif tanpa menghabiskan bandwidth memori (Thread OS biasa butuh 2MB per thread).
-2. **Deep Recursion Safe**: Tidak seperti bahasa lain yang akan terkena *Stack Overflow*, Go akan terus melipatgandakan ukuran stack hingga batas memory sistem.
-3. **Contiguous Layout**: Menjamin performa akses cache CPU yang optimal karena data stack tetap berada dalam blok memori tunggal yang berurutan.
+### Kenapa desain ini dipakai?
+Kalau setiap goroutine langsung diberi stack besar seperti thread OS tradisional, memori akan cepat habis. Go memilih pendekatan stack kecil yang bisa tumbuh supaya concurrency tetap murah.
 
-### Analogi Model Mental
-Bayangkan **Tas Lipat Kolapsibel**.
-Awalnya tas Anda kecil (2KB) karena hanya membawa dompet. Saat Anda membeli banyak oleh-oleh (Fungsi rekursif), tas tersebut otomatis **Memuai** menjadi koper. Jika sudah penuh, tas tersebut tidak robek, melainkan isinya dipindahkan dengan cepat ke **Brankas Besar (Blok Memori Baru)** yang sudah disiapkan oleh petugas hotel (Runtime).
+### Analogi singkat
+Bayangkan koper lipat:
+- awalnya kecil supaya ringan dibawa;
+- saat isi bertambah, koper dipindahkan ke ukuran yang lebih besar;
+- barangnya tetap sama, hanya wadahnya yang berubah.
 
----
+## Tahap 2: Visualisasi Sistem
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+### Mekanisme copying
+![Visualisasi: Mekanisme stack copying](./assets/stack_copy.svg)
 
-### Mekanisme Copying (SVG)
-![Visualisasi: Mekanisme Stack Copying (Dynamic Resizing)](./assets/stack_copy.svg)
-
-### Alur Resizing (Mermaid)
+### Alur pertumbuhan stack
 ```mermaid
 graph TD
-
-    S1[Initial Stack: 2KB] -->|Need More| GC[Stack Guard Check]
-    GC -->|Overflow| NEW[Allocate 4KB]
-    NEW -->|Copy| MOV[Move Old Stack Data]
-    MOV -->|Update| PTR[Adjust All Pointers]
+    S1[Stack kecil] --> C[Guard check]
+    C --> G[Perlu ruang lebih besar]
+    G --> N[Alokasi stack baru]
+    N --> M[Salin frame lama]
+    M --> U[Perbarui referensi internal]
 ```
 
+## Tahap 3: Mekanisme Internal
+
+Saat fungsi dipanggil, runtime memastikan sisa stack masih cukup. Jika tidak cukup, runtime masuk ke jalur pertumbuhan stack.
+
+Intinya:
+- stack goroutine disimpan kontigu;
+- saat penuh, runtime mengalokasikan area yang lebih besar;
+- data frame lama disalin ke area baru;
+- pointer internal yang relevan perlu tetap konsisten setelah pemindahan.
+
+Model ini membuat goroutine murah dibuat, tetapi juga berarti kita perlu memahami bahwa stack goroutine bukan blok statis yang ukurannya tetap dari awal sampai akhir.
+
+## Tahap 4: Lab Praktis
+
+Lihat folder [examples/](./examples) untuk percobaan berikut:
+- `01_stack_recursion.go`: menjalankan rekursi dalam untuk menunjukkan bahwa runtime dapat menumbuhkan stack goroutine secara dinamis.
+
+## Tahap 5: Ringkasan Praktis
+
+- Stack goroutine di Go kecil di awal, lalu tumbuh saat dibutuhkan.
+- Pertumbuhan stack membantu Go menjaga biaya concurrency tetap rendah.
+- Pemahaman ini penting saat membahas runtime, recursion dalam, dan perilaku fungsi yang intensif stack.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Setiap pemanggilan fungsi di Go diawali dengan *Stack Guard Check*. Jika sisa stack tidak cukup, runtime memanggil `runtime.newstack`. Karena data stack dipindahkan, Go harus menyesuaikan semua pointer yang menunjuk ke data di stack lama agar menunjuk ke alamat baru. Inilah alasan mengapa Go tidak mengizinkan pointer tetap menunjuk ke stack yang sudah didealokasikan (berbeda dengan C).
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_stack_recursion.go`: Mengamati pertumbuhan stack melalui fungsi rekursif dalam dan tracing runtime.
-- `02_pointer_escape_stack.go`: Membuktikan bagaimana pointer tetap valid setelah stack dipindahkan.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

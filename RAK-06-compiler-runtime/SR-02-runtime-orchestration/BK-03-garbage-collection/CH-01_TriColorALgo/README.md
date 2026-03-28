@@ -1,55 +1,56 @@
-# CH-01: Tri-color Algorithm (Garbage Collection)
+# CH-01: Tri-color Algorithm
 
-> **Source Link**: [Go Runtime: GC Design](https://github.com/golang/go/blob/master/src/runtime/mgc.go) | [Go Blog: Getting to Go (GC History)](https://blog.golang.org/ismmkeynote)
+> **Source Link**: [Go GC guide](https://go.dev/doc/gc-guide) | [runtime/mgc.go](https://go.dev/src/runtime/mgc.go)
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+## Tahap 1: Konsep dan Intuisi
 
-### Definisi ("Apa itu?")
-Algoritma Tri-color adalah mekanisme *Incremental Mark-and-Sweep* yang digunakan Go untuk mengidentifikasi objek yang masih digunakan (live) dan objek yang bisa dihapus dari memori tanpa menghentikan program dalam waktu lama (*Low Latency*).
+### Apa itu?
+Tri-color adalah model mental yang dipakai untuk menjelaskan bagaimana garbage collector membedakan objek yang masih perlu dipertahankan dari objek yang bisa dibersihkan.
 
-### Rasionalitas ("Why & How?")
-1. **Latency over Throughput**: Go mendesain GC untuk meminimalkan waktu jeda (*Stop-The-World*) agar aplikasi tetap responsif.
-2. **Concurrent Marking**: GC berjalan bersamaan dengan kode aplikasi (mutator), sehingga membutuhkan mekanisme status (Warna) untuk mendeteksi perubahan referensi data saat proses scanning.
+### Kenapa desain ini dipakai?
+Go ingin menjaga jeda GC tetap rendah. Karena itu, banyak pekerjaan marking dilakukan sambil program tetap berjalan. Model tri-color membantu runtime menjaga konsistensi saat collector dan program aktif bersamaan.
 
-### Analogi Model Mental
-Bayangkan **Membersihkan Gudang (Memori)** saat orang masih bekerja di dalamnya.
-- **Putih**: Barang yang belum diperiksa (Default: Calon sampah).
-- **Abu-abu**: Barang yang sudah ditandai "Penting" tapi isinya (referensinya) belum diperiksa.
-- **Hitam**: Barang yang sudah dipastikan "Penting" dan semua isinya juga sudah diperiksa.
-Tujuan akhir: Hapus semua barang yang tetap berwarna Putih.
+### Analogi singkat
+Bayangkan sedang memilah barang di gudang:
+- **putih**: belum dipastikan masih dibutuhkan;
+- **abu-abu**: sudah ditemukan penting, tapi isi atau referensinya belum ditelusuri penuh;
+- **hitam**: sudah aman, dan relasinya sudah diperiksa.
 
----
+## Tahap 2: Visualisasi Sistem
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+### Status objek
+![Visualisasi: Status objek dalam tri-color GC](./assets/gctricolor.svg)
 
-### Status Object (SVG)
-![Visualisasi: Status Object dalam Algoritma Tri-color GC](./assets/gctricolor.svg)
-
-### Alur Kerja (Mermaid)
+### Alur kerja umum
 ```mermaid
 graph LR
-
-    H[Black: Reachable] --> G[Grey: Scanning]
-    G --> W[White: Unreachable/Candidate]
-    
-    subgraph Process
-        direction TB
-        S1[Iterative Marking]
-        S2[Write Barrier Protection]
-    end
+    W[White] --> G[Grey]
+    G --> B[Black]
+    B --> S[Sweep white objects]
 ```
 
+## Tahap 3: Mekanisme Internal
+
+Secara sederhana, prosesnya berjalan seperti ini:
+- runtime mulai dari root yang diketahui masih hidup;
+- objek yang ditemukan masuk ke status abu-abu;
+- collector menelusuri referensi dari objek abu-abu lalu menghitamkannya;
+- objek yang tetap putih sampai akhir fase marking menjadi kandidat untuk dibersihkan.
+
+Saat marking berjalan bersamaan dengan program, runtime memakai **write barrier** agar perubahan referensi baru tidak membuat objek hidup terlewat dari proses penandaan.
+
+Model ini menyederhanakan banyak detail implementasi nyata, tetapi cukup tepat untuk memahami arah kerja GC Go.
+
+## Tahap 4: Lab Praktis
+
+Lihat folder [examples/](./examples) untuk percobaan berikut:
+- `01_gc_trace.go`: memicu GC dan membaca statistik memori, lalu bisa dijalankan bersama `GODEBUG=gctrace=1` untuk melihat trace collector.
+
+## Tahap 5: Ringkasan Praktis
+
+- Tri-color membantu menjelaskan fase marking dalam GC Go.
+- Tujuan utamanya bukan throughput maksimum, tetapi jeda yang lebih terkendali untuk aplikasi umum.
+- Write barrier penting agar marking tetap aman saat program masih terus memodifikasi heap.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menggunakan **Write Barrier** saat GC berjalan. Jika aplikasi mencoba mengubah referensi pointer objek Hitam ke objek Putih, Write Barrier akan mengubah objek Putih tersebut menjadi Abu-abu agar tidak terhapus secara tidak sengaja. Proses ini memastikan integritas data dalam lingkungan multi-threaded yang berjalan paralel dengan kolektor sampah.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_gc_trace.go`: Memantau perilaku GC menggunakan variabel lingkungan `GODEBUG=gctrace=1`.
-- `02_mem_allocation.go`: Simulasi alokasi masif untuk memicu GC Pacing.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

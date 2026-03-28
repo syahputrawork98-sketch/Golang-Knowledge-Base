@@ -1,42 +1,56 @@
-# CH-01: Code Generation & ABI (Compiler Backend)
+# CH-01: Code Generation and ABI Basics
 
-> **Source Link**: [Go Compiler: Architecture](https://github.com/golang/go/blob/master/src/cmd/compile/README.md) | [Go ABI: Spec](https://github.com/golang/go/blob/master/src/cmd/compile/internal-abi.md)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [compiler README](https://github.com/golang/go/blob/master/src/cmd/compile/README.md) | [internal ABI notes](https://github.com/golang/go/blob/master/src/cmd/compile/internal/abi/README.md)
+- **Framing**: Setelah optimisasi selesai, compiler masih punya satu tugas besar: menurunkan representasi internal ke bentuk yang bisa dipahami mesin dan toolchain akhir.
 
-### Definisi ("Apa itu?")
-Code Generation adalah tahap akhir kompilasi di mana instruksi SSA yang sudah dioptimalkan diterjemahkan menjadi kode mesin biner spesifik untuk arsitektur target (seperti x86-64 atau ARM64).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Instruction Selection**: Memilih instruksi CPU yang paling efisien untuk menjalankan logika SSA.
-2. **Calling Convention (ABI)**: Mengatur bagaimana fungsi dipanggil, argumen dilewatkan (melalui register vs stack), dan nilai dikembalikan. Go menggunakan ABI internal berbasis register sejak v1.17 untuk meningkatkan performa.
-3. **Relocation**: Menentukan alamat memori akhir untuk simbol-simbol dalam program.
+### Definisi
+Code generation adalah tahap saat representasi compiler yang sudah siap diterjemahkan menjadi assembly atau bentuk rendah lain yang kemudian dirakit dan dilink menjadi binary. Di tahap ini, aturan ABI juga penting karena menentukan bagaimana fungsi saling memanggil.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Compiler akhirnya harus berbicara dalam bahasa mesin**  
+   Program Go tidak berhenti di representasi internal.
+2. **ABI menentukan kontrak pemanggilan fungsi**  
+   Argumen, nilai balik, dan register atau stack usage harus konsisten.
+3. **Backend menjembatani abstraksi dan eksekusi nyata**  
+   Di sinilah hasil kerja frontend dan middle-end benar-benar dipersiapkan untuk dijalankan.
 
 ### Analogi Model Mental
-Bayangkan **Penerjemah Bahasa Teknis**.
-SSA adalah "Bahasa Inggris Teknik" yang universal. Namun, mesin pabrik di Jepang (**x86**) dan Jerman (**ARM**) mengerti bahasa yang berbeda. **CodeGen** adalah penerjemah yang mengubah instruksi umum "Potong Besi" menjadi "Gunakan pisau nomor 5 dengan kecepatan 400rpm" (Instruksi mesin spesifik).
+Kalau frontend menulis blueprint dan middle-end mengoptimalkan alur produksi, backend adalah tahap saat instruksi akhir diberikan ke mesin pabrik dalam format yang benar-benar bisa dieksekusi.
 
----
+### Terminologi Teknis
+- **Code Generation**: proses menurunkan IR ke instruksi rendah.
+- **ABI**: aturan pemanggilan fungsi dan layout interaksi antar komponen biner.
+- **Assembly Output**: bentuk rendah yang bisa diamati sebelum linking akhir.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph TD
-    SSA[Optimized SSA] -->|Arch Selector| ASM[Architecture Assembly]
-    ASM -->|Assembler| OBJ[Object File]
-    OBJ -->|Linker| EXE[Executable Binary]
+    SSA[Optimized SSA] --> CodeGen[Code generation]
+    CodeGen --> ASM[Assembly]
+    ASM --> Object[Object file]
+    Object --> Binary[Linked executable]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Backend memilih bentuk instruksi yang sesuai untuk arsitektur target lalu menyiapkan data agar cocok dengan aturan ABI yang dipakai toolchain. Untuk pembaca repositori ini, yang penting bukan menghafal semua detail register, tetapi memahami bahwa tahap akhir compiler sangat dipengaruhi oleh target architecture dan kontrak pemanggilan fungsi.
+
+Nilai praktisnya:
+- membantu pembaca melihat hubungan antara output compiler dan binary final;
+- menjelaskan kenapa assembly output bisa dipakai sebagai jendela belajar backend;
+- memberi fondasi sebelum masuk ke runtime behavior yang memakai hasil binary itu.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_asm_output.go](./examples/01_asm_output.go) - Fungsi kecil yang bisa dipakai bersama `go tool compile -S` untuk melihat keluaran assembly dasar.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menggunakan sistem *Abstract Assembly* yang kemudian diturunkan ke instruksi mesin spesifik. Backend kompilator Go dirancang untuk kompilasi yang sangat cepat. Penentuan alokasi register dilakukan pada tahap ini menggunakan algoritma *Regalloc* untuk memastikan data penting tetap berada di dalam CPU semaksimal mungkin.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_asm_output.go`: Melihat hasil kompilasi Go ke instruksi Assembly mesin (menggunakan `go tool compile -S`).
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

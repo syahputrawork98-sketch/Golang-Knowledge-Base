@@ -1,52 +1,59 @@
-# CH-01: JSON Encoding (Serialization)
+# CH-01: `encoding/json` for Structured Data Exchange
 
-> **Source Link**: [Go Packages: encoding/json](https://golang.org/pkg/encoding/json/) | [Go Blog: JSON and Go](https://blog.golang.org/json)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [encoding/json package](https://pkg.go.dev/encoding/json) | [JSON and Go](https://go.dev/blog/json)
+- **Framing**: `encoding/json` adalah pintu masuk utama saat aplikasi Go perlu bertukar data dengan sistem lain dalam format teks yang mudah dibaca manusia.
 
-### Definisi ("Apa itu?")
-Pakat `encoding/json` adalah alat standar Go untuk melakukan *Marshaling* (konversi Struct ke JSON) dan *Unmarshaling* (konversi JSON ke Struct) menggunakan metadata *Struct Tags*.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Interoperability**: JSON adalah standar de-facto komunikasi API web.
-2. **Type Safety**: Memastikan data dinamis dari luar tetap memiliki tipe data yang jelas di dalam aplikasi Go.
-3. **Reflective Metadata**: Menggunakan *Reflect* secara internal untuk memetakan kunci JSON ke field Struct secara otomatis berdasarkan *tag*.
+### Definisi
+Paket `encoding/json` menangani marshaling dan unmarshaling antara nilai Go dan representasi JSON. Ia membaca struct tags, memetakan field, dan juga bisa bekerja dengan data yang strukturnya tidak sepenuhnya tetap.
+
+### Rasionalitas
+Paket ini penting karena:
+
+1. **JSON adalah format interoperabilitas paling umum**  
+   API, konfigurasi, dan payload eksternal sering memakai JSON.
+2. **Struct tags memberi kontrol terhadap output**  
+   Nama field, penghilangan field, dan perilaku serialisasi bisa diatur cukup rapi.
+3. **Ada jalur untuk data dinamis dan data terstruktur**  
+   Kita bisa memakai struct saat schema jelas, atau map/interface saat input lebih longgar.
 
 ### Analogi Model Mental
-Bayangkan **Paspor Internasional**.
-Struct Go Anda adalah identitas lokal Indonesia. **JSON** adalah format Paspor Internasional agar identitas Anda bisa dibaca oleh petugas di negara lain (Python, Node.js, dsb). Pakat `json` adalah **Kantor Imigrasi** yang menerjemahkan kartu identitas Anda ke buku paspor.
+Bayangkan formulir identitas yang harus diubah ke format internasional agar bisa dibaca sistem lain. Struct Go adalah data internal, sedangkan JSON adalah bentuk pertukaran yang disepakati bersama.
 
----
+### Terminologi Teknis
+- **Marshal**: mengubah nilai Go menjadi JSON.
+- **Unmarshal**: mengubah JSON menjadi nilai Go.
+- **Struct Tag**: metadata field yang membantu mengatur nama dan perilaku serialisasi.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Pemetaan Field (SVG)
-![Visualisasi: Pemetaan Struct Tags ke JSON](./assets/json_tags.svg)
+![JSON Tags](./assets/json_tags.svg)
 
-### Alur Kerja (Mermaid)
 ```mermaid
 graph TD
-
-    ST[Go Struct] -->|json.Marshal| JR[JSON Raw Bytes]
-    JR -->|json.Unmarshal| ST2[New Go Struct]
-    
-    subgraph Tags
-        T["`json:'id'`"]
-    end
-    ST --- T
+    Struct[Go struct] --> Marshal[json.Marshal]
+    Marshal --> Raw[JSON bytes]
+    Raw --> Unmarshal[json.Unmarshal]
+    Unmarshal --> Struct2[Go value]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat melakukan marshal, paket ini memeriksa field export dan struct tag untuk membentuk output JSON. Saat unmarshal, ia membaca key dari JSON lalu mencoba memetakannya ke field yang sesuai. Untuk aliran data besar atau streaming, `json.Encoder` dan `json.Decoder` memberi kontrol lebih baik daripada fungsi satu kali.
+
+Nilai praktisnya:
+- sangat sentral untuk web API dan konfigurasi;
+- membantu pembaca memahami trade-off antara struct ketat dan data dinamis;
+- menjadi fondasi natural sebelum masuk ke format data yang lebih rendah levelnya.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_basic_marshal.go](./examples/01_basic_marshal.go) - Marshal dan unmarshal dasar memakai struct tags.
+- [02_dynamic_json.go](./examples/02_dynamic_json.go) - Membaca JSON yang bentuknya lebih dinamis dengan `map[string]interface{}`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Proses `Marshal` melakukan inspeksi rekursif terhadap field struct. Field yang tidak memiliki tag akan menggunakan nama field asli. Field yang bersifat privat (huruf kecil) tidak akan diproses. Untuk efisiensi tinggi (Streaming), gunakan `json.Encoder` dan `json.Decoder` alih-alih `Marshal/Unmarshal` global.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_basic_marshal.go`: Konversi sederhana dengan struct tags.
-- `02_dynamic_json.go`: Menangani JSON yang tidak diketahui strukturnya menggunakan `map[string]interface{}`.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

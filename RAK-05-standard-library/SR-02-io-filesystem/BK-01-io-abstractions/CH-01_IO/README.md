@@ -1,54 +1,58 @@
-# CH-01: Reader & Writer (IO Abstractions)
+# CH-01: `io.Reader` and `io.Writer`
 
-> **Source Link**: [Go Packages: io](https://golang.org/pkg/io/) | [Go Blog: The Laws of Reflection (Implicit relevance to IO Interfaces)](https://blog.golang.org/laws-of-reflection)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [io package](https://pkg.go.dev/io)
+- **Framing**: Package `io` penting karena ia tidak sekadar memberi fungsi bantu, tetapi menetapkan kontrak paling dasar untuk aliran data di Go.
 
-### Definisi ("Apa itu?")
-Pakat `io` mendefinisikan interface dasar `Reader` dan `Writer` yang menjadi fondasi seluruh operasi input/output di Go, memungkinkan aliran data yang konsisten antar file, jaringan, hingga memori.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Composability**: Anda bisa membungkus `Reader` apa pun dengan enkripsi, kompresi, atau logging tanpa peduli sumber datanya.
-2. **Memory Efficiency**: Mendukung *Streaming* (baca per blok) sehingga aplikasi tidak perlu memuat file 10GB ke dalam RAM sekaligus.
-3. **Universal Contract**: Hampir semua pakat di Standlib menggunakan kontrak ini, membuat integrasi antar modul sangat mudah.
+### Definisi
+`io.Reader` dan `io.Writer` adalah interface dasar yang mewakili sumber dan tujuan data. Banyak package lain di Go dibangun di atas dua kontrak ini, sehingga file, buffer, network connection, dan stream lain bisa diperlakukan dengan pola yang seragam.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Composability jadi sangat kuat**  
+   Selama sebuah tipe memenuhi kontrak `Reader` atau `Writer`, ia bisa dipasang ke banyak utilitas standar.
+2. **Streaming lebih natural**  
+   Data tidak harus dimuat penuh ke memori sebelum diproses.
+3. **Fondasi package lain jadi lebih mudah dipahami**  
+   `bufio`, `net/http`, `os`, dan banyak area lain bergantung pada interface ini.
 
 ### Analogi Model Mental
-Bayangkan **Selang Air**.
-`Reader` adalah ujung selang yang menyedot air (data), dan `Writer` adalah ujung selang yang menyemprotkan air. Anda bisa menyambungkan selang dari tangki (File) ke ember (Jaringan) menggunakan sambungan standar (Interface). Anda tidak perlu tahu pompanya merek apa, selama diameter selangnya pas.
+Bayangkan selang air dengan ukuran sambungan yang sudah disepakati. Selama ujung pipa cocok, Anda bisa menghubungkan sumber dan tujuan apa pun tanpa peduli mereknya.
 
----
+### Terminologi Teknis
+- **Reader**: sumber yang mengisi buffer byte.
+- **Writer**: tujuan yang menerima buffer byte untuk ditulis.
+- **Streaming**: pemrosesan data bertahap tanpa harus memuat seluruh isi sekaligus.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Aliran Data (SVG)
-![Visualisasi: Aliran Data io.Reader dan io.Writer](./assets/io_flow.svg)
+![IO Flow](./assets/io_flow.svg)
 
-### Hirarki Interface (Mermaid)
 ```mermaid
 graph LR
-
-    S[Source: File/Net] --> R[io.Reader]
-    R -->|Read| B[Byte Buffer]
-    B -->|Write| W[io.Writer]
-    W --> D[Destination: File/Net]
-    
-    subgraph Utilities
-        C[io.Copy]
-        P[io.Pipe]
-    end
+    Source[Source data] --> Reader[io.Reader]
+    Reader --> Buffer[byte buffer]
+    Buffer --> Writer[io.Writer]
+    Writer --> Destination[Destination]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Method `Read(p []byte)` meminta caller menyediakan buffer lalu mengembalikan jumlah byte yang benar-benar terisi. Method `Write(p []byte)` melakukan kebalikannya. Desain ini memberi kontrol yang kuat terhadap alokasi memori dan membuat utilitas seperti `io.Copy` bisa bekerja di atas banyak tipe berbeda tanpa perlu tahu detail implementasinya.
+
+Nilai praktisnya:
+- membantu pembaca melihat Go sebagai ekosistem kontrak, bukan kumpulan package terpisah;
+- menjelaskan kenapa aliran data di Go terasa konsisten;
+- menjadi fondasi sebelum masuk ke buffering dan file management.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_custom_reader.go](./examples/01_custom_reader.go) - Reader kustom sederhana yang mengubah huruf kecil menjadi huruf besar sebelum diteruskan ke output.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Metode `Read(p []byte)` mengisi buffer `p` dan mengembalikan jumlah byte yang dibaca serta error (termasuk `io.EOF`). Desain ini memaksa pemanggil untuk mengalokasikan memori terlebih dahulu, memberikan kontrol penuh terhadap penggunaan RAM. `io.Copy` mengoptimalkan pemindahan data antar interface dengan menghindari buffer perantara jika memungkinkan.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_custom_reader.go`: Membuat filter teks sederhana dengan interface `Reader`.
-- `02_io_copy_stream.go`: Memindahkan data dari file ke standard output secara efisien.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

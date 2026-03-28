@@ -1,47 +1,56 @@
-# CH-02: Binary Encoding (Fixed Length)
+# CH-02: `encoding/binary` for Fixed-Size Data
 
-> **Source Link**: [Go Packages: encoding/binary](https://golang.org/pkg/encoding/binary/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [encoding/binary package](https://pkg.go.dev/encoding/binary)
+- **Framing**: `encoding/binary` dipakai saat data perlu dibaca atau ditulis sebagai urutan byte yang stabil, misalnya untuk header file, format fixed-size, atau protokol tingkat lebih rendah.
 
-### Definisi ("Apa itu?")
-Pakat `encoding/binary` menangani konversi antara angka (uint32, int64, dsb) dan urutan byte tetap, seringkali digunakan untuk format file biner atau protokol tingkat rendah.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Deterministic Size**: Berbeda dengan JSON yang ukurannya fleksibel (teks), binary encoding menjamin ukuran data yang tetap dan sangat kecil.
-2. **Endianness Control**: Memungkinkan pemilihan `BigEndian` atau `LittleEndian` untuk kompatibilitas antar arsitektur CPU yang berbeda.
-3. **Speed**: Konversi langsung ke byte jauh lebih cepat daripada konversi ke teks dan kembali lagi.
+### Definisi
+Paket `encoding/binary` menangani pembacaan dan penulisan nilai fixed-size ke representasi biner. Salah satu konsep utamanya adalah memilih urutan byte, seperti `LittleEndian` atau `BigEndian`.
+
+### Rasionalitas
+Paket ini penting karena:
+
+1. **Ukuran data bisa lebih deterministik**  
+   Tidak seperti JSON, bentuk biner bisa dibuat lebih padat dan tetap.
+2. **Urutan byte harus dinyatakan jelas**  
+   Ini penting untuk kompatibilitas antar mesin atau format file.
+3. **Membuka jalan ke data yang lebih dekat ke sistem**  
+   Pembaca belajar bahwa tidak semua serialisasi perlu berbentuk teks.
 
 ### Analogi Model Mental
-Bayangkan **Mesin Morse**.
-JSON adalah bahasa Inggris (bisa panjang-pendek). **Binary** adalah kode Morse pendek-titik-garis yang sangat efisien dikirim lewat kabel. Pakat `binary` adalah **Operator Morse** yang memastikan kode tersebut ditulis dengan urutan yang benar (ujung besar/kecil) agar bisa dibaca di seberang sana.
+Kalau JSON seperti dokumen manusiawi yang dibaca orang, binary encoding lebih mirip paket sinyal mesin yang harus disusun dengan urutan byte yang tepat agar tidak salah tafsir.
 
----
+### Terminologi Teknis
+- **Fixed-Size Value**: nilai dengan ukuran byte yang pasti.
+- **Endianness**: urutan byte paling signifikan dan paling tidak signifikan.
+- **Binary Layout**: bentuk data saat sudah diwakili sebagai bytes mentah.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    I[Int64: 1024] -->|binary.Write| B[[]byte: [0 0 4 0]]
-    B -->|binary.Read| I2[Int64: 1024]
-    
-    subgraph CPU_Order
-        BE[Big Endian: MSB First]
-        LE[Little Endian: LSB First]
-    end
+    Value[Numeric value] --> Write[binary.Write]
+    Write --> Bytes[Byte sequence]
+    Bytes --> Read[binary.Read]
+    Read --> Value2[Decoded value]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`encoding/binary` bekerja paling baik untuk nilai dengan ukuran tetap. Saat menulis, kita harus memilih byte order dengan sadar. Saat membaca, urutan byte yang dipakai harus sama dengan saat data dibuat. Untuk kasus yang sangat sederhana, helper seperti `binary.LittleEndian.Uint32` sering lebih langsung daripada abstraksi yang lebih umum.
+
+Nilai praktisnya:
+- cocok untuk header, metadata fixed-size, dan format dekat mesin;
+- membantu pembaca memahami mengapa urutan byte penting;
+- menjadi pelengkap yang baik setelah memahami serialisasi berbasis teks seperti JSON.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_read_binary_file.go](./examples/01_read_binary_file.go) - Membaca data fixed-size sederhana dengan `encoding/binary`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Pakar menyarankan penggunaan `binary.Read` dan `binary.Write` hanya untuk data dengan ukuran tetap (*fixed-size values*). Go menggunakan refleksi untuk mengidentifikasi tipe data, namun untuk kecepatan ekstrem, gunakan fungsi spesifik seperti `PutUint32` atau `Uint32` dari `LittleEndian/BigEndian` secara langsung pada slice byte.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_read_binary_file.go`: Membaca header file biner (seperti gambar/audio).
-- `02_endianness_proof.go`: Membuktikan perbedaan posisi byte antara arsitektur berbeda.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

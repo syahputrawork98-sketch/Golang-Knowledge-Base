@@ -1,56 +1,56 @@
-# CH-01: Spans & Arenas (Memory Allocator)
+# CH-01: Spans and Arenas
 
-> **Source Link**: [Go Runtime: Memory Management](https://github.com/golang/go/blob/master/src/runtime/malloc.go) | [Go Blog: Memory Management](https://blog.golang.org/allocation-pacing)
+> **Source Link**: [runtime/malloc.go](https://go.dev/src/runtime/malloc.go) | [Go GC guide](https://go.dev/doc/gc-guide)
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+## Tahap 1: Konsep dan Intuisi
 
-### Definisi ("Apa itu?")
-Allocator Go adalah sistem manajemen memori berbasis **TCMalloc** yang membagi memori menjadi hirarki blok bernama `mspan` (rentang memori) dan `mcache` untuk meminimalkan fragmentasi dan persaingan lock antar CPU.
+### Apa itu?
+Allocator Go adalah bagian runtime yang bertugas menyediakan memori untuk objek baru. Di balik layar, runtime memakai struktur seperti span, cache lokal, dan heap global supaya alokasi umum bisa tetap cepat.
 
-### Rasionalitas ("Why & How?")
-1. **Concurrency Performance**: Dengan memberikan setiap processor (**P**) cache lokal (`mcache`), alokasi objek kecil tidak memerlukan lock global yang lambat.
-2. **Fragmentation Control**: Memori dibagi menjadi kelas-kelas ukuran (*Size Classes*) sehingga objek kecil selalu menempati slot yang pas ukurannya.
-3. **Huge Pages**: Menggunakan unit besar bernama `Arena` (64MB) untuk meminta memori dari OS secara efisien.
+### Kenapa desain ini dipakai?
+Mayoritas program sering membuat objek kecil dalam jumlah besar. Kalau setiap alokasi harus lewat jalur global yang mahal, performa akan cepat turun. Karena itu runtime memecah tanggung jawab allocator ke beberapa lapisan agar contention dan fragmentasi lebih terkendali.
 
-### Analogi Model Mental
-Bayangkan **Manajemen Hotel Besar**.
-- **Arena**: Lantai hotel (Blok besar).
-- **MSpan**: Kamar hotel (Kelompok blok dengan ukuran sama).
-- **Object**: Tamu (Data Anda).
-Jika tamu datang rombongan (alokasi banyak), hotel memberikan satu lantai khusus (**Span**) agar mereka tidak bercampur dengan tamu lain dan proses administrasi (**Locking**) jadi lebih cepat karena sudah dikelola per lantai.
+### Analogi singkat
+Bayangkan gudang bertingkat:
+- **arena** adalah area gudang besar;
+- **span** adalah blok rak dengan ukuran slot tertentu;
+- objek program adalah barang yang ditempatkan ke slot yang ukurannya paling sesuai.
 
----
+Dengan model ini, barang kecil tidak perlu selalu minta area gudang baru dari nol.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## Tahap 2: Visualisasi Sistem
 
-### Hirarki Alokator (SVG)
-![Visualisasi: Hirarki Alokator Memori (TCMalloc)](./assets/mem_allocator.svg)
+### Hirarki allocator
+![Visualisasi: Hirarki allocator memori](./assets/mem_allocator.svg)
 
-### Struktur Memori (Mermaid)
+### Alur umum alokasi
 ```mermaid
 graph TD
-
-    APP[Application] --> MCACHE[mcache: Local CPU]
-    MCACHE -->|Needs more| MCENTRAL[mcentral: Shared SizeClass]
-    MCENTRAL -->|Needs more| MHEAP[mheap: Global Memory]
-    MHEAP --> OS[OS Kernel]
+    APP[Application] --> MCACHE[mcache]
+    MCACHE --> MCENTRAL[mcentral]
+    MCENTRAL --> MHEAP[mheap]
+    MHEAP --> OS[Operating System]
 ```
 
+## Tahap 3: Mekanisme Internal
+
+Secara umum, runtime memisahkan jalur alokasi berdasarkan ukuran:
+- objek sangat kecil bisa memakai jalur optimisasi khusus;
+- objek kecil biasanya dilayani lewat cache lokal agar tidak selalu berebut lock global;
+- objek lebih besar akan turun ke heap global.
+
+Struktur seperti `mcache`, `mcentral`, `mheap`, dan `mspan` membantu runtime mengelompokkan slot memori berdasarkan kelas ukuran. Ini bukan berarti semua alokasi selalu murah, tetapi desain ini membuat kasus umum jauh lebih efisien.
+
+## Tahap 4: Lab Praktis
+
+Lihat folder [examples/](./examples) untuk percobaan berikut:
+- `01_alloc_profiling.go`: membuat banyak alokasi kecil dan membaca `runtime.MemStats` untuk melihat perubahan statistik memori.
+
+## Tahap 5: Ringkasan Praktis
+
+- Allocator Go dirancang untuk membuat alokasi umum tetap cepat dan cukup skalabel.
+- Struktur seperti span dan heap penting untuk memahami organisasi memori runtime.
+- Pemahaman allocator membantu saat membaca perilaku `MemStats`, GC, dan biaya alokasi objek.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Alokasi dibagi menjadi tiga jalur:
-- **Tiny (< 16B)**: Digabung ke dalam satu slot memori.
-- **Small (16B - 32KB)**: Dialokasikan dari `mcache` lokal.
-- **Large (> 32KB)**: Dialokasikan langsung dari `mheap` global.
-Sistem ini menjamin bahwa alokasi mayoritas aplikasi (objek kecil) hampir instan karena tidak ada persaingan antar thread.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_alloc_profiling.go`: Menggunakan `runtime/pprof` untuk melihat di mana memori dialokasikan.
-- `02_stats_inspection.go`: Membaca `runtime.MemStats` untuk melihat jumlah span dan objek aktif.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -34,13 +35,13 @@ func main() {
 	s := strings.NewReader("hello gopher standard library")
 	u := UpperReader{innerReader: s}
 
-	// Membaca menggunakan io.Copy ke Standard Output
-	// io.Copy adalah konsumen universal io.Reader
-	fmt.Print("Filtered Output: ")
-	io.Copy(nil, u) // Simulasi, biasanya ke os.Stdout
-	
-	// Lab: Tulis manual ke buffer untuk melihat hasil
-	buf := make([]byte, 32)
-	n, _ := u.Read(buf)
-	fmt.Println(string(buf[:n]))
+	var out bytes.Buffer
+
+	// io.Copy memindahkan isi reader ke writer lain.
+	if _, err := io.Copy(&out, u); err != nil {
+		fmt.Println("copy error:", err)
+		return
+	}
+
+	fmt.Println("Filtered Output:", out.String())
 }

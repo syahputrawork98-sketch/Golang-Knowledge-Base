@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"time"
 )
 
@@ -13,12 +14,19 @@ import (
 // Analogi: Pelayan yang mengantarkan formulir pesanan ke dapur.
 
 func main() {
-	url := "https://jsonplaceholder.typicode.com/posts"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		io.WriteString(w, `{"status":"created","source":"local-test-server"}`)
+	}))
+	defer server.Close()
+
+	url := server.URL
 	
 	// 1. Siapkan data yang akan dikirim
 	data := map[string]string{
 		"title":  "Gopher Standard Library",
-		"body":   "Learning HTTP Client at Platinum Gold Standard",
+		"body":   "Learning HTTP client with local standard library server",
 		"userId": "1",
 	}
 	jsonData, _ := json.Marshal(data)

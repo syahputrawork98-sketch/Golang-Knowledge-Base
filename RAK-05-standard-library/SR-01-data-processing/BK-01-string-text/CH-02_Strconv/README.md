@@ -1,44 +1,58 @@
-# CH-02: Conversions (Strconv)
+# CH-02: `strconv` for Safe Conversion
 
-> **Source Link**: [Go Packages: strconv](https://golang.org/pkg/strconv/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [strconv package](https://pkg.go.dev/strconv)
+- **Framing**: `strconv` dipakai saat data datang sebagai string, tetapi aplikasi butuh nilai yang benar-benar bertipe seperti `int`, `float64`, atau `bool`.
 
-### Definisi ("Apa itu?")
-Pakat `strconv` menyediakan fungsi untuk mengonversi nilai antara tipe data dasar (int, float, bool) dan representasi string-nya secara aman.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Strict Typing**: Go sangat ketat. Anda tidak bisa menjumlahkan string "10" dan angka 10 tanpa konversi eksplisit.
-2. **Input Validation**: Memastikan data string dari user/API benar-benar valid sebagai angka sebelum diproses.
-3. **Format Control**: Mengontrol presisi desimal dan basis angka (biner, heksadesimal) saat konversi ke teks.
+### Definisi
+Paket `strconv` menyediakan fungsi untuk mengonversi nilai dasar ke string dan sebaliknya. Ini termasuk parsing angka, boolean, serta formatting nilai ke representasi teks yang lebih terkontrol.
+
+### Rasionalitas
+Paket ini penting karena:
+
+1. **Konversi jadi eksplisit dan aman**  
+   Go tidak melakukan coercion otomatis, jadi parsing harus dilakukan dengan sadar.
+2. **Validasi input lebih mudah**  
+   Kesalahan parsing langsung dikembalikan sebagai `error`.
+3. **Lebih tepat untuk konversi dasar daripada `fmt`**  
+   `strconv` dirancang spesifik untuk pekerjaan ini tanpa lapisan generality tambahan.
 
 ### Analogi Model Mental
-Bayangkan **Alat Penerjemah Mata Uang**.
-Anda punya uang (Data Int/Float) tapi ingin menuliskan nominalnya di kwitansi (String). Pakat `strconv` adalah **Kalkulator** yang memastikan angka "Rp 10.000" diterjemahkan dengan tepat menjadi angka 10000 agar bisa dihitung oleh sistem kasir.
+Bayangkan formulir kertas yang harus diubah menjadi angka di sistem kasir. Tulisan "12345" baru bisa dihitung setelah diterjemahkan menjadi nilai numerik yang valid.
 
----
+### Terminologi Teknis
+- **Parsing**: mengubah representasi teks menjadi nilai bertipe.
+- **Formatting**: mengubah nilai bertipe menjadi bentuk string.
+- **Base / Radix**: sistem bilangan seperti desimal, biner, atau heksadesimal.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    S[String: '42'] -->|strconv.Atoi| I[Int: 42]
-    I2[Int: 100] -->|strconv.Itoa| S2[String: '100']
-    F[Float: 3.14] -->|strconv.FormatFloat| S3[String: '3.14']
-    S4[String: 'true'] -->|strconv.ParseBool| B[Bool: true]
+    S1[String int] --> Atoi[strconv.Atoi]
+    Atoi --> I[Int]
+    S2[String float] --> ParseFloat[strconv.ParseFloat]
+    ParseFloat --> F[Float64]
+    I2[Int] --> Itoa[strconv.Itoa]
+    Itoa --> S3[String]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Paket ini memisahkan fungsi parsing berdasarkan tipe target, misalnya `Atoi`, `ParseInt`, `ParseFloat`, dan `ParseBool`. Desain ini membuat error parsing lebih mudah ditangani dan menghindari ambiguitas. Untuk output, fungsi seperti `Itoa` atau `FormatFloat` memberi kontrol lebih jelas terhadap hasil teks.
+
+Nilai praktisnya:
+- sangat sering dipakai pada input user, query parameter, config, dan file teks;
+- membantu menjaga type safety tetap jelas;
+- menegaskan boundary antara data mentah dan data yang siap diproses.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_safe_parse.go](./examples/01_safe_parse.go) - Parsing `int`, `float`, dan `bool` dengan penanganan error dasar.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Pakat ini mengoptimalkan konversi dengan menghindari penggunaan `fmt` yang lebih lambat karena `fmt` menggunakan refleksi (runtime-heavy). Fungsi `Atoi` adalah singkatan dari "ASCII to Integer" dan sebaliknya `Itoa` untuk "Integer to ASCII". Pastikan selalu mengecek `error` saat menggunakan fungsi `Parse` karena input string mungkin tidak valid.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_safe_parse.go`: Penanganan error saat parsing data mentah.
-- `02_bit_control.go`: Mengontrol basis bit (binary/hex) saat konversi.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

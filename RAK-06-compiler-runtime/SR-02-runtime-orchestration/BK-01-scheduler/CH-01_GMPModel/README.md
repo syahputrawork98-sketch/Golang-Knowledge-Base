@@ -1,62 +1,64 @@
-# CH-01: G-M-P Model (Scheduler Architecture)
+# CH-01: G-M-P Model
 
-> **Source Link**: [Go Runtime: Hacking.md](https://github.com/golang/go/blob/master/src/runtime/Hacking.md) | [Go Blog: Analysis of the Go Scheduler](https://blog.gopheracademy.com/advent-2015/go-scheduler/)
+> **Source Link**: [runtime/HACKING.md](https://github.com/golang/go/blob/master/src/runtime/HACKING.md) | [runtime/proc.go](https://go.dev/src/runtime/proc.go)
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+## Tahap 1: Konsep dan Intuisi
 
-### Definisi ("Apa itu?")
-Model G-M-P adalah arsitektur penjadwalan Go yang memisahkan abstraksi eksekusi (**G**oroutine), pembungkus thread OS (**M**achine), dan sumber daya eksekusi (**P**rocessor) untuk mengelola ribuan tugas di atas sedikit inti CPU.
+### Apa itu?
+Model G-M-P adalah cara runtime Go memisahkan tiga peran utama saat menjalankan goroutine:
+- **G**: unit kerja, yaitu goroutine;
+- **M**: thread OS yang benar-benar mengeksekusi kode;
+- **P**: resource scheduler yang memegang antrean kerja dan konteks eksekusi.
 
-### Rasionalitas ("Why & How?")
-1. **M:N Scheduling**: Menghindari overhead pembuatan thread OS yang mahal (2MB stack vs 2KB stack Goroutine).
-2. **Resource Decoupling**: **P** bertindak sebagai perantara yang menampung antrean lokal Goroutine, memungkinkan worker (**M**) untuk diganti atau ditidurkan tanpa kehilangan tugas.
-3. **Efficiency**: Mengurangi *context switching* di level kernel dengan melakukan penjadwalan di user-space.
+### Kenapa desain ini dipakai?
+Go ingin menjalankan banyak goroutine tanpa harus membuat satu thread OS untuk setiap tugas. Dengan memisahkan `G`, `M`, dan `P`, runtime bisa menjadwalkan pekerjaan dengan lebih hemat dibanding model satu-thread-satu-task.
 
-### Analogi Model Mental
-Bayangkan **Sebuah Kafe (Runtime)**.
-- **G (Goroutine)**: Pelanggan yang membawa pesanan.
-- **P (Processor)**: Meja kasir (Resource). Hanya ada sejumlah meja kasir sebanyak Inti CPU Anda.
-- **M (Machine)**: Staf Kasir (Worker Thread). Staf bisa datang dan pergi, tapi mereka hanya bisa melayani pelanggan jika mereka memiliki akses ke Meja Kasir (**P**).
+### Analogi singkat
+Bayangkan dapur restoran:
+- `G` adalah pesanan;
+- `M` adalah koki;
+- `P` adalah meja kerja yang punya alat dan antrean lokal.
 
----
+Koki hanya bisa kerja efektif kalau ia sedang memegang meja kerja. Saat satu koki terblokir, meja kerja bisa dipasangkan ke koki lain.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## Tahap 2: Visualisasi Sistem
 
-### Anatomi G-M-P (SVG)
-![Visualisasi: Anatomi Model Penjadwalan G-M-P](./assets/gmp_model.svg)
+### Anatomi G-M-P
+![Visualisasi: Anatomi model G-M-P](./assets/gmp_model.svg)
 
-### Struktur Penjadwal (Mermaid)
+### Alur scheduler sederhana
 ```mermaid
 graph TD
+    G1[Goroutine]
+    P[Processor]
+    M[Machine / OS Thread]
+    GQ[Run Queue]
 
-    subgraph RunQueue
-        G1[Goroutine 1]
-        G2[Goroutine 2]
-    end
-    
-    P[Processor: P] -->|Schedule| G1
-    M[Machine: M] --- P
-    
-    subgraph OS_Level
-        T[OS Thread] --- M
-    end
-    
-    subgraph GlobalQueue
-        GQ[Global Run Queue]
-    end
+    GQ --> P
+    P --> M
+    M --> G1
 ```
 
+## Tahap 3: Mekanisme Internal
+
+Secara umum, scheduler Go bekerja seperti ini:
+- goroutine yang siap jalan masuk ke antrean lokal `P` atau antrean global;
+- `M` mengambil kerja lewat `P` yang sedang dipegangnya;
+- jika satu `P` kehabisan kerja, runtime bisa melakukan **work stealing** dari `P` lain;
+- jika sebuah goroutine masuk ke syscall yang memblokir, runtime bisa melepas `P` dari `M` itu agar pekerjaan lain tetap jalan.
+
+Detail implementasinya lebih kaya dari model sederhana ini, tetapi inti desainnya tetap: pisahkan unit kerja, worker, dan resource scheduler agar orkestrasi tetap efisien.
+
+## Tahap 4: Lab Praktis
+
+Lihat folder [examples/](./examples) untuk percobaan berikut:
+- `01_gmp_inspection.go`: mengamati `GOMAXPROCS` dan jumlah goroutine sebelum, saat, dan sesudah beban paralel singkat.
+
+## Tahap 5: Ringkasan Praktis
+
+- G-M-P adalah model inti scheduler Go.
+- `P` penting karena ia membawa antrean kerja lokal dan konteks scheduler.
+- Tujuan utamanya adalah membuat banyak goroutine tetap murah dijalankan tanpa terlalu bergantung pada thread OS.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Scheduler Go bekerja secara kooperatif dan preemptive. Saat Goroutine melakukan syscall atau blocking, **M** akan dilepaskan dari **P**, dan **P** akan mencari **M** baru untuk melanjutkan pengerjaan Goroutine lain. Algoritma **Work Stealing** memungkinkan sebuah **P** yang menganggur untuk mencuri 50% Goroutine dari antrean **P** lain yang sedang sibuk.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_gmp_inspection.go`: Menggunakan `runtime.NumGoroutine()` dan `GOMAXPROCS` untuk melihat interaksi scheduler.
-- `02_trace_scheduler.go`: Visualisasi pengerjaan scheduler menggunakan `go tool trace`.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

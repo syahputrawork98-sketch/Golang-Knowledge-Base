@@ -1,44 +1,56 @@
-# CH-01: OS Operations (System Interaction)
+# CH-01: `os` for File and Environment Operations
 
-> **Source Link**: [Go Packages: os](https://golang.org/pkg/os/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [os package](https://pkg.go.dev/os)
+- **Framing**: Package `os` menjadi jembatan utama antara program Go dan sistem operasi, terutama saat aplikasi perlu membuat, membaca, memeriksa, atau menghapus file.
 
-### Definisi ("Apa itu?")
-Pakat `os` menyediakan interface yang platform-independen untuk mengakses fungsionalitas sistem operasi seperti manipulasi file, variabel lingkungan (environment variables), dan proses.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Abstraction**: Anda tidak perlu tahu apakah sedang berjalan di Windows atau Linux untuk membuat folder atau menghapus file.
-2. **File Lifecycle**: Menyediakan kontrol penuh atas pembukaan file dengan berbagai mode (Read/Write, Append, Create).
-3. **Runtime Context**: Mengambil argumen baris perintah (`os.Args`) dan berinteraksi dengan status keluar program (`os.Exit`).
+### Definisi
+Paket `os` menyediakan akses ke operasi file, directory, environment variable, process state, dan hal-hal lain yang dekat dengan sistem operasi tetapi dibungkus dalam API lintas platform yang lebih nyaman.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Operasi file dasar ada di sini**  
+   Banyak workflow aplikasi butuh create, read, stat, dan remove file.
+2. **Abstraksi lintas platform membantu**  
+   Program tidak perlu menulis ulang operasi dasar untuk Windows dan Unix dari nol.
+3. **Context runtime aplikasi jadi bisa dibaca**  
+   Environment dan argumen proses juga berada di wilayah package ini.
 
 ### Analogi Model Mental
-Bayangkan **Asisten Pribadi (PA)**.
-Anda (Program) tidak perlu turun tangan sendiri untuk membangun gudang (Folder) atau membuang sampah (Hapus File). Anda cukup memberi perintah kepada **PA (Pakat os)**, dan dia yang akan berbicara dengan Pemerintah (Sistem Operasi) sesuai aturan yang berlaku di negara tersebut.
+Bayangkan `os` seperti asisten administrasi yang mengurus berkas dan izin akses ke lemari arsip. Program Anda tinggal memberi perintah yang benar, lalu asisten itu yang berurusan dengan aturan gedung.
 
----
+### Terminologi Teknis
+- **File Descriptor / Handle**: representasi resource file yang dibuka.
+- **Stat**: metadata file seperti ukuran atau waktu modifikasi.
+- **Environment Variable**: nilai konfigurasi yang diberikan dari lingkungan proses.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph TD
-    App[Go Application] --> OS_Pkg[os Package]
-    OS_Pkg -->|File Ops| Disk[Storage]
-    OS_Pkg -->|Env/Args| Shell[Environment]
-    OS_Pkg -->|Process| Kernel[OS Kernel]
+    App[Go app] --> OSPkg[os package]
+    OSPkg --> FileOps[File operations]
+    OSPkg --> EnvOps[Environment access]
+    OSPkg --> ProcOps[Process interaction]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Package ini memberi fungsi tingkat tinggi seperti `ReadFile`, `WriteFile`, `Stat`, dan `Remove`, plus API yang lebih detail jika kontrol tambahan diperlukan. Inti yang perlu dipahami pembaca adalah bahwa operasi ini tetap menyentuh resource OS nyata, jadi penanganan error dan cleanup tetap penting.
+
+Nilai praktisnya:
+- sangat relevan untuk utility, CLI, dan service yang menyentuh filesystem;
+- membantu membedakan operasi file sederhana dari kontrak I/O murni;
+- menjadi fondasi sebelum pembaca belajar soal asset embedding.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_file_crud.go](./examples/01_file_crud.go) - Alur create, read, stat, dan delete file sederhana dengan cleanup di akhir.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Fungsi `os.Open` membuka file dengan mode *read-only*. Gunakan `os.OpenFile` jika butuh kontrol lebih detail (seperti penambahan data/append). Jangan lupa selalu memanggil `defer file.Close()` untuk melepaskan deskriptor file agar tidak terjadi kebocoran sumber daya sistem (file handle limit).
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_file_crud.go`: Operasi Create, Read, Update, dan Delete file secara aman.
-- `02_env_vars.go`: Mengelola konfigurasi aplikasi menggunakan variabel lingkungan.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

@@ -1,48 +1,57 @@
-# CH-03: Byte Slices (Mutabel Manipulation)
+# CH-03: `bytes` and Mutable Byte Processing
 
-> **Source Link**: [Go Packages: bytes](https://golang.org/pkg/bytes/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [bytes package](https://pkg.go.dev/bytes)
+- **Framing**: Paket `bytes` penting saat data tidak lagi nyaman diperlakukan sebagai string immutable, misalnya ketika kita menyusun buffer, memproses protokol, atau bekerja dengan payload biner.
 
-### Definisi ("Apa itu?")
-Pakat `bytes` menyediakan fungsionalitas manipulasi slice byte (`[]byte`) yang serupa dengan pakat `strings`, namun untuk data yang bersifat mutabel (bisa diubah).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Mutability**: Berbeda dengan string yang read-only, slice byte bisa dimodifikasi di tempat, menghemat alokasi memori untuk operasi berulang.
-2. **Binary Data**: Esensial untuk menangani data non-tekstual seperti protokol jaringan, gambar, atau file terenkripsi.
-3. **Buffer Power**: `bytes.Buffer` adalah alat serbaguna untuk membangun data dinamis yang nantinya bisa dibaca atau ditulis.
+### Definisi
+Paket `bytes` menyediakan fungsi utilitas untuk `[]byte`, serta tipe seperti `bytes.Buffer` yang berguna untuk menyusun dan membaca data secara dinamis.
+
+### Rasionalitas
+Paket ini penting karena:
+
+1. **`[]byte` bisa diubah di tempat**  
+   Ini membedakannya dari string yang immutable.
+2. **`bytes.Buffer` cocok untuk aliran data bertahap**  
+   Kita bisa menulis, membaca, dan reset buffer tanpa selalu membuat objek baru.
+3. **Bridge antara teks dan data mentah jadi lebih jelas**  
+   Banyak operasi I/O dan serialisasi bekerja lebih alami di level byte.
 
 ### Analogi Model Mental
-Bayangkan **Papan Tulis (Whiteboard)**.
-Berbeda dengan "Master Cetakan" di `strings`, `bytes` adalah **Papan Tulis** yang isinya bisa Anda hapus dan tulis ulang kapan saja tanpa membuang papannya. Sangat cocok untuk mengolah data mentah yang sering berubah-ubah.
+Kalau `strings` seperti dokumen cetak, `bytes` lebih mirip papan tulis atau buffer kerja yang bisa ditulis ulang, dibaca sebagian, lalu dikosongkan lagi.
 
----
+### Terminologi Teknis
+- **Mutable Slice**: slice byte yang isinya dapat diubah.
+- **Buffer**: penyangga sementara untuk menulis dan membaca data bertahap.
+- **Binary Payload**: data yang tidak harus dipahami sebagai teks manusia.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Mekanisme Pertumbuhan (SVG)
-![Visualisasi: Mekanisme Pertumbuhan bytes.Buffer](./assets/buffer_grow.svg)
+![Buffer Growth](./assets/buffer_grow.svg)
 
-### Alur Buffer (Mermaid)
 ```mermaid
 graph LR
-
-    B1[[]byte: 'A B C'] -->|bytes.Split| S[Slice Array: [['A'], ['B'], ['C']]]
-    B2[Buffer] -->|Write| B3[Data Stream]
-    B3 -->|Read| B2
+    Input[Byte writes] --> Buffer[bytes.Buffer]
+    Buffer --> Read[Read bytes]
+    Buffer --> Reset[Reset buffer]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`bytes.Buffer` menyimpan data dalam slice internal yang dapat tumbuh saat perlu. Karena buffer ini bisa ditulis dan dibaca berkali-kali, ia sangat berguna untuk payload dinamis, staging data, atau output sementara. Saat kebutuhan utama masih teks biasa, `strings.Builder` sering cukup; saat mulai bermain dengan `[]byte`, `bytes` menjadi lebih tepat.
+
+Nilai praktisnya:
+- cocok untuk data dinamis yang dekat dengan I/O;
+- membantu mengurangi pembuatan string sementara yang tidak perlu;
+- menjadi jembatan alami ke topik serialisasi dan binary encoding.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_bytes_buffer.go](./examples/01_bytes_buffer.go) - Penyusunan, pembacaan sebagian, dan reset `bytes.Buffer`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Secara internal, `bytes.Buffer` menggunakan slice byte yang tumbuh secara eksponensial untuk meminimalkan *re-allocation*. Jika Anda tahu ukuran data di awal, gunakan `Grow(n)` untuk efisiensi maksimal. `bytes` juga menyediakan fungsi pencarian dan pembersihan (Trim) yang dioptimalkan untuk memori tinggi.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_bytes_buffer.go`: Pembangunan pesan dinamis dengan `bytes.Buffer`.
-- `02_compare_copy.go`: Efisiensi perbandingan data biner.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

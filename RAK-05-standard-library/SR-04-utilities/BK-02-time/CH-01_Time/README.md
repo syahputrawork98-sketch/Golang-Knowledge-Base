@@ -1,49 +1,58 @@
-# CH-01: Time Management (Lifecycle & Precision)
+# CH-01: `time` for Duration, Timer, and Ticker
 
-> **Source Link**: [Go Packages: time](https://golang.org/pkg/time/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [time package](https://pkg.go.dev/time)
+- **Framing**: Package `time` sangat sentral di Go karena hampir semua aplikasi butuh membaca waktu, mengukur durasi, atau menjalankan sesuatu berdasarkan jeda dan interval.
 
-### Definisi ("Apa itu?")
-Pakat `time` menyediakan fungsionalitas untuk mengukur, menampilkan, dan mengelola waktu, durasi, serta penjadwalan (tickers/timers).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Precision**: Mendukung resolusi hingga nanodetik yang esensial untuk benchmarking dan sistem real-time.
-2. **Monotonicity**: Menyediakan *Monotonic Time* yang aman dari perubahan jam sistem oleh NTP, menjamin perhitungan durasi tetap akurat.
-3. **Async Support**: Integrasi erat dengan `select` dan `channel` untuk timeout dan interval pengerjaan.
+### Definisi
+Paket `time` menyediakan tipe `Time` dan `Duration`, plus utility seperti `Sleep`, `Timer`, dan `Ticker` untuk penjadwalan berbasis waktu.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Pengukuran waktu adalah kebutuhan dasar banyak aplikasi**  
+   Mulai dari timeout sampai logging dan benchmarking.
+2. **Timer dan ticker membentuk pola scheduling sederhana**  
+   Banyak event loop dan worker ringan bergantung pada primitive ini.
+3. **Durasi dan waktu memiliki peran berbeda**  
+   `Time` mewakili titik waktu, sedangkan `Duration` mewakili jarak antar waktu.
 
 ### Analogi Model Mental
-Bayangkan **Jam Tangan Serbaguna dengan Stopwatch & Alarm**.
-Anda butuh tahu jam berapa sekarang (**Time**), berapa lama Anda lari (**Duration**), dan ingin dipanggil setiap 5 menit untuk minum (**Ticker/Interval**). Pakat `time` adalah jam tangan tersebut yang membantu Anda disiplin dalam mengeksekusi tugas.
+Bayangkan satu alat yang sekaligus bisa jadi jam, stopwatch, dan alarm. Itulah kira-kira peran package `time` di banyak program Go.
 
----
+### Terminologi Teknis
+- **Time**: titik waktu tertentu.
+- **Duration**: selisih atau lama waktu.
+- **Ticker**: sinyal berulang pada interval tertentu.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Event Loop Ticker (SVG)
-![Visualisasi: Alur Kerja time.Ticker & Channel](./assets/time_loop.svg)
+![Time Loop](./assets/time_loop.svg)
 
-### Hirarki Waktu (Mermaid)
 ```mermaid
 graph TD
-
-    NOW[time.Now] --> DISP[Format / Print]
-    DUR[time.Duration] --> SLP[time.Sleep]
-    TKR[time.Ticker] --> LOOP[Channel Recv]
-    CTX[context.WithTimeout] --- DUR
+    Now[time.Now] --> Duration[time.Since or Sub]
+    Duration --> Timer[time.NewTimer]
+    Duration --> Ticker[time.NewTicker]
+    Ticker --> Loop[Periodic work]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`time.Duration` direpresentasikan sebagai jumlah nanodetik, sedangkan `Time` membawa informasi titik waktu dan clock reading yang relevan untuk perhitungan durasi. `Timer` mengirim satu sinyal setelah jeda tertentu, sementara `Ticker` terus mengirim sinyal berkala sampai dihentikan. Perbedaan ini penting agar pembaca tidak mencampur event satu kali dan event berulang.
+
+Nilai praktisnya:
+- membantu pembaca menulis timeout, polling, dan interval sederhana;
+- memperjelas kapan memakai `Sleep`, `Timer`, atau `Ticker`;
+- memberi fondasi yang aman sebelum pembahasan timeouts di area lain seperti networking.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_timer_ticker.go](./examples/01_timer_ticker.go) - Perbandingan perilaku timer sekali jalan dan ticker berulang.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menggunakan format waktu yang unik: `Mon Jan 2 15:04:05 MST 2006` (Layout 1234567). Ingatlah bahwa `time.Duration` adalah `int64` dalam satuan nanodetik. Selalu gunakan `time.Since(start)` untuk mengukur durasi daripada pengurangan manual dua objek `Time` agar mendapatkan manfaat dari jam monotonik.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_timer_ticker.go`: Perbedaan Timer (sekali jalan) dan Ticker (berulang).
-- `02_parsing_time.go`: Mengubah string tanggal kustom menjadi objek `Time` yang valid.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

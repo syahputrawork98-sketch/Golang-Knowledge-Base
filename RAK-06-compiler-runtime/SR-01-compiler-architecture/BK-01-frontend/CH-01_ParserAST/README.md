@@ -1,55 +1,58 @@
-# CH-01: Parser & AST (Compiler Frontend)
+# CH-01: Parser and AST in the Compiler Frontend
 
-> **Source Link**: [Go Compiler: Parser Source](https://github.com/golang/go/blob/master/src/cmd/compile/internal/syntax/parser.go) | [Go Blog: The Go GC (Frontend mention)](https://blog.golang.org/ismmkeynote)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [go/parser package](https://pkg.go.dev/go/parser) | [go/ast package](https://pkg.go.dev/go/ast) | [compiler syntax parser source](https://github.com/golang/go/blob/master/src/cmd/compile/internal/syntax/parser.go)
+- **Framing**: Parser dan AST adalah titik pertama saat compiler berhenti melihat kode sebagai teks mentah dan mulai melihatnya sebagai struktur program.
 
-### Definisi ("Apa itu?")
-Parser adalah tahap awal kompilasi Go yang mengubah teks mentah kode sumber (`.go`) menjadi struktur data memori bernama **Abstract Syntax Tree (AST)** yang mewakili hierarki logika program.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Validation**: Memastikan kode mengikuti aturan sintaksis bahasa Go (misal: penutupan kurung, urutan kata kunci).
-2. **Logical Mapping**: Mengonversi teks linier menjadi pohon keputusan sehingga komputer bisa memahami hubungan antar variabel, fungsi, dan blok logika.
-3. **Type Checking Foundation**: AST menjadi dasar bagi tahap berikutnya untuk memeriksa apakah tipe data yang digunakan sudah konsisten.
+### Definisi
+Parser membaca token hasil pemindaian lexer lalu membangun **Abstract Syntax Tree (AST)**, yaitu representasi pohon yang menunjukkan bentuk deklarasi, ekspresi, dan blok logika program Go.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Syntax harus dipahami sebelum hal lain bisa terjadi**  
+   Type checking, optimisasi, dan code generation semuanya bergantung pada struktur awal yang benar.
+2. **AST memberi bentuk hierarkis pada source code**  
+   Program tidak lagi dilihat sebagai deretan karakter, tetapi sebagai node dan relasi antar node.
+3. **Frontend menentukan kualitas tahap berikutnya**  
+   Jika parsing gagal atau struktur tidak terbentuk dengan benar, pipeline compiler berhenti di sini.
 
 ### Analogi Model Mental
-Bayangkan **Membaca Resep Masakan**.
-Teks resep adalah **Source Code**. Mata dan otak Anda (**Parser**) membaca teks tersebut bukan sebagai huruf per huruf, tapi sebagai urutan langkah (**AST**): "Siapkan bahan" -> "Potong bawang" -> "Tumis". Anda sekarang punya peta mental tentang apa yang harus dilakukan sebelum benar-benar menyalakan api.
+Bayangkan arsitek yang menerima tumpukan instruksi tertulis lalu mengubahnya menjadi blueprint bangunan. Blueprint itu belum menjadi gedung, tetapi tanpa blueprint yang benar, tahap konstruksi tidak bisa dimulai.
 
----
+### Terminologi Teknis
+- **Token**: unit sintaksis dasar hasil scanning.
+- **Parser**: komponen yang menyusun token menjadi struktur yang valid.
+- **AST**: representasi pohon dari bentuk sintaksis program.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Struktur Pohon (SVG)
-![Visualisasi: Struktur Hierarki Abstract Syntax Tree (AST)](./assets/ast_tree.svg)
+![AST Tree](./assets/ast_tree.svg)
 
-### Alur Kerja (Mermaid)
 ```mermaid
 graph TD
-
-    SC[Source Code] -->|Lexing| TK[Tokens]
-    TK -->|Parsing| AST[Abstract Syntax Tree]
-    
-    subgraph TreeStructure
-        Node1[Function Declaration]
-        Node2[Variable Definition]
-        Node3[Return Statement]
-        Node1 --> Node2
-        Node1 --> Node3
-    end
+    Source[Source code] --> Tokens[Scanner tokens]
+    Tokens --> Parser[Parser]
+    Parser --> AST[Abstract Syntax Tree]
+    AST --> Next[Type checking and later passes]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Frontend compiler Go memecah proses awal menjadi scanning lalu parsing. Parser membangun node-node AST secara sistematis, lalu hasil ini menjadi dasar untuk validasi simbol dan tipe. Di level repositori ini, yang penting dipahami adalah hubungan sebab-akibatnya: tanpa struktur sintaksis yang valid, compiler tidak punya bahan untuk melanjutkan ke tahap tengah dan akhir.
+
+Nilai praktisnya:
+- membantu pembaca memahami mengapa error sintaks muncul sangat awal;
+- menjelaskan peran `go/parser` dan `go/ast` sebagai jendela pembelajaran ke frontend compiler;
+- menjadi fondasi sebelum masuk ke SSA.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_inspect_ast.go](./examples/01_inspect_ast.go) - Contoh kecil untuk mem-parse source string dan menginspeksi node penting di AST.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Parser Go adalah *top-down recursive descent parser*. Ia menggunakan token yang dihasilkan oleh *Scanner* (Lexer) untuk membangun node AST secara rekursif. Go sangat mengoptimalkan kecepatan tahap ini; parser Go dianggap salah satu yang tercepat untuk bahasa dengan fitur setara. Setelah AST terbentuk, Go akan melakukan *Type Checking* untuk memastikan semua referensi simbol valid.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_inspect_ast.go`: Menggunakan paket `go/ast` dan `go/parser` untuk melihat struktur internal kode Go Anda sendiri.
-- `02_token_scanner.go`: Melihat bagaimana Go memecah teks menjadi token mentah.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

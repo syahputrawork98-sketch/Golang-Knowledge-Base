@@ -1,50 +1,50 @@
-# CH-01: Cgo Barrier (Foreign Function Interface)
+# CH-01: Cgo Barrier
 
-> **Source Link**: [Go Packages: cgo](https://golang.org/cmd/cgo/) | [Go Runtime: Cgo Stack Handling](https://github.com/golang/go/blob/master/src/runtime/cgocall.go)
+> **Source Link**: [cmd/cgo](https://pkg.go.dev/cmd/cgo) | [runtime/cgocall.go](https://go.dev/src/runtime/cgocall.go)
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+## Tahap 1: Konsep dan Intuisi
 
-### Definisi ("Apa itu?")
-Cgo Barrier adalah mekanisme transisi antara dunia Go (yang memiliki GC, stack dinamis, dan scheduler) dan dunia C (yang memiliki stack statis dan manual memory management).
+### Apa itu?
+Cgo adalah jembatan yang memungkinkan kode Go memanggil fungsi C atau berinteraksi dengan library C. Begitu kode menyeberang ke sisi C, runtime Go harus mengelola transisi itu dengan hati-hati.
 
-### Rasionalitas ("Why & How?")
-1. **Interoperability**: Mengizinkan Go memanfaatkan library C yang sudah matang (seperti SQLite, libcurl).
-2. **Stack Switching**: Go harus memindahkan eksekusi dari stack Goroutine (2KB) ke stack thread OS reguler (2MB) saat memanggil fungsi C agar tidak terjadi overflow.
-3. **Pointer Safety**: Menjamin bahwa GC Go tidak memindahkan data yang sedang diproses oleh fungsi C (*Pointer Pinning*).
+### Kenapa desain ini penting?
+Go punya scheduler, goroutine, stack yang bisa tumbuh, dan garbage collector. Dunia C tidak otomatis mengikuti aturan itu. Karena itu, pemanggilan cgo membawa overhead dan aturan tambahan yang tidak muncul pada kode Go murni.
 
-### Analogi Model Mental
-Bayangkan **Gerbang Perbatasan Negara**.
-Go adalah **Negara A** (Modern, otomatis) dan C adalah **Negara B** (Tradisional, manual). Saat Anda (Data) menyeberang, Anda harus melewati **Pintu Tol (Cgo Barrier)**. Di sini, paspor Anda diperiksa, kendaraan Anda diganti agar sesuai aturan jalan di Negara B, dan ada jaminan bahwa Anda tidak akan "diambil" oleh petugas kebersihan (GC) Negara A selama berada di luar negeri.
+### Analogi singkat
+Bayangkan gerbang perbatasan:
+- di sisi Go, lalu lintasnya diatur runtime;
+- di sisi C, aturannya berbeda;
+- saat menyeberang, ada pemeriksaan ekstra agar data dan eksekusi tidak rusak di tengah jalan.
 
----
-
-## 2. Visualisasi Sistem (Mermaid)
+## Tahap 2: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    Go[Go Context] -->|cgocall| B[Cgo Barrier]
-    B -->|Stack Switch| C[C Function]
-    C -->|Return| B
-    B -->|Restore Stack| Go
-    
-    subgraph Transition
-        direction TB
-        S[Save GP Registers]
-        P[Pin Pointers]
-    end
+    G[Go code] --> B[cgocall boundary]
+    B --> C[C function]
+    C --> B
+    B --> G
 ```
 
+## Tahap 3: Mekanisme Internal
+
+Secara umum, runtime perlu memperhatikan beberapa hal saat masuk ke cgo:
+- transisi dari konteks goroutine ke panggilan yang menyentuh dunia C;
+- implikasi terhadap scheduler dan thread OS;
+- aturan pointer safety agar garbage collector tidak kehilangan jejak data Go yang masih dipakai.
+
+Karena ada biaya transisi, cgo sebaiknya dipakai saat memang memberi nilai nyata, bukan sebagai jalur default untuk pekerjaan yang bisa dilakukan di Go biasa.
+
+## Tahap 4: Lab Praktis
+
+Lihat folder [examples/](./examples) untuk percobaan berikut:
+- `01_cgo_callback.go`: contoh callback sederhana antara C dan Go dalam satu program kecil.
+
+## Tahap 5: Ringkasan Praktis
+
+- Cgo membuka akses ke ekosistem C, tetapi membawa overhead dan aturan tambahan.
+- Titik paling sensitif adalah transisi eksekusi, pointer safety, dan integrasi dengan runtime Go.
+- Gunakan cgo saat manfaatnya jelas, bukan hanya karena “bisa”.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Setiap pemanggilan Cgo melibatkan *overhead* yang cukup besar (runtime overhead sekitar 50-200ns) karena proses pemindahan stack dan registrasi pointer ke GC. Go menggunakan "trampoline" untuk melompat dari runtime Go ke kode C. Hindari pemanggilan Cgo dalam loop ketat karena akan menurunkan performa secara drastis dibandingkan kode murni Go.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_simple_cgo.go`: Pemanggilan fungsi matematika C sederhana dari Go.
-- `02_pointer_passing.go`: Demonstrasi aturan aman melempar pointer Go ke dalam C.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

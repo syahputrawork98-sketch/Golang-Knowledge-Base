@@ -1,43 +1,56 @@
-# CH-02: Embed System (Binary Inlining)
+# CH-02: `embed` for Bundled Assets
 
-> **Source Link**: [Go Packages: embed](https://golang.org/pkg/embed/) | [Go Blog: Package embed](https://blog.golang.org/embed)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [embed package](https://pkg.go.dev/embed) | [Package embed](https://go.dev/blog/embed)
+- **Framing**: `embed` dipakai saat aplikasi perlu membawa file statis langsung ke dalam binary, sehingga distribusi dan deployment jadi lebih sederhana.
 
-### Definisi ("Apa itu?")
-Pakat `embed` (diperkenalkan di Go 1.16) memungkinkan penyertaan file statis (seperti gambar, HTML, atau config) langsung ke dalam file biner Go saat proses kompilasi.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Single Binary Deployment**: Tidak perlu lagi menyertakan folder `assets/` secara terpisah saat mendeploy aplikasi. Cukup satu file biner.
-2. **Type Safety**: Menyediakan akses ke file tersebut melalui interface yang sudah dikenal (`FS`, `ReadFile`).
-3. **No External Dependecies**: Mengurangi risiko error "File Not Found" di produksi karena data statis sudah "melekat" di dalam kode.
+### Definisi
+Paket `embed` memungkinkan file atau direktori statis disertakan saat kompilasi. Data yang di-embed kemudian bisa diakses sebagai `string`, `[]byte`, atau `embed.FS`.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Single-binary deployment jadi lebih realistis**  
+   Config, template, atau asset kecil bisa ikut dibawa tanpa folder terpisah.
+2. **File statis tetap diakses lewat API yang familiar**  
+   Dengan `embed.FS`, pembaca tetap bisa berpikir dalam model filesystem.
+3. **Resiko missing file di produksi bisa dikurangi**  
+   Asset penting tidak lagi tergantung keberadaan file eksternal saat runtime.
 
 ### Analogi Model Mental
-Bayangkan **Buku yang Berisi Foto**.
-Tanpa `embed`, Anda memberikan buku (Program) ke teman, tapi foto-fotonya terpisah di amplop lain. Jika amplopnya hilang, ceritanya tidak lengkap. Dengan `embed`, Anda **Mencetak Foto Langsung di Halaman Buku**. Di mana pun bukunya berada, fotonya pasti ada di sana.
+Kalau tanpa `embed` Anda mengirim buku dan amplop foto secara terpisah, dengan `embed` foto-foto itu sudah dicetak langsung ke halaman buku yang sama.
 
----
+### Terminologi Teknis
+- **Embedded Asset**: file yang dibawa ke binary saat build.
+- **Directive**: komentar compiler `//go:embed` yang menentukan file apa yang diikutkan.
+- **embed.FS**: representasi filesystem virtual untuk file yang di-embed.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph TD
-    Source[Code + Assets] --> Compile[go build]
-    Compile --> Binary[Single Executable]
-    Binary -->|Runtime| FS[embed.FS: Virtual Filesystem]
+    Assets[Source files] --> Build[go build]
+    Build --> Binary[Compiled binary]
+    Binary --> Read[Access via embed API]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Compiler membaca directive `//go:embed` lalu memasukkan file target ke dalam binary saat build. Setelah itu, aplikasi tidak perlu lagi mengandalkan file eksternal yang sama di runtime. Karena sifatnya read-only, `embed` cocok untuk asset statis yang stabil, bukan data yang harus diubah saat program berjalan.
+
+Nilai praktisnya:
+- mempermudah distribusi aplikasi kecil atau tool tunggal;
+- berguna untuk config, template, atau asset pendukung;
+- membantu pembaca memahami trade-off antara file eksternal dan binary yang lebih mandiri.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_embed_config.go](./examples/01_embed_config.go) - Menyertakan `test_data.txt` ke dalam binary dengan directive `//go:embed`.
+- [test_data.txt](./examples/test_data.txt) - File statis sederhana yang dipakai sebagai payload embed.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Gunakan direktif `//go:embed path/to/file` tepat di atas variabel. Variabel tersebut bisa bertipe `string`, `[]byte`, atau `embed.FS` untuk akses ke banyak file sekaligus. Data yang di-embed bersifat *read-only* dan tidak menambah beban memori di runtime hingga data tersebut benar-benar diakses (mengingat ia disimpan di segmen data biner).
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_embed_config.go`: Memasukkan file JSON konfigurasi ke dalam aplikasi.
-- `02_embed_web_assets.go`: Menyajikan file HTML/CSS dari biner tunggal.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

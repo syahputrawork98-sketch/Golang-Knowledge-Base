@@ -1,55 +1,59 @@
-# CH-01: HTTP Client & Server (Web Protocols)
+# CH-01: `net/http` for HTTP Server and Client Basics
 
-> **Source Link**: [Go Packages: net/http](https://golang.org/pkg/net/http/) | [Go Blog: HTTP/2 in Go 1.6](https://blog.golang.org/http2)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [net/http package](https://pkg.go.dev/net/http)
+- **Framing**: `net/http` adalah salah satu kekuatan practical Go karena server dan client HTTP dasar sudah tersedia langsung di standard library tanpa perlu framework tambahan.
 
-### Definisi ("Apa itu?")
-Pakat `net/http` menyediakan implementasi protokol HTTP tingkat tinggi, memungkinkan pembuatan server web yang tangguh dan client yang efisien langsung dari toolchain standar Go.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Production-Ready**: Server bawaan Go sangat stabil dan digunakan oleh raksasa teknologi (Google, Cloudflare) tanpa butuh framework tambahan.
-2. **Concurrency Native**: Setiap request yang masuk otomatis ditangani oleh goroutine tersendiri (Thread-per-request model).
-3. **Standard Contract**: Antara Client dan Server menggunakan tipe data yang sama (`Request` dan `Response`), mempermudah debugging dan pengembangan terdistribusi.
+### Definisi
+Paket `net/http` menyediakan tipe dan fungsi untuk membangun server HTTP, menangani request masuk, dan mengirim request keluar sebagai client. Di sinilah pembaca mulai melihat bagaimana standard library Go mendukung web API secara langsung.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Server dan client berbagi model yang konsisten**  
+   Request, response, header, dan body dibawa dalam abstraksi yang saling terhubung.
+2. **Handler model di Go cukup sederhana dan kuat**  
+   Fungsi biasa bisa menjadi entry point untuk endpoint HTTP.
+3. **Boundary standard library tetap jelas**  
+   Banyak kebutuhan web dasar sebenarnya sudah bisa dilayani tanpa framework tambahan.
 
 ### Analogi Model Mental
-Bayangkan **Restoran Pintar**.
-Client (Anda) mengirim pesanan (Request) lewat **Pelayan (http.Client)**. Di dapur, ada **Koki (http.Server)** yang menerima pesanan tersebut. Karena restorannya "Pintar", ada banyak koki (Goroutines) yang bekerja sekaligus, sehingga tidak perlu antre panjang untuk mendapatkan makanan (Response).
+Bayangkan restoran kecil yang sudah punya meja kasir dan kurir internal. Satu sisi menerima pesanan dari pelanggan, sisi lain bisa juga memesan bahan ke luar. `net/http` menangani dua arah aliran itu dengan kontrak yang sejenis.
 
----
+### Terminologi Teknis
+- **Handler**: fungsi yang menerima request dan menulis response.
+- **ServeMux**: multiplexer yang memetakan path ke handler.
+- **HTTP Client**: objek yang mengirim request keluar dan menerima response.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Siklus Request-Response (SVG)
-![Visualisasi: Siklus HTTP Request / Response](./assets/http_cycle.svg)
+![HTTP Cycle](./assets/http_cycle.svg)
 
-### Alur Komunikasi (Mermaid)
 ```mermaid
 sequenceDiagram
-
-    Client->>Server: Request: GET /api/data
-    Note over Server: Match Handler (Mux)
-    Server-->>Client: Response: 200 OK (JSON)
-    
-    subgraph Internals
-        direction TB
-        M[ServeMux: Router]
-        H[Handler: Logic]
-        M --> H
-    end
+    Client->>Server: HTTP request
+    Server->>Mux: Match route
+    Mux->>Handler: Invoke handler
+    Handler-->>Client: HTTP response
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di sisi server, `http.HandleFunc` atau `ServeMux` menghubungkan path ke fungsi handler. Di sisi client, `http.Client` mengirim request dan menerima response yang body-nya harus ditutup setelah dipakai. Keduanya berbagi model HTTP yang sama, sehingga pembaca bisa melihat Go web stack sebagai satu ekosistem yang konsisten.
+
+Nilai praktisnya:
+- cocok untuk API kecil sampai service internal yang tidak butuh banyak lapisan tambahan;
+- membantu pembaca memahami pola dasar request-response tanpa distraksi framework;
+- menjadi fondasi untuk topik lanjutan seperti timeout, transport, dan middleware di rak lain.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_simple_api_server.go](./examples/01_simple_api_server.go) - Handler sederhana yang mengembalikan JSON response.
+- [02_http_client_post.go](./examples/02_http_client_post.go) - Client POST sederhana yang berbicara ke server lokal berbasis standard library.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menggunakan `ServeMux` (Multi-plexer) untuk memetakan URL ke fungsi handler yang tepat. Untuk Client, pastikan selalu menutup body response (`resp.Body.Close()`) agar koneksi TCP bisa digunakan kembali (*Keep-Alive*). Kegagalan melakukan ini akan menyebabkan kebocoran memory dan file handle.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_simple_api_server.go`: Membangun endpoint JSON sederhana.
-- `02_http_client_post.go`: Mengirim data ke API eksternal dengan timeout.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

@@ -1,50 +1,58 @@
-# CH-02: Buffered IO (Bufio)
+# CH-02: `bufio` and Buffered Access
 
-> **Source Link**: [Go Packages: bufio](https://golang.org/pkg/bufio/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [bufio package](https://pkg.go.dev/bufio)
+- **Framing**: `bufio` dipakai saat operasi I/O kecil terlalu sering menyentuh sistem operasi secara langsung dan perlu diberi lapisan buffer agar lebih efisien.
 
-### Definisi ("Apa itu?")
-Pakat `bufio` membungkus `io.Reader` atau `io.Writer` lainnya untuk menyediakan buffering (penyanggaan), yang mengurangi jumlah pemanggilan syscall (sistem operasi) yang mahal saat membaca/menulis data kecil secara berulang.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Performance**: Membaca file 1 byte per 1 byte langsung dari disk sangat lambat. `bufio` mengambil 4KB (default) sekaligus ke memori agar pembacaan berikutnya instan.
-2. **Scanner Utility**: Menyediakan `Scanner` yang sangat berguna untuk membaca data berbasis baris (Line-by-line) dengan mudah.
-3. **Write Management**: Menjamin data dikumpulkan terlebih dahulu sebelum benar-benar "ditembakkan" ke disk atau jaringan dalam satu paket besar.
+### Definisi
+Paket `bufio` membungkus `Reader` atau `Writer` lain dengan buffer di memori. Ia juga menyediakan helper seperti `Scanner` untuk membaca data berbasis token atau baris.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Syscall bisa dikurangi**  
+   Operasi kecil tidak harus selalu pergi ke disk atau jaringan satu per satu.
+2. **Scanning baris jadi jauh lebih mudah**  
+   `bufio.Scanner` memberi jalur praktis untuk memproses teks bertahap.
+3. **Buffering menjelaskan banyak pola I/O di Go**  
+   Banyak package memanfaatkan ide dasar yang sama demi throughput dan ergonomi.
 
 ### Analogi Model Mental
-Bayangkan **Ember Penampung Air**.
-Tanpa `bufio`, Anda lari bolak-balik ke sumur (Disk) untuk mengambil 1 gelas air (1 byte). Dengan `bufio`, Anda membawa **Ember** (4KB buffer). Anda mengisi ember sekali di sumur, lalu bisa menuang 4000 gelas air dengan cepat di rumah tanpa perlu lari-lari lagi.
+Tanpa buffer, Anda seperti bolak-balik ke sumur untuk satu gelas air. Dengan `bufio`, Anda membawa ember lebih besar lalu menuangkannya sedikit-sedikit saat dibutuhkan.
 
----
+### Terminologi Teknis
+- **Buffer**: area memori sementara untuk menampung data.
+- **Scanner**: helper untuk membaca data bertahap, sering per baris.
+- **Flush**: mengirim isi buffer writer ke tujuan sebenarnya.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Optimasi Performance (SVG)
-![Visualisasi: Mengapa Bufio Lebih Cepat?](./assets/bufio_perf.svg)
+![Bufio Performance](./assets/bufio_perf.svg)
 
-### Alur Buffer (Mermaid)
 ```mermaid
 graph LR
-
-    D[Disk/Network] -->|Sparse Read| B[Bufio Buffer: 4KB]
-    B -->|Fast Read| A[Application]
-    
-    A2[Application] -->|Write| B2[Bufio Buffer]
-    B2 -->|Flush| D2[Disk/Network]
+    Source[Disk or network] --> Buffer[bufio buffer]
+    Buffer --> App[Application read]
+    App --> WriterBuf[bufio.Writer]
+    WriterBuf --> Dest[Destination]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`bufio.Reader` mengisi buffer lebih dulu lalu melayani pembacaan berikutnya dari memori. `bufio.Writer` menahan write kecil sampai buffer penuh atau sampai `Flush()` dipanggil. Sementara itu, `Scanner` memberi API yang sederhana untuk teks, walau tetap punya batas default ukuran token yang perlu diingat.
+
+Nilai praktisnya:
+- cocok untuk file teks, log, dan stream kecil berulang;
+- mengurangi overhead operasi kecil yang terlalu sering;
+- membuat pembaca lebih paham kapan buffering memberi dampak nyata.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_buffered_reading.go](./examples/01_buffered_reading.go) - Membaca input multi-baris dengan `bufio.Scanner`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-`bufio.Reader` melakukan *filling* (pengisian) buffer saat data kosong. Sebaliknya, `bufio.Writer` harus di-`Flush()` secara manual (atau saat buffer penuh) untuk memastikan data benar-benar terkirim ke `underlying writer`. `Scanner` memiliki batas default 64KB per baris; gunakan `Buffer()` jika ingin membaca baris yang lebih panjang.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_buffered_reading.go`: Perbandingan kecepatan pembacaan dengan vs tanpa `bufio`.
-- `02_line_scanner.go`: Ekstraksi data dari file log baris demi baris secara efisien.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

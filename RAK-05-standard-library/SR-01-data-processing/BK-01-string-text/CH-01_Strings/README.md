@@ -1,44 +1,57 @@
-# CH-01: Strings Manipulation (High-Level Text)
+# CH-01: `strings` for High-Level Text Processing
 
-> **Source Link**: [Go Packages: strings](https://golang.org/pkg/strings/) | [Go Blog: Strings, bytes, runes and characters](https://blog.golang.org/strings)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [strings package](https://pkg.go.dev/strings) | [Strings, bytes, runes and characters in Go](https://go.dev/blog/strings)
+- **Framing**: Paket `strings` dipakai saat kita bekerja dengan teks biasa dan butuh operasi seperti pencarian, pemotongan, penggantian, atau penggabungan tanpa turun dulu ke level `[]byte`.
 
-### Definisi ("Apa itu?")
-Pakat `strings` menyediakan fungsi bantuan untuk manipulasi string UTF-8 yang efisien tanpa mengubah string asli (karena string di Go bersifat imutabel).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Efficiency**: Fungsi seperti `strings.Builder` mencegah alokasi memori berlebih saat penggabungan string skala besar.
-2. **Standardization**: Menyediakan cara idiomatik untuk pemotongan, pencarian, dan penggantian teks yang aman terhadap karakter multi-byte (Unicode).
-3. **ReadOnly Native**: Mengoptimalkan performa dengan memanfaatkan sifat *read-only* dari string Go.
+### Definisi
+Paket `strings` menyediakan kumpulan fungsi untuk membaca, mencari, membagi, dan menyusun string di Go. Karena string bersifat immutable, operasi ini menghasilkan nilai baru alih-alih mengubah isi string lama di tempat.
+
+### Rasionalitas
+Paket ini penting karena:
+
+1. **Operasi teks sehari-hari jadi idiomatik**  
+   Pencarian substring, prefix, suffix, replace, dan split semua punya API yang jelas.
+2. **String builder tersedia untuk penggabungan efisien**  
+   `strings.Builder` membantu saat kita perlu menyusun string besar tanpa banyak alokasi kecil.
+3. **Boundary terhadap `[]byte` tetap jelas**  
+   Selama kebutuhan masih tekstual, `strings` biasanya lebih nyaman daripada turun ke `bytes`.
 
 ### Analogi Model Mental
-Bayangkan **Mesin Cetak**.
-String asli adalah "Master Cetakan" yang tidak bisa diubah. Jika Anda ingin menambahkan teks ("Kopi") ke "Susu", pakat `strings` seperti **Tukang Cetak** yang mengambil cetakan "Susu", membuat salinan baru, menambahkan "Kopi", dan memberikan hasilnya kepada Anda.
+Bayangkan dokumen cetak yang sedang Anda beri highlight, tandai, dan salin ulang. Anda tidak mengubah kertas asli secara fisik, tetapi membuat versi hasil olahan yang baru.
 
----
+### Terminologi Teknis
+- **Immutable String**: string tidak diubah di tempat, tetapi menghasilkan nilai baru.
+- **Substring Search**: pencarian bagian teks di dalam string yang lebih besar.
+- **Builder**: objek penyangga untuk menyusun string dengan biaya alokasi yang lebih terkontrol.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    S[Source String] --> F[Strings Function]
-    F -->|Contains/Index| B[Boolean/Int Result]
-    F -->|Replace/Join| N[New String Copy]
-    F -->|Builder| M[Efficient Allocation]
+    S[Input string] --> Find[strings.Contains / Index]
+    S --> Replace[strings.ReplaceAll]
+    S --> Builder[strings.Builder]
+    Builder --> Out[Assembled output]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+String di Go hanyalah pasangan pointer dan panjang terhadap data byte yang dibaca sebagai teks UTF-8. Karena nilainya immutable, operasi seperti `ReplaceAll` atau `ToUpper` mengembalikan string baru. Saat penyusunan teks dilakukan bertahap, `strings.Builder` mengurangi kebutuhan membuat banyak salinan sementara.
+
+Nilai praktisnya:
+- cocok untuk parsing ringan dan manipulasi teks harian;
+- aman dipakai tanpa mengubah sumber data asli;
+- menjadi pintu masuk natural sebelum pembaca belajar kapan harus pindah ke `bytes`.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_search_replace.go](./examples/01_search_replace.go) - Pencarian dan penggantian teks dengan `Contains`, `HasPrefix`, `Index`, dan `ReplaceAll`.
+- [02_string_builder.go](./examples/02_string_builder.go) - Penyusunan string bertahap memakai `strings.Builder`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go String secara internal adalah *header* berisi pointer ke data underlying dan panjang (*length*). Pakat `strings` beroperasi langsung pada slice byte underlying ini namun tetap menjamin integritas UTF-8. Penggunaan `strings.Builder` sangat disarankan karena ia meminimalkan penyalinan memori dengan mengalokasikan buffer internal yang tumbuh secara dinamis.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_search_replace.go`: Penggunaan `Contains`, `HasPrefix`, dan `ReplaceAll`.
-- `02_string_builder.go`: Pembuktian efisiensi alokasi vs penggabungan `+`.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

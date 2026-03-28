@@ -1,49 +1,60 @@
-# CH-01: Cryptography (Security)
+# CH-01: `crypto` for Hashing and Encryption Basics
 
-> **Source Link**: [Go Packages: crypto](https://golang.org/pkg/crypto/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [crypto package](https://pkg.go.dev/crypto) | [crypto/aes](https://pkg.go.dev/crypto/aes) | [crypto/sha256](https://pkg.go.dev/crypto/sha256)
+- **Framing**: Topik keamanan di `RAK-05` bukan soal teori kriptografi berat, tetapi tentang memahami alat bawaan Go yang paling sering dipakai untuk menjaga integritas dan kerahasiaan data.
 
-### Definisi ("Apa itu?")
-Keluarga pakat `crypto/*` menyediakan algoritma kriptografi yang aman dan modern untuk enkripsi (AES), tanda tangan digital (RSA/ECDSA), dan hashing data (SHA256).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Data Integrity**: Memastikan data tidak diubah selama transit (Hashing).
-2. **Confidentiality**: Menjaga kerahasiaan data sensitif (Enkripsi).
-3. **Standard Compliance**: Implementasi di Go ditulis mengikuti standar keamanan internasional dan dioptimalkan dengan instruksi CPU (seperti AES-NI).
+### Definisi
+Keluarga package `crypto/*` menyediakan primitive keamanan seperti hashing, random source yang aman, dan enkripsi. Di chapter ini fokus utamanya adalah membedakan hashing dari enkripsi simetris dan memahami kapan masing-masing dipakai.
+
+### Rasionalitas
+Topik ini penting karena:
+
+1. **Integrity dan confidentiality adalah dua tujuan berbeda**  
+   Hashing memeriksa perubahan data, sementara enkripsi menyembunyikan isi data.
+2. **Standard library sudah memberi primitive yang layak dipakai**  
+   Engineer tidak perlu membangun algoritma sendiri dari nol.
+3. **Pemilihan source randomness sangat krusial**  
+   Package keamanan memakai `crypto/rand`, bukan `math/rand`.
 
 ### Analogi Model Mental
-Bayangkan **Mesin Penghancur & Brankas**.
-- **Hashing (SHA)**: Seperti **Mesin Penghancur Kertas**. Anda masukkan dokumen, hasilnya cacahan kertas yang unik. Anda tidak bisa mengembalikan cacahan itu jadi dokumen asal, tapi anda tahu jika cacahannya berbeda, maka dokumen asalnya pasti sudah diganti.
-- **Enkripsi (AES)**: Seperti **Brankas dengan Kunci**. Anda masukkan emas (Data), kunci pintunya (Key). Hanya yang punya kunci yang bisa melihat emasnya lagi.
+Hashing mirip segel anti-rusak pada paket. Jika segelnya berubah, kita tahu paket pernah dibuka. Enkripsi lebih mirip brankas yang mengunci isi paket agar tidak bisa dibaca tanpa kunci.
 
----
+### Terminologi Teknis
+- **Hashing**: menghasilkan fingerprint tetap dari input.
+- **Symmetric Encryption**: enkripsi dan dekripsi memakai kunci yang sama.
+- **Cryptographically Secure Randomness**: sumber angka acak yang layak untuk keamanan.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Mekanisme AES (SVG)
-![Visualisasi: Mekanisme AES Block Cipher](./assets/aes_cipher.svg)
+![AES Cipher](./assets/aes_cipher.svg)
 
-### Alur Kriptografi (Mermaid)
 ```mermaid
 graph LR
-    P[Plain Data] -->|Hash: SHA256| H[Checksum: 32 bytes]
-    P -->|Encrypt: AES| E[Ciphertext]
-    E -->|Decrypt: Key| P
+    Plain[Plain data] --> Hash[SHA256]
+    Plain --> Encrypt[AES-GCM encrypt]
+    Encrypt --> Cipher[Ciphertext]
+    Cipher --> Decrypt[AES-GCM decrypt]
+    Decrypt --> Plain2[Recovered data]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Hash function seperti SHA-256 menerima input lalu menghasilkan fingerprint yang deterministik. Enkripsi simetris seperti AES-GCM menggunakan kunci dan nonce untuk mengubah plaintext menjadi ciphertext yang bisa dikembalikan lagi hanya oleh pihak yang punya kunci yang benar. Karena itu, keamanan bukan hanya soal algoritma, tetapi juga soal pemakaian nonce, key, dan randomness yang benar.
+
+Nilai praktisnya:
+- membantu pembaca membedakan hashing password sederhana dari enkripsi payload;
+- memberi jalur masuk yang aman ke utilitas keamanan bawaan;
+- menjaga `RAK-05` tetap praktis tanpa berubah menjadi kuliah kriptografi.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_password_hashing.go](./examples/01_password_hashing.go) - Demonstrasi hashing SHA-256 sederhana dengan tambahan salt.
+- [02_aes_encryption.go](./examples/02_aes_encryption.go) - Demonstrasi enkripsi dan dekripsi pesan dengan AES-GCM.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go membedah kriptografi menjadi sub-paket spesifik. Gunakan `crypto/rand` (bukan `math/rand`) untuk menghasilkan kunci atau *salt* yang aman untuk keamanan. Hashing bersifat deterministik; input yang sama akan menghasilkan hash yang selalu sama. Enkripsi simetris (AES) jauh lebih cepat daripada enkripsi asimetris (RSA) untuk data besar.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_password_hashing.go`: Mengamankan data dengan SHA256 (plus Salt).
-- `02_aes_encryption.go`: Enkripsi dan dekripsi pesan rahasia secara simetris (AES-GCM).
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
-
+*Status: [x] Complete*
