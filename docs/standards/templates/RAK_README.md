@@ -1,22 +1,24 @@
-# Template: Rak README
+# Template: RAK README
 
-Gunakan format ini untuk setiap `RAK-XX/README.md`.
+Gunakan format ini untuk `RAK-XX/README.md`.
+
+```md
+# RAK-XX: [Nama Rak]
+
+[Deskripsi singkat domain rak ini.]
+
+## Struktur
+
+### [SR-01 atau BK-01]
+[Deskripsi singkat.]
+
+### [SR-02 atau BK-02]
+[Deskripsi singkat.]
+
+## Boundary
+- [Apa yang dibahas di rak ini]
+- [Apa yang bukan cakupan rak ini]
 
 ---
-
-# Rak [XX]: [Nama Rak]
-
-[Deskripsi singkat tentang domain teknologi yang dicakup oleh Rak ini.]
-
-## 🏗️ Struktur Sub-Rak & Buku
-
-- **[SR-01-nama-slug]**
-    - [BK-01_Nama]
-    - [BK-02_Nama]
-
-## 🎯 Key Goals
-- [Goal 1]
-- [Goal 2]
-
----
-*Back to [Library Root](../../README.md)*
+*Status: [ ] Draft*
+```

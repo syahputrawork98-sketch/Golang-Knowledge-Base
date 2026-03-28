@@ -1,19 +1,23 @@
-# SR-07: Concurrency Basic (The Engine)
+# SR-07: Concurrency Basic
 
-> **"Do not communicate by sharing memory; instead, share memory by communicating."**
+Sub-rak ini membahas fondasi concurrency Go: bagaimana goroutine bekerja, bagaimana channel dipakai, dan bagaimana kode tetap aman saat berjalan bersamaan.
 
-Sub-Rak ini membedah "Senjata Rahasia" Go yang sebenarnya: Concurrency. Kita akan belajar bagaimana Go menangani ribuan tugas sekaligus secara efisien tanpa beban berat Thread OS tradisional.
+## Struktur
 
-## Kurikulum Premium
+### [BK-01_Orchestration](./BK-01_Orchestration/)
+Goroutine, scheduling dasar, dan orkestrasi pekerjaan paralel.
 
-### 1. [BK-01: Orchestration](./BK-01_Orchestration/README.md)
-Mekanisme eksekusi paralel dan sinkronisasi penyelesaian tugas (Goroutines & WaitGroups).
+### [BK-02_Communication](./BK-02_Communication/)
+Channel dan pola komunikasi antar goroutine.
 
-### 2. [BK-02: Communication](./BK-02_Communication/README.md)
-Managemen aliran data dan koordinasi antar proses melalui Channels & Select.
+### [BK-03_Safety](./BK-03_Safety/)
+Mutex, context, dan dasar menjaga kode concurrent tetap aman.
 
-### 3. [BK-03: Safety & Resilience](./BK-03_Safety/README.md)
-Mencegah Data Race dan mengelola siklus hidup proses (Mutex & Context Pattern).
+## Boundary
+
+- fokus pada dasar concurrency yang wajib dipahami sebelum masuk ke pola lanjutan;
+- menyiapkan pembaca untuk rak evolusi dan core mechanics;
+- bukan tempat utama untuk concurrency pattern industri atau bedah scheduler runtime.
 
 ---
-*Status: [ ] In Progress (Gold Standard - PPM V4)*
+*Status: [x] Complete*

@@ -1,14 +1,20 @@
-# SR-01: Basics (The Atoms of Go)
+# SR-01: Basics
 
-Sub-Rak ini membedah blok bangunan terkecil dari bahasa Go dengan kedalaman absolut. Di sini kita mempelajari fondasi yang akan menopang seluruh arsitektur sistem yang kompleks.
+Sub-rak ini membahas blok paling dasar dalam bahasa Go: identitas program dan sistem tipe yang menjadi fondasi seluruh materi berikutnya.
 
-## 🏁 Daftar Buku
+## Struktur
 
-### 1. [BK-01: Identity](./BK-01_Identity/)
-Membahas tentang Variabel, Konstanta, Scope, dan Visibilitas sebagai identitas utama sebuah program.
+### [BK-01_Identity](./BK-01_Identity/)
+Variabel, konstanta, scope, visibilitas, dan identitas dasar dalam program Go.
 
-### 2. [BK-02: Type System](./BK-02_TypeSystem/)
-Membahas tentang sifat fisik data di memori, Unicode, sistem tipe yang ketat, dan dasar-dasar pointer.
+### [BK-02_TypeSystem](./BK-02_TypeSystem/)
+Tipe data, representasi nilai, unicode, dan dasar pointer.
+
+## Boundary
+
+- fokus pada elemen paling dasar yang harus dipahami sebelum masuk ke alur kontrol dan struktur data;
+- cocok sebagai pijakan awal untuk pembaca baru;
+- bukan tempat utama untuk pattern arsitektur, concurrency, atau internals runtime.
 
 ---
-*Status: [x] Complete (Gold Standard)*
+*Status: [x] Complete*

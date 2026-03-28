@@ -1,16 +1,23 @@
-# SR-04: Object Orientation (The Blueprints)
+# SR-04: Object Orientation
 
-> **"Go is object-oriented, but it's not class-based. It's about data structuring and contract fulfillment."**
+Sub-rak ini membahas cara Go membangun perilaku ala OOP tanpa class inheritance tradisional: lewat struct, method, dan komposisi.
 
-Sub-Rak ini mengeksplorasi bagaimana Go menangani desain objek menggunakan sistem tipe yang unik, tanpa hirarki warisan tradisional.
+## Struktur
 
-## Struktur Buku
+### [BK-01_StructsMethods](./BK-01_StructsMethods/)
+Struct dan method sebagai bentuk dasar pengelompokan data dan perilaku.
 
-### 1. [BK-01: Structs & Methods](./BK-01_StructsMethods/README.md)
-Dasar pendefinisian data dan perilaku (behavior).
+### [BK-02_CompositionEmbedding](./BK-02_CompositionEmbedding/)
+Composition dan embedding sebagai pendekatan khas Go untuk membangun sistem yang fleksibel.
 
-### 2. [BK-02: Composition & Embedding](./BK-02_CompositionEmbedding/README.md)
-Membangun sistem yang kompleks melalui penggabungan komponen, bukan warisan.
+### [BK-03_Interfaces](./BK-03_Interfaces/)
+Interface sebagai kontrak perilaku dan dasar polimorfisme di Go.
+
+## Boundary
+
+- fokus pada gaya OOP khas Go yang berbasis komposisi;
+- membantu pembaca berpindah dari model class-oriented ke model Go;
+- bukan tempat utama untuk rasionalitas desain Go yang lebih filosofis.
 
 ---
-*Status: [ ] In Progress (Gold Standard - PPM V4)*
+*Status: [x] Complete*

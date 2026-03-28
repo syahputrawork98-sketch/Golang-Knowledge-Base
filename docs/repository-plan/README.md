@@ -1,45 +1,57 @@
-# Golang Knowledge Base: Universal Deconstruction Plan
+# Golang Knowledge Base Blueprint
 
-> **Status**: Gold Standard (6-Level Hierarchy)
-> **Last Updated**: 2026-03-22
+Dokumen ini memetakan gambaran besar isi repositori. Fokusnya adalah struktur pembelajaran, bukan aturan teknis mikro.
 
-Rencana ini menggunakan **Unified Gold Standard** untuk mentransformasi dokumen teknis menjadi unit pelajaran yang presisi melalui hirarki **6-Level Depth**.
+## 1. Fungsi Dokumen Ini
 
----
+Dokumen ini menjawab:
+- repo ini dibagi ke area apa saja;
+- kenapa area itu dipisah;
+- arah pertumbuhan repositori ke depan.
 
-## 1. Arsitektur 6-Rak (The Universe Blueprint)
+Aturan teknis repo hidup di:
+- `docs/standards/README.md`
+- `docs/standards/authoring.md`
 
-Pemisahan secara abstraksi dari mulai akar filosofi hingga jeroan kompilernya:
+## 2. Blueprint 6 Rak
 
-### I. RAK-01-anatomy (The Landscape)
-Sejarah kompilator, filosofi desain (Simple & Concurrent), use-case (Cloud Native), serta limitasi dan penafian arsitektur (Tidak ada "Nil Content").
+### RAK-01: Anatomy
+Membahas asal-usul, filosofi, use case, dan konteks kelahiran Go.
 
-### II. RAK-02-foundation (The Standard Book)
-Mempelajari sintaks dasar secara bertahap (Variabel, Kontrol Alur, Tipe Data, Struct, Interface) bersumber dari dokumentasi resmi Go.
+### RAK-02: Foundation
+Membahas fondasi bahasa dan penggunaan idiomatik sehari-hari.
 
-### III. RAK-03-evolution (History & Future)
-Mendokumentasikan evolusi versi Go dan migrasi rilis secara kronologis.
+### RAK-03: Evolution
+Membahas module system, testing, concurrency patterns, observability, dan area evolusi ekosistem.
 
-### IV. RAK-04-core-mechanics (The Internal Logic)
-Rasionalitas di balik mekanika inti Go, termasuk sistem error handling, pointer, dan pattern bawaannya.
+### RAK-04: Core Mechanics
+Membahas rasionalitas desain dan pola sistemik Go.
 
-### V. RAK-05-standard-library (The Environment)
-Eksplorasi utilitas dan library ekosistem "Batteries Included" bawaan Go: `fmt`, `net/http`, `io/fs`, `sync`, dll.
+### RAK-05: Standard Library
+Membahas utilitas dan paket bawaan Go sebagai lingkungan kerja utama.
 
-### VI. RAK-06-compiler-runtime (The Machine Room)
-Deep dive ke dalam jeroan *Go compiler*, M:P:G Goroutine Scheduler, dan Garbage Collection.
+### RAK-06: Compiler and Runtime
+Membahas compiler internals, scheduler, allocator, stack, GC, dan interfacing ke dunia luar.
 
----
+## 3. Kedalaman Struktur
 
-## 2. Hirarki Kedalaman (Digital Mirroring)
+Repositori ini menggunakan struktur:
 
-Setiap materi didekonstruksi hingga 6 level kedalaman jika diperlukan:
-1. **Root** (Pusat Hub)
-2. **RAK** (Domain)
-3. **SR** (Track)
-4. **BK** (Book)
-5. **CH** (Chapter)
-6. **SEC** (Section)
+1. Root
+2. RAK
+3. SR
+4. BK
+5. CH
+6. SEC
 
----
-*Referensi Utama: Unified Gold Standard v1 (docs/standards).*
+Pengecualian:
+- `RAK-01` boleh melewati `SR` karena sifatnya naratif.
+
+## 4. Catatan Strategis
+
+- `RAK-02`, `RAK-04`, dan `RAK-06` harus dijaga boundary-nya agar tidak membahas hal yang sama dari sudut pandang yang sama.
+- Pertumbuhan repo harus mengikuti struktur, bukan kebiasaan menambah folder secara ad hoc.
+## 5. Rujukan
+
+- [../standards/README.md](../standards/README.md)
+- [../standards/authoring.md](../standards/authoring.md)

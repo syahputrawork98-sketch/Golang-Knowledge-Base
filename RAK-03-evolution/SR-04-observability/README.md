@@ -1,33 +1,23 @@
-# SR-04: Runtime Observability
+# SR-04: Observability
 
-**Mastering the Science of System Introspection**
+Sub-rak ini membahas cara melihat perilaku program Go saat berjalan lewat profiling, tracing, metrics, dan telemetry.
 
-Selamat datang di modul **Runtime Observability**. Di sini, Anda akan belajar cara melihat ke dalam "jantung" aplikasi Go yang sedang berjalan untuk mengoptimalkan performa, mendeteksi kebocoran resource, dan memantau kesehatan sistem di skala produksi.
+## Struktur
 
-## Struktur Modul
+### [BK-01-profiling](./BK-01-profiling/)
+CPU, memory, block, dan mutex profiling untuk membaca biaya eksekusi program.
 
-Modul ini dibagi menjadi tiga buku utama yang mencakup spektrum observabilitas penuh:
+### [BK-02-tracing](./BK-02-tracing/)
+Execution trace dan distributed tracing untuk memahami aliran kerja runtime dan request.
 
-### [BK-01: Profiling & Deep Inspection](./BK-01-profiling/README.md)
-Teknik menggunakan `pprof` untuk bedah performa mendalam.
-- CPU & Heap Analysis (Bottleneck identification)
-- Goroutine & Thread Profiling (Leak detection)
-- Block & Mutex Contention (Sync synchronization)
+### [BK-03-telemetry](./BK-03-telemetry/)
+Metrics, Prometheus, slog, dan telemetry modern dalam aplikasi Go.
 
-### [BK-02: Tracing & Execution Flow](./BK-02-tracing/README.md)
-Visualisasi orkestrasi internal Go Scheduler.
-- Execution Tracer (Timeline visualization)
-- User-defined Tasks & Regions (Semantic spans)
-- Distributed Tracing Concepts (OpenTelemetry)
+## Boundary
 
-### [BK-03: Metrics & Structured Logging](./BK-03-telemetry/README.md)
-Telemetri modern untuk sistem yang skalabel.
-- `runtime/metrics` (Efficient runtime introspection)
-- Prometheus Integration (Industrial monitoring)
-- Structured Logging with `slog` (Machine-readable logs)
-
-## Kenapa Ini Penting? (Senior Perspective)
-Seorang Senior Engineer tidak menebak mengapa aplikasi lambat; mereka **mengukur**. Kemampuan menggunakan profil dan trace secara efektif adalah pembeda utama antara pengembang yang "berharap kodenya cepat" dan yang "tahu kodenya optimal".
+- fokus pada observability dan cara membaca perilaku aplikasi secara nyata;
+- membantu engineer menjembatani kode dengan data operasional;
+- bukan tempat utama untuk testing atau internals compiler.
 
 ---
-*Part of [RAK-03-evolution](../README.md)*
+*Status: [x] Complete*

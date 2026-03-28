@@ -1,33 +1,23 @@
-# SR-05: System Internals & Optimization
+# SR-05: Internals
 
-**Mechanical Sympathy: Engineering for the Metal**
+Sub-rak ini membahas area internal yang membantu engineer memahami performa dan perilaku Go lebih dalam tanpa harus langsung masuk ke rak compiler/runtime.
 
-Selamat datang di modul puncak **System Internals & Optimization**. Di sini, Anda akan melampaui sekadar menulis kode yang berfungsi dan mulai menulis kode yang bekerja secara harmonis dengan runtime Go dan arsitektur CPU modern.
+## Struktur
 
-## Struktur Modul
+### [BK-01-memory](./BK-01-memory/)
+Escape analysis, garbage collection, dan allocator dari sudut pandang performa dan pemahaman perilaku.
 
-Modul ini dibagi menjadi tiga buku eksplorasi mendalam:
+### [BK-02-scheduler](./BK-02-scheduler/)
+GMP model, syscall poller, dan preemption sebagai bagian dari perilaku runtime yang penting dipahami.
 
-### [BK-01: Memory Management Internals](./BK-01-memory/README.md)
-Memahami siklus hidup objek dan strategi pembersihan memori.
-- Escape Analysis (Stack vs Heap decision)
-- Garbage Collection Deep Dive (Mark & Sweep internals)
-- Memory Allocator Architecture (mspan/mcache hierarchy)
+### [BK-03-optimization](./BK-03-optimization/)
+Inlining, alignment, padding, dan teknik optimisasi yang terasa langsung efeknya pada kode.
 
-### [BK-02: Runtime Scheduler (G-M-P)](./BK-02-scheduler/README.md)
-Membedah mesin penggerak konkurensi Go.
-- G-M-P Model (M:N Scheduling logic)
-- Syscall & Network Poller (I/O orchestration)
-- Preemption Mechanisms (Handling greedy goroutines)
+## Boundary
 
-### [BK-03: Performance Optimization](./BK-03-optimization/README.md)
-Teknik memeras setiap siklus CPU yang tersedia.
-- Inlining & BCE (Compiler-level boosts)
-- Data Alignment (Padding & Cache efficiency)
-- Zero-Allocation Patterns (sync.Pool & Reuse)
-
-## Kenapa Ini Penting? (Senior Perspective)
-Di skala sistem terdistribusi yang memproses jutaan request per detik, penghematan 8 byte per struct atau pengurangan 1ms pada jeda GC bukan lagi optimasi prematur—itu adalah kebutuhan infrastruktur. Modul ini membekali Anda dengan insting "mekanikal" untuk membangun sistem yang benar-benar berperforma tinggi.
+- fokus pada internals yang berguna untuk engineer dan performance-minded developer;
+- menjadi jembatan dari ekosistem praktis ke pemahaman mesin yang lebih dalam;
+- bukan tempat utama untuk source code compiler Go secara penuh.
 
 ---
-*Part of [RAK-03-evolution](../README.md)*
+*Status: [x] Complete*

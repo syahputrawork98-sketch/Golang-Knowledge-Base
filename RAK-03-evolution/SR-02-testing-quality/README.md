@@ -1,14 +1,23 @@
-# SR-02: Testing & Quality Excellence
+# SR-02: Testing and Quality
 
-![Testing Quality Hero](./assets/hero-testing-quality.png)
+Sub-rak ini membahas cara menjaga kualitas kode Go lewat testing, mocking, fuzzing, coverage, dan alat bantu reliabilitas.
 
-## Overview
-Modul ini mentransformasi paradigma pengujian Anda dari sekadar "menjalankan kode" menjadi "menjamin arsitektur dan kualitas produksi". Kita akan mengeksplorasi teknik pengujian Go dari tingkat dasar hingga standar industri modern.
+## Struktur
 
-## Books (BK)
-- [BK-01: Unit Testing Primitives](./BK-01-unit-testing/README.md)
-- [BK-02: The Art of Mocking](./BK-02-mocking-patterns/README.md)
-- [BK-03: Modern Reliability](./BK-03-reliability/README.md)
+### [BK-01-unit-testing](./BK-01-unit-testing/)
+Dasar unit testing, helper, setup, dan pola pengujian idiomatik di Go.
+
+### [BK-02-mocking-patterns](./BK-02-mocking-patterns/)
+Mocking dengan interface, function injection, dan pendekatan integrasi nyata.
+
+### [BK-03-reliability](./BK-03-reliability/)
+Fuzzing, race detection, coverage, dan cara meningkatkan kepercayaan terhadap kode.
+
+## Boundary
+
+- fokus pada kualitas, pengujian, dan keandalan kode Go;
+- cocok untuk engineer yang ingin naik dari sekadar menulis test menjadi membangun confidence;
+- bukan tempat utama untuk observability runtime atau bedah concurrency internals.
 
 ---
-*Back to [RAK-03 Evolution](../README.md)*
+*Status: [x] Complete*

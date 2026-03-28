@@ -1,16 +1,20 @@
-# SR-06: Modern Features (Generics & Error Handling)
+# SR-06: Modern Features
 
-> **"Go's evolution is slow and deliberate. Generics and advanced error handling are the fruits of that patience."**
+Sub-rak ini membahas fitur Go yang lebih modern dan ekspresif, terutama generics dan penanganan error yang lebih kaya.
 
-Sub-Rak ini mengeksplorasi penambahan besar terakhir pada bahasa Go yang memungkinkan penulisan kode yang lebih aman, fleksibel, dan ekspresif.
+## Struktur
 
-## Struktur Buku
+### [BK-01_Genericity](./BK-01_Genericity/)
+Generics, constraints, dan cara menulis kode yang reusable tanpa kehilangan kejelasan.
 
-### 1. [BK-01: Genericity](./BK-01_Genericity/README.md)
-Pemrograman berbasis tipe generic (Type Parameters).
+### [BK-02_Errors](./BK-02_Errors/)
+Error wrapping, inspection, dan pola modern untuk membangun error handling yang kuat.
 
-### 2. [BK-02: Errors](./BK-02_Errors/README.md)
-Manajemen kesalahan tingkat lanjut dan pertahanan sistem.
+## Boundary
+
+- fokus pada fitur yang muncul lebih belakangan dalam evolusi pemakaian Go;
+- membantu pembaca memperluas fondasi bahasa ke pola yang lebih modern;
+- bukan tempat utama untuk module system atau pattern concurrency lanjutan.
 
 ---
-*Status: [x] Complete (Gold Standard - PPM V4)*
+*Status: [x] Complete*

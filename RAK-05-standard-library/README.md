@@ -1,67 +1,26 @@
-# RAK-05: Standard Library (The Gopher's Arsenal)
+# RAK-05: Standard Library
 
-> **Status**: Platinum Gold Standard (PPM V4) 100% ✅  
-> **Kedalaman**: Industri & System Internals  
-> **Fokus**: Efisiensi, Interoperabilitas, dan Keamanan.
+Rak ini membahas paket bawaan Go yang paling penting untuk kerja sehari-hari: pengolahan data, I/O, jaringan, utilitas, dan keamanan. Fokusnya adalah memahami kenapa standard library Go kuat dan bagaimana memakainya dengan efektif.
 
----
+## Struktur
 
-## 🎯 Visi & Strategi
-Standard Library Go bukan sekadar kumpulan fungsi, melainkan "Senjata Utama" yang dirancang untuk performa tinggi tanpa dependensi eksternal. RAK-05 membedah anatomi library ini dengan fokus pada **"Kenapa"** (Rasionalitas) dan **"Bagaimana"** (Mekanisme Internal).
+### [SR-01-data-processing](./SR-01-data-processing/)
+Manipulasi string, bytes, dan serialisasi data seperti JSON atau binary encoding.
 
----
+### [SR-02-io-filesystem](./SR-02-io-filesystem/)
+Abstraksi I/O, file handling, dan interaksi dengan filesystem.
 
-## 🗺️ Peta Navigasi (Visual Map)
+### [SR-03-networking](./SR-03-networking/)
+HTTP dan dasar komunikasi jaringan untuk membangun service Go.
 
-```mermaid
-graph TD
-    RAK05[RAK-05: Standard Library] --> SR01[SR-01: Data Processing]
-    RAK05 --> SR02[SR-02: IO & Filesystem]
-    RAK05 --> SR03[SR-03: Networking]
-    RAK05 --> SR04[SR-04: Utilities]
+### [SR-04-utilities](./SR-04-utilities/)
+Waktu, enkripsi, dan utilitas penting lain yang sering dipakai dalam aplikasi nyata.
 
-    SR01 --> BK01[BK-01: String & Text]
-    SR01 --> BK02[BK-02: Serialization]
-    
-    SR02 --> BK03[BK-01: IO Interface]
-    SR02 --> BK04[BK-02: OS & Embed]
+## Boundary
 
-    style SR01 fill:#f9f,stroke:#333
-    style SR02 fill:#bbf,stroke:#333
-    style SR03 fill:#bfb,stroke:#333
-    style SR04 fill:#fbf,stroke:#333
-```
+- fokus pada paket standard library dan cara memahaminya secara praktis;
+- membahas library bawaan sebagai lingkungan kerja utama Go;
+- bukan tempat utama untuk pola desain murni atau internals compiler dan runtime.
 
 ---
-
-## 📂 Daftar Jalur Spesialis (Sub-Rak)
-
-### [SR-01: Data Processing & Encoding](./SR-01-data-processing)
-*Membedah manipulasi teks dan konversi format data.*
-- **BK-01: String & Text**: [Strings](./SR-01-data-processing/BK-01-string-text/CH-01_Strings), [Strconv](./SR-01-data-processing/BK-01-string-text/CH-02_Strconv), [Bytes](./SR-01-data-processing/BK-01-string-text/CH-03_Bytes).
-- **BK-02: Serialization**: [JSON](./SR-01-data-processing/BK-02-serialization/CH-01_JSON), [Binary Encoding](./SR-01-data-processing/BK-02-serialization/CH-02_Binary).
-
-### [SR-02: IO & Filesystem](./SR-02-io-filesystem)
-*Fondasi aliran data dan interaksi sistem operasi.*
-- **BK-01: IO Abstractions**: [io.Reader/Writer](./SR-02-io-filesystem/BK-01-io-abstractions/CH-01_IO), [Buffered IO (bufio)](./SR-02-io-filesystem/BK-01-io-abstractions/CH-02_Bufio).
-- **BK-02: File Management**: [OS Ops](./SR-02-io-filesystem/BK-02-file-management/CH-01_OS), [Embed System](./SR-02-io-filesystem/BK-02-file-management/CH-02_Embed).
-
-### [SR-03: Networking & Protocols](./SR-03-networking)
-*Membangun tulang punggung sistem terdistribusi.*
-- **BK-01: Web & API**: [net/http](./SR-03-networking/BK-01-web-api/CH-01_HTTP) (Server & Client).
-
-### [SR-04: Utilities & Security](./SR-04-utilities)
-*Manajemen waktu, penjadwalan, dan enkripsi.*
-- **BK-01: Security**: [Cryptography](./SR-04-utilities/BK-01-security/CH-01_Crypto) (Hashing & AES).
-- **BK-02: Time**: [Precision Time](./SR-04-utilities/BK-02-time/CH-01_Time) (Timer & Ticker).
-
----
-
-## 🧪 Laboratory Experiments
-Setiap bab di atas dilengkapi dengan folder `examples/` berisi skrip Go yang siap dijalankan untuk membuktikan konsep secara empiris.
-
-## 🎨 Visual Assets
-Seluruh unit dilengkapi dengan **7 Premium Technical SVGs** dan **12 Mermaid Diagrams** untuk menyederhanakan konsep internal yang kompleks.
-
----
-*Dikelola dengan Standar Platinum Gold PPM V4. Seluruh hak cipta dokumentasi dilindungi.*
+*Status: [x] Complete*

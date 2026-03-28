@@ -1,25 +1,23 @@
-# SR-03: Advanced Concurrency Patterns
+# SR-03: Concurrency
 
-**From Go Channel Basics to High-Performance System Architect**
+Sub-rak ini membahas concurrency Go di level yang lebih lanjut: primitive sinkronisasi, pipeline, dan pola ketahanan sistem concurrent.
 
-Modul ini membekali Anda dengan senjata-senjata terberat di arsenal Go untuk membangun sistem konkuren yang efisien, aman, dan tahan banting.
+## Struktur
 
-## Struktur Modul
+### [BK-01-low-level](./BK-01-low-level/)
+Primitive sinkronisasi seperti `sync.Once`, `sync.Pool`, semaphore, dan `sync.Cond`.
 
-| Book | Topik | Target |
-|------|-------|--------|
-| [BK-01](./BK-01-low-level/README.md) | Low-Level Sync Primitives | Menguasai `sync.Once`, `sync.Pool`, dan `sync.Cond` |
-| [BK-02](./BK-02-pipelines/README.md) | Pipeline & Flow Patterns | Merancang aliran data industrial dengan Fan-Out/In dan Generator |
-| [BK-03](./BK-03-resilience/README.md) | Resilience & Flow Control | Melindungi sistem dengan Rate Limiting, errgroup, dan Singleflight |
+### [BK-02-pipelines](./BK-02-pipelines/)
+Fan-in, fan-out, pipeline, dan aliran kerja concurrent yang terstruktur.
 
-## Learning Path
+### [BK-03-resilience](./BK-03-resilience/)
+Rate limiting, `errgroup`, `singleflight`, dan kontrol ketahanan di sistem concurrent.
 
-```mermaid
-graph LR
-    BK01[BK-01: Low-Level Primitives] --> BK02[BK-02: Pipelines]
-    BK02 --> BK03[BK-03: Resilience]
-    BK03 --> NEXT[SR-04: Runtime Observability]
-```
+## Boundary
+
+- fokus pada concurrency pattern yang lebih lanjut dari fondasi dasar;
+- menjembatani teori dasar concurrency dengan kebutuhan sistem produksi;
+- bukan tempat utama untuk filosofi concurrency Go atau scheduler runtime level rendah.
 
 ---
-*Back to [RAK-03 Page](../README.md)*
+*Status: [x] Complete*

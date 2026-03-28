@@ -1,14 +1,23 @@
-# SR-01: Module System & Supply Chain
+# SR-01: Module System
 
-![Module System Hero](./assets/hero-module-system.png)
+Sub-rak ini membahas cara Go mengelola modul, dependency, workspace, dan keamanan supply chain dalam proyek nyata.
 
-## Overview
-Modul ini mengeksplorasi ekosistem modul Go, mulai dari manajemen dependensi lokal hingga distribusi enterprise dan keamanan supply chain.
+## Struktur
 
-## Books (BK)
-- [BK-01: The Module Lifecycle](./BK-01-module-lifecycle/README.md)
-- [BK-02: Enterprise Proxy & Private Hubs](./BK-02-enterprise-proxy/README.md)
-- [BK-03: Maintenance & Security](./BK-03-maintenance-security/README.md)
+### [BK-01-module-lifecycle](./BK-01-module-lifecycle/)
+`go.mod`, `go.sum`, workspace, dan lifecycle modul dari pengembangan sampai distribusi.
+
+### [BK-02-enterprise-proxy](./BK-02-enterprise-proxy/)
+Proxy, private module, dan tantangan enterprise saat mengelola dependency.
+
+### [BK-03-maintenance-security](./BK-03-maintenance-security/)
+Audit keamanan, maintenance, dan pengelolaan versi serta retraction.
+
+## Boundary
+
+- fokus pada ekosistem modul dan supply chain Go modern;
+- relevan untuk engineer yang mengelola dependency di proyek nyata;
+- bukan tempat utama untuk sintaks bahasa dasar atau arsitektur package internal aplikasi.
 
 ---
-*Back to [RAK-03 Evolution](../README.md)*
+*Status: [x] Complete*

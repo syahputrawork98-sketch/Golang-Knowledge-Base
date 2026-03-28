@@ -1,23 +1,23 @@
-# RAK-01: Anatomy (The Landscape)
+# RAK-01: Anatomy
 
-Selamat datang di Rak pertama dari **Golang Knowledge Base**. Rak ini mengeksplorasi asal-usul narasi Go, krisis yang melahirkannya, filosofi "Less is More", dan target utamanya dalam ekosistem cloud-native modern.
+Rak ini menjadi pintu masuk untuk memahami Go dari sisi cerita besarnya: kenapa Go lahir, filosofi apa yang dibawanya, dan kenapa bahasa ini kuat di dunia cloud-native.
 
-## 📚 Daftar Buku
+## Struktur
 
-### 0. [BK-00: The Genesis](./BK-00_TheGenesis/)
-Membedah krisis di Google dan warisan teknis dari "The Big Three" yang melahirkan Go.
-- [CH-01: The Google Crisis](./BK-00_TheGenesis/CH-01_TheGoogleCrisis/)
-- [CH-02: The Founders' Legacy](./BK-00_TheGenesis/CH-02_TheFoundersLegacy/)
+### [BK-00_TheGenesis](./BK-00_TheGenesis/)
+Latar belakang kelahiran Go, krisis yang melatarinya, dan warisan para pendirinya.
 
-### 1. [BK-01: Foundations](./BK-01_Foundations/)
-Menelusuri esensi dasar: silsilah teknis Go dan filosofi desain yang membuatnya unik.
-- [CH-01: The Evolution](./BK-01_Foundations/CH-01_TheEvolution/)
-- [CH-02: Philosophy](./BK-01_Foundations/CH-02_Philosophy/)
+### [BK-01_Foundations](./BK-01_Foundations/)
+Fondasi naratif Go: evolusi awal dan filosofi desain yang membentuk karakter bahasanya.
 
-### 2. [BK-02: Cloud Native](./BK-02_CloudNative/)
-Melihat implementasi Go di dunia nyata: mengapa Docker, Kubernetes, dan Terraform memilih Go.
-- [CH-01: The Go Use Cases](./BK-02_CloudNative/CH-01_TheGoUseCases/)
-- [CH-02: The Gopher Way](./BK-02_CloudNative/CH-02_TheGopherWay/)
+### [BK-02_CloudNative](./BK-02_CloudNative/)
+Alasan Go banyak dipakai di sistem modern seperti container platform, orchestration, dan tooling infrastruktur.
+
+## Boundary
+
+- fokus pada asal-usul, filosofi, dan konteks penggunaan Go;
+- cocok sebagai pengantar sebelum masuk ke sintaks dan mekanika teknis;
+- bukan tempat utama untuk membahas detail penggunaan bahasa, pola arsitektur, atau internals runtime.
 
 ---
-*Status: [x] Complete (Audit Verified)*
+*Status: [x] Complete*

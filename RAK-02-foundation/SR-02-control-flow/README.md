@@ -1,17 +1,23 @@
-# SR-02: Control Flow (The Pulse of Execution)
+# SR-02: Control Flow
 
-Sub-Rak ini membedah bagaimana Go mengontrol jalannya eksekusi program melalui logika kondisional, perulangan, dan penanganan kegagalan mendadak dengan kedalaman senior.
+Sub-rak ini membahas bagaimana program Go mengatur jalannya eksekusi: membuat keputusan, melakukan iterasi, dan mengelola cleanup serta recovery.
 
-## 🏁 Daftar Buku
+## Struktur
 
-### 1. [BK-01: Conditional Logic](./BK-01_ConditionalLogic/) (4 Bab)
-Struktur `if`, `switch`, dan optimasi logika.
+### [BK-01_ConditionalLogic](./BK-01_ConditionalLogic/)
+`if`, `switch`, dan logika kondisional yang membentuk pengambilan keputusan program.
 
-### 2. [BK-02: Iteration Patterns](./BK-02_IterationPatterns/) (4 Bab)
-Mekanisme `for`, `range`, dan optimasi performa iterasi.
+### [BK-02_IterationPatterns](./BK-02_IterationPatterns/)
+`for`, `range`, dan pola iterasi yang umum di Go.
 
-### 3. [BK-03: Defer and Recovery](./BK-03_DeferAndRecovery/) (3 Bab)
-Manajemen sumber daya dan pola ketahanan sistem (*Resilience*).
+### [BK-03_DeferAndRecovery](./BK-03_DeferAndRecovery/)
+`defer`, `panic`, dan `recover` untuk pengelolaan cleanup dan ketahanan eksekusi.
+
+## Boundary
+
+- fokus pada alur eksekusi program dari level dasar sampai menengah;
+- membantu pembaca memahami ritme program Go saat berjalan;
+- bukan tempat utama untuk concurrency atau mekanika runtime yang lebih dalam.
 
 ---
-*Status: [x] Complete (Gold Standard - 11 Chapters)*
+*Status: [x] Complete*

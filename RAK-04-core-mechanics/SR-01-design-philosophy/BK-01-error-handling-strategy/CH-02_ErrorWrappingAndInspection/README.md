@@ -1,44 +1,62 @@
-# CH-02: Error Wrapping & Inspection (The Modern Way)
+# CH-02: Error Wrapping and Inspection
 
-> **Source Link**: [Go Blog: Working with Errors in Go 1.13](https://blog.golang.org/go1.13-errors)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Blog: Working with Errors in Go 1.13](https://go.dev/blog/go1.13-errors)
+- **Framing**: Error wrapping di Go dipakai untuk menambah konteks tanpa membuang identitas error aslinya.
 
-### Definisi ("Apa itu?")
-Error wrapping adalah mekanisme untuk menambahkan konteks pada error yang ada tanpa menghilangkan muatan (payload) error aslinya. Go menggunakan kata kunci `%w` dalam `fmt.Errorf` untuk membungkus error.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-Dalam sistem terdistribusi atau berjenjang:
-1. **Traceability**: Mengetahui di mana error berasal dan jalur mana yang ia lewati.
-2. **Programmatic Inspection**: Menggunakan `errors.Is` untuk membandingkan error dan `errors.As` untuk mengekstrak data dari error kustom tanpa harus melakukan tipe assertion manual yang berisiko.
+### Definisi
+Error wrapping adalah teknik membungkus error yang sudah ada dengan konteks baru, sambil tetap menjaga error asli agar masih bisa diperiksa secara programatik.
+
+Salah satu bentuk yang paling umum adalah memakai `%w` di `fmt.Errorf`.
+
+### Rasionalitas
+Dalam sistem yang berlapis, error jarang berhenti di satu fungsi saja. Karena itu Go menyediakan cara untuk:
+
+1. **Menambah konteks tanpa kehilangan asal error**  
+   Kita tetap bisa tahu error ini muncul saat apa dan di lapisan mana.
+2. **Melakukan pemeriksaan yang aman**  
+   `errors.Is` dan `errors.As` membuat pemeriksaan error jadi lebih rapi daripada mengandalkan string matching atau type assertion kasar.
+3. **Menjaga error chain tetap berguna**  
+   Error bisa terus dibawa naik sambil tetap bisa ditelusuri.
 
 ### Analogi Model Mental
-Bapak-bapak di gudang menemukan paket rusak. Ia memasukkan paket itu ke dalam kotak yang lebih besar (**Wrap**) dan menempelkan label "Kerusakan terdeteksi di Gudang B" sebelum mengirimnya ke kantor pusat. Kantor pusat bisa melihat label luar (**Context**), tapi tetap bisa membuka kotak untuk melihat paket aslinya (**Unwrap**) jika perlu.
+Bayangkan ada paket rusak ditemukan di gudang. Petugas gudang memasukkan paket itu ke kotak yang lebih besar lalu menempelkan label baru: “Rusak saat pemeriksaan gudang B”. Kantor pusat bisa membaca label luarnya, tapi kalau perlu tetap bisa membuka bungkus itu dan melihat masalah aslinya.
 
----
+### Terminologi Teknis
+- **Wrapping**: menambah konteks di atas error yang sudah ada.
+- **Unwrap**: membuka satu lapisan pembungkus error.
+- **Inspection**: memeriksa apakah rantai error mengandung jenis atau nilai tertentu.
+- **Error Chain**: rangkaian error yang saling membungkus.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph TD
-    A[Original Error: EOF] -->|Wrapped by| B[fmt.Errorf: reading config: %w]
-    B -->|Wrapped by| C[fmt.Errorf: start service: %w]
-    C -->|errors.Is| D{Is it EOF?}
-    D -- Yes --> E[Execute recovery]
-    D -- No --> F[Log and panic]
+    A[Original error: EOF] -->|wrap| B[fmt.Errorf: reading config: %w]
+    B -->|wrap| C[fmt.Errorf: start service: %w]
+    C -->|errors.Is / errors.As| D{Known error?}
+    D -- Yes --> E[Handle known case]
+    D -- No --> F[Return or log with context]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Secara internal, pemeriksaan error wrapping berjalan dengan menelusuri rantai error.
+
+- `errors.Unwrap` mengambil satu lapisan error bila tipe tersebut menyediakan `Unwrap() error`.
+- `errors.Is` berjalan menyusuri rantai untuk mencari kecocokan nilai atau sentinel error.
+- `errors.As` menyusuri rantai untuk mencari tipe error tertentu dan menyalin hasilnya ke target yang diberikan.
+
+Yang penting di level desain adalah: wrapping bukan sekadar menambah pesan, tetapi menjaga error tetap bisa dipahami oleh manusia dan mesin sekaligus.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_wrapping.go](./examples/01_wrapping.go) - Membungkus error dengan `%w` dan `fmt.Errorf`.
+- [02_inspection.go](./examples/02_inspection.go) - Menggunakan `errors.Is` dan `errors.As` untuk inspection.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Secara internal, `errors.Unwrap` akan memanggil metode `Unwrap() error` jika tipenya memilikinya. Fungsi `errors.Is` dan `errors.As` melakukan traversal (penelusuran) ke dalam rantai error tersebut secara rekursif hingga menemukan kecocokan atau mencapai akhir rantai (`nil`).
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_wrapping.go`: Menggunakan `%w` dan `fmt.Errorf`.
-- `02_inspection.go`: Demonstrasi `errors.Is` dan `errors.As`.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

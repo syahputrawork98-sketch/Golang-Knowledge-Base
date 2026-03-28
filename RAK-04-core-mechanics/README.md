@@ -1,36 +1,23 @@
-# RAK-04: Core Mechanics (The Internal Logic)
+# RAK-04: Core Mechanics
 
-Selamat datang di "Ruang Kontrol" desain Go. Rak ini tidak membahas *bagaimana* menulis kode (RAK-02), melainkan membedah **Rasionalitas di Balik Desain Go** dan pola-pola sistemik yang membuatnya unik.
+Rak ini membahas alasan di balik desain Go dan pola sistemik yang membuat bahasa ini terasa khas. Fokusnya bukan sekadar cara pakai, tetapi kenapa Go memilih pendekatan tertentu.
 
-## 🧭 Panduan Navigasi & Batasan (The Boundary)
+## Struktur
 
-Untuk mencegah tumpang tindih materi, RAK-04 memiliki batasan tegas sebagai berikut:
+### [SR-01-design-philosophy](./SR-01-design-philosophy/)
+Error handling, pointer semantics, memory semantics, dan filosofi desain dasar Go.
 
-| Aspek | RAK-02 (Foundation) | RAK-04 (Core Mechanics) | RAK-06 (Compiler/Runtime) |
-| :--- | :--- | :--- | :--- |
-| **Sudut Pandang** | **Engineer Intuition** | **Architectural Rationale** | **Low-Level Implementation** |
-| **Fokus** | Cara pakai idiomatik & efisiensi praktis. | Filosofi desain & pola sistemik. | Bedah source code & perilaku mesin. |
-| **Contoh** | "Gunakan `defer` untuk *cleanup*." | "Mengapa Go memilih `defer` daripada `try-catch`?" | "Algoritma *open-coded defer* di `runtime/panic.go`." |
+### [SR-02-architecture-patterns](./SR-02-architecture-patterns/)
+Pattern bawaan Go untuk middleware, concurrency, dan desain interface yang kuat.
 
----
+### [SR-03-tooling-excellence](./SR-03-tooling-excellence/)
+Tooling, dependency management, benchmarking, dan area pendukung yang memperkuat cara kerja Go di level sistem.
 
-## 🏗️ Cakupan Materi (Scope)
+## Boundary
 
-Rak ini akan membedah area-area berikut secara mendalam:
-
-### 1. Desain Sistem & Filosofi
-- Strategi penanganan error (Why explicit vs implicit?).
-- Pointer Semantics vs Value Semantics (Kapan dan mengapa memilih salah satunya?).
-- Filosofi "Share Memory by Communicating".
-
-### 2. Pola Arsitektur Bawaan (Standard Patterns)
-- Mekanisme Middleware & Decorator di Go.
-- Pola Konkurensi Lanjutan (Worker Pools, Fan-in/Fan-out).
-- Desain Interface & Abstraksi yang *Robust*.
-
-### 3. Ekosistem Tooling & Integrasi
-- Cara kerja `go mod` dan penanganan dependensi.
-- Strategi Testing & Benchmarking tingkat lanjut.
+- fokus pada rasionalitas desain dan pola arsitektur bawaan Go;
+- menjembatani penggunaan praktis di `RAK-02` dengan internals rendah di `RAK-06`;
+- bukan tempat utama untuk tutorial sintaks dasar atau bedah source code runtime secara detail.
 
 ---
-*Status: [ ] In Progress (Awaiting Structural Decomposition)*
+*Status: [/] Partial*

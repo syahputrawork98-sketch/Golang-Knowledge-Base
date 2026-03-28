@@ -1,65 +1,26 @@
-# RAK-06: Compiler & Runtime (The Deep Interior)
+# RAK-06: Compiler and Runtime
 
-> **Status**: Platinum Gold Standard (PPM V4) 100% ✅  
-> **Kedalaman**: Go Internals & System Architect  
-> **Fokus**: Orchestration, Orchestration, Orchestration.
+Rak ini adalah area terdalam di repo: bagaimana compiler Go bekerja, bagaimana scheduler mengatur goroutine, bagaimana memori dikelola, dan bagaimana Go berinteraksi dengan dunia luar di level sistem.
 
----
+## Struktur
 
-## 🎯 Visi & Strategi
-Modul ini adalah destinasi akhir bagi seorang Gopher yang ingin menguasai bagaimana kode mereka benar-benar dieksekusi di atas silikon. Kita akan membedah kompilator yang cerdas, scheduler yang efisien, dan allocator memori yang meminimalkan fragmentasi.
+### [SR-01-compiler-architecture](./SR-01-compiler-architecture/)
+Parser, AST, SSA, dan code generation dalam pipeline compiler Go.
 
----
+### [SR-02-runtime-orchestration](./SR-02-runtime-orchestration/)
+Scheduler, stack, dan orkestrasi runtime saat program berjalan.
 
-## 🗺️ Peta Navigasi (Internals Map)
+### [SR-03-memory-management](./SR-03-memory-management/)
+Allocator, spans, arenas, dan cara Go mengelola memori secara efisien.
 
-```mermaid
-graph TD
-    RAK06[RAK-06: Compiler & Runtime] --> SR01[SR-01: Compiler Architecture]
-    RAK06 --> SR02[SR-02: Runtime Orchestration]
-    RAK06 --> SR03[SR-03: Memory Management]
-    RAK06 --> SR04[SR-04: System Interfacing]
+### [SR-04-system-interfacing](./SR-04-system-interfacing/)
+Cgo, assembly, dan batas interaksi antara Go dengan sistem atau bahasa lain.
 
-    SR01 --> BK01[BK-01: Frontend/AST]
-    SR01 --> BK02[BK-02: Middle-end/SSA]
-    
-    SR02 --> BK03[BK-01: Scheduler/GMP]
-    SR02 --> BK04[BK-03: Garbage Collection]
+## Boundary
 
-    style SR01 fill:#e1b12c,stroke:#333
-    style SR02 fill:#44bd32,stroke:#333
-    style SR03 fill:#0097e6,stroke:#333
-    style SR04 fill:#8c7ae6,stroke:#333
-```
+- fokus pada implementasi rendah dan perilaku mesin di balik program Go;
+- cocok untuk pembaca yang ingin memahami Go lebih dalam dari sekadar pemakaian API;
+- bukan tempat utama untuk pengantar sintaks atau navigasi standard library sehari-hari.
 
 ---
-
-## 📂 Daftar Jalur Spesialis (Sub-Rak)
-
-### [SR-01: Compiler Architecture](./SR-01-compiler-architecture)
-*Transformasi dari teks mentah ke instruksi mesin.*
-- **BK-01: Frontend**: [Lexer & Parser/AST](./SR-01-compiler-architecture/BK-01-frontend/CH-01_ParserAST).
-- **BK-02: Middle-end**: [SSA (Static Single Assignment)](./SR-01-compiler-architecture/BK-02-middle-end/CH-01_SSA).
-- **BK-03: Backend**: [Code Generation](./SR-01-compiler-architecture/BK-03-backend/CH-01_CodeGen).
-
-### [SR-02: Runtime Orchestration](./SR-02-runtime-orchestration)
-*Otak di balik eksekusi paralel dan pembersihan memori.*
-- **BK-01: Scheduler**: [G-M-P Model](./SR-02-runtime-orchestration/BK-01-scheduler/CH-01_GMPModel).
-- **BK-02: Stack**: [Stack Growth](./SR-02-runtime-orchestration/BK-02-stack/CH-01_GrowthCopying).
-- **BK-03: Garbage Collection**: [Tri-color Algorithm](./SR-02-runtime-orchestration/BK-03-garbage-collection/CH-01_TriColorALgo).
-
-### [SR-03: Memory Management](./SR-03-memory-management)
-*Efisiensi alokasi tingkat sistem.*
-- **BK-01: Allocator**: [Spans & Arenas (TCMalloc)](./SR-03-memory-management/BK-01-allocator/CH-01_SpansArenas).
-
-### [SR-04: System Interfacing](./SR-04-system-interfacing)
-*Batas antara Go dan dunia luar.*
-- **BK-01: Cgo & Assembly**: [Cgo Barrier](./SR-04-system-interfacing/BK-01-assembly-cgo/CH-01_CgoBarrier), [Go Assembly](./SR-04-system-interfacing/BK-01-assembly-cgo/CH-02_GoAssembly).
-
----
-
-## 🎨 Expert Visuals
-Modul ini didukung oleh **7+ Premium SVGs** (G-M-P, GC Tri-color, Stack Copying, SSA Optimization) untuk memudahkan pemahaman konsep tingkat rendah yang abstrak.
-
----
-*Dikelola dengan Standar Platinum Gold PPM V4. Modul Puncak (Apex) dari Go Knowledge Base.*
+*Status: [x] Complete*

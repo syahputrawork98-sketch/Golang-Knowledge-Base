@@ -1,14 +1,14 @@
 # Template: Book Status
 
-Gunakan tabel ini untuk file `docs/status.md` pada setiap level Buku (Level 4).
+Gunakan tabel ini untuk rekap status pada level `BK`.
 
-| Bab | Judul | Status | Ex | SVG | Spec-Sync |
+| Unit | Judul | Status | Examples | Visual | Notes |
 | :--- | :--- | :--- | :---: | :---: | :--- |
-| CH-01 | Overview | Sync | ✅ | ✅ | [Version] |
-| CH-02 | [Judul] | Draft | ❌ | ❌ | [Version] |
-| ... | ... | ... | ... | ... | ... |
+| CH-01 | [Judul] | Draft | No | No | [Catatan] |
+| CH-02 | [Judul] | Partial | Yes | No | [Catatan] |
+| CH-03 | [Judul] | Complete | Yes | Yes | [Catatan] |
 
-**Keterangan Status**:
-- `Draft`: Narasi dasar selesai.
-- `Partial`: Narasi ok, kode/visual dalam pengerjaan.
-- `Sync`: 100% Gold Standard.
+Keterangan:
+- `Draft`: narasi awal ada, tetapi belum lengkap.
+- `Partial`: unit sedang dikerjakan dan belum lulus Gold Standard.
+- `Complete`: unit sudah memenuhi PPM V4 atau sah sebagai `Nil Content`.

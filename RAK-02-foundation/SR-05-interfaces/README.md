@@ -1,19 +1,23 @@
-# SR-05: Interfaces (The Contracts)
+# SR-05: Interfaces
 
-> **"Interfaces are the single most powerful tool for decoupling and polymorphism in Go. Use them wisely, not prematurely."**
+Sub-rak ini membahas interface sebagai alat abstraksi utama di Go: bagaimana kontrak perilaku dibentuk, dipenuhi, dan dipakai secara idiomatik.
 
-Sub-Rak ini menyajikan pembedahan mendalam terhadap Kontrak Implisit Go, dari mekanik memori hingga pola desain tingkat tinggi.
+## Struktur
 
-## Kurikulum Premium
+### [BK-01_Abstraction](./BK-01_Abstraction/)
+Makna interface, implicit fulfillment, dan dasar kontrak perilaku.
 
-### 1. [BK-01: Abstraction Mechanics](./BK-01_Abstraction/README.md)
-Bagaimana "Duck Typing" bekerja secara statis di Go.
+### [BK-02_TypeDynamics](./BK-02_TypeDynamics/)
+Type assertion, type switch, dan dinamika tipe saat interface digunakan.
 
-### 2. [BK-02: Type Dynamics](./BK-02_TypeDynamics/README.md)
-Melihat ke dalam kotak hitam interface (Runtime insights & Type Inspection).
+### [BK-03_Patterns](./BK-03_Patterns/)
+Pola-pola penggunaan interface dalam desain kode yang fleksibel dan mudah diuji.
 
-### 3. [BK-03: Architectural Patterns](./BK-03_Patterns/README.md)
-Membangun sistem yang dapat diuji (testable) dan terpisah (decoupled).
+## Boundary
+
+- fokus pada interface sebagai alat desain dan abstraksi;
+- menolong pembaca memahami salah satu fitur paling penting di Go;
+- bukan tempat utama untuk pattern arsitektur tingkat tinggi atau internals runtime interface.
 
 ---
-*Status: [x] Complete (Gold Standard - PPM V4)*
+*Status: [x] Complete*

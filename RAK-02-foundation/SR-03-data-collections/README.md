@@ -1,17 +1,23 @@
-# SR-03: Data Collections (The Organizers)
+# SR-03: Data Collections
 
-Sub-Rak ini membedah bagaimana Go mengelola kumpulan data di memori melalui Array, Slice, dan Map. Fokus utama adalah pada keamanan memori (*memory safety*) dan efisiensi akses data.
+Sub-rak ini membahas struktur data dasar Go untuk menyimpan, mengakses, dan memproses kumpulan nilai secara efisien.
 
-## 🏁 Daftar Buku
+## Struktur
 
-### 1. [BK-01: Discrete Collections](./BK-01_DiscreteCollections/) (4 Bab)
-Membedah Array dan Slice dari anatomi dasar hingga optimasi memori dinamis.
+### [BK-01_DiscreteCollections](./BK-01_DiscreteCollections/)
+Array dan slice sebagai fondasi koleksi berurutan.
 
-### 2. [BK-02: Key-Value Systems](./BK-02_KeyValueSystems/) (3 Bab)
-Membongkar cara kerja Hash Table (Map) di Go secara internal dan performanya.
+### [BK-02_KeyValueSystems](./BK-02_KeyValueSystems/)
+Map, perilaku key-value, dan aspek keamanan serta performanya.
 
-### 3. [BK-03: Collection Patterns](./BK-03_CollectionPatterns/) (2 Bab)
-Pola-pola manipulasi data (Sorting, Search, Transformation) yang efisien.
+### [BK-03_CollectionPatterns](./BK-03_CollectionPatterns/)
+Pola kerja koleksi seperti sorting, searching, dan manipulasi data.
+
+## Boundary
+
+- fokus pada koleksi data yang paling penting dalam praktik Go;
+- membantu pembaca memahami trade-off penggunaan array, slice, dan map;
+- bukan tempat utama untuk abstraksi interface atau pattern arsitektur.
 
 ---
-*Status: [x] Complete (Gold Standard - PPM V4)*
+*Status: [x] Complete*

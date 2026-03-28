@@ -1,58 +1,66 @@
-# CH-02: Memory Layout & Padding (The CPU Efficiency)
+# CH-02: Memory Layout and Padding
 
-> **Source Link**: [Go Blog: The Go Blog: Writing memory-efficient Go](https://blog.golang.org/writing-memory-efficient-go) | [Go Specification: Size and alignment guarantees](https://golang.org/ref/spec#Size_and_alignment_guarantees)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Specification: Size and alignment guarantees](https://go.dev/ref/spec#Size_and_alignment_guarantees) | [Go Blog: Writing memory-efficient Go](https://go.dev/blog/writing-memory-efficient-go)
+- **Framing**: Urutan field dalam struct bukan cuma soal gaya, tetapi bisa memengaruhi ukuran objek dan efisiensi akses memori.
 
-### Definisi ("Apa itu?")
-Setiap tipe data di Go memiliki ukuran (size) dan persyaratan penyelarasan (**Alignment**). Memori dialokasikan dalam kelipatan kata (word size), biasanya 8 byte pada sistem 64-bit.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-CPU membaca memori dalam blok (cache lines). Jika data tidak selaras (misaligned), CPU mungkin harus melakukan dua kali pembacaan untuk satu variabel. Go menambahkan **Padding** (ruang kosong) di antara field struct untuk memastikan setiap field dimulai pada alamat yang selaras.
-Strategi pengurutan field dari besar ke kecil (**Descending Order**) dapat meminimalkan padding dan menghemat memori.
+### Definisi
+Setiap tipe di Go punya ukuran dan kebutuhan alignment. Agar field bisa diakses dengan efisien, compiler bisa menambahkan ruang kosong di antara field struct. Ruang kosong itulah yang disebut padding.
+
+### Rasionalitas
+Memory layout penting karena:
+
+1. **Ukuran struct bisa membesar tanpa terasa**  
+   Urutan field yang kurang tepat bisa menghasilkan banyak padding.
+2. **Akses memori lebih rapi untuk CPU**  
+   Alignment membantu CPU membaca data dengan lebih efisien.
+3. **Desain data jadi punya biaya nyata**  
+   Susunan field bukan cuma masalah estetik, tetapi juga soal footprint memori.
 
 ### Analogi Model Mental
-Bayangkan memori sebagai sebuah **Rak Buku** dengan sekat setiap 8 cm. Jika Anda memiliki buku tebal 4 cm dan buku tipis 1 cm, lalu buku tebal lagi 4 cm:
-- Jika tidak diatur, buku tebal kedua mungkin harus terpotong sekat (**Padding** diperlukan).
-- Jika Anda menaruh buku 4 cm, 4 cm, lalu 1 cm secara berurutan, Anda mengisi ruang secara optimal tanpa banyak celah kosong.
+Bayangkan rak buku dengan sekat-sekat tetap. Kalau buku tipis dan tebal disusun sembarangan, akan muncul banyak ruang kosong yang terbuang. Kalau disusun lebih rapi, rak terisi lebih efisien. Padding di struct mirip ruang kosong itu.
 
----
+### Terminologi Teknis
+- **Alignment**: aturan penyelarasan alamat memori untuk tipe tertentu.
+- **Padding**: ruang kosong tambahan agar alignment tetap terpenuhi.
+- **Struct Layout**: susunan field dalam representasi memori.
+- **Memory Footprint**: total ukuran memori yang dipakai objek.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Layout Memori (SVG)
-![Visualisasi: BadStruct Memory Layout](./assets/memory_layout.svg)
+![Visualisasi: Memory Layout](./assets/memory_layout.svg)
 
-### Perbandingan Struktur (Mermaid)
 ```mermaid
 graph LR
-
     subgraph BadOrder
-        A[bool: 1b] --> P1[Padding: 7b]
+        A[bool: 1b] --> P1[padding: 7b]
         P1 --> B[int64: 8b]
         B --> C[int32: 4b]
-        C --> P2[Padding: 4b]
+        C --> P2[padding: 4b]
     end
-    subgraph OptimizedOrder
+    subgraph BetterOrder
         D[int64: 8b] --> E[int32: 4b]
         E --> F[bool: 1b]
-        F --> P3[Padding: 3b]
+        F --> P3[padding: 3b]
     end
-    Note over BadOrder: Total: 24 bytes
-    Note over OptimizedOrder: Total: 16 bytes
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Go menentukan layout field berdasarkan aturan alignment arsitektur target. Secara praktis, field tertentu perlu ditempatkan pada alamat yang sesuai dengan kebutuhan alignment-nya, dan compiler menambah padding bila perlu.
+
+Pelajaran desain yang penting:
+- urutan field dapat memengaruhi ukuran total struct;
+- struktur data yang lebih hemat bisa mengurangi footprint memori;
+- optimisasi layout sebaiknya dipakai saat memang relevan, bukan sebagai obsesi di semua tempat.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_struct_size.go](./examples/01_struct_size.go) - Menggunakan `unsafe.Sizeof` dan `unsafe.Offsetof` untuk membedah layout struct.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menentukan aligment berdasarkan arsitektur CPU. Aturan dasarnya: sebuah field dengan ukuran `n` byte harus diletakkan pada alamat yang merupakan kelipatan dari `n` (hingga batas maksimum word size, misal 8).
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_struct_size.go`: Menggunakan `unsafe.Sizeof` dan `unsafe.Offsetof` untuk membedah layout.
-- `02_alignment_audit.go`: Perbandingan penggunaan memori antara struct yang dioptimasi vs tidak.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

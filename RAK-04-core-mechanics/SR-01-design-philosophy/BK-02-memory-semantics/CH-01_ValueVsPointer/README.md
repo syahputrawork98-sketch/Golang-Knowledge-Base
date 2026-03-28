@@ -1,60 +1,70 @@
-# CH-01: Value vs Pointer (Memory Semantics)
+# CH-01: Value vs Pointer
 
-> **Source Link**: [The Go Programming Language Specification - Pointer types](https://golang.org/ref/spec#Pointer_types) | [Effective Go: Pointers vs. Values](https://golang.org/doc/effective_go#pointers_vs_values)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Specification: Pointer types](https://go.dev/ref/spec#Pointer_types) | [Effective Go: Pointers vs Values](https://go.dev/doc/effective_go#pointers_vs_values)
+- **Framing**: Salah satu keputusan desain paling penting di Go adalah kapan data sebaiknya dibawa sebagai nilai, dan kapan lebih masuk akal dibawa sebagai pointer.
 
-### Definisi ("Apa itu?")
-- **Value Semantics**: Data disalin (copy) saat dikirim ke fungsi atau diberikan ke variabel lain.
-- **Pointer Semantics**: Lokasi memori (address) yang dikirim, memungkinkan beberapa bagian program berbagi data yang sama.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-Pemilihan semantik berdampak langsung pada:
-1. **Efficiency**: Struktur data besar lebih efisien dikirim sebagai pointer untuk menghindari penyalinan memori yang mahal.
-2. **Mutation**: Hanya pointer yang memungkinkan fungsi pengirim mengubah nilai asli data tersebut.
-3. **Escape Analysis**: Go secara otomatis menentukan apakah variabel cukup diletakkan di **Stack** (Cepat) atau harus "melarikan diri" ke **Heap** (Lambat tapi persisten) berdasarkan penggunaannya.
+### Definisi
+- **Value Semantics**: data disalin saat diberikan ke variabel lain atau dikirim ke fungsi.
+- **Pointer Semantics**: yang dibagikan adalah alamat ke data yang sama, sehingga banyak bagian program bisa melihat objek yang sama.
+
+### Rasionalitas
+Pilihan antara value dan pointer berpengaruh langsung pada desain dan perilaku program:
+
+1. **Biaya copy**  
+   Nilai besar bisa mahal jika terus disalin.
+2. **Mutasi data**  
+   Pointer memungkinkan perubahan terlihat oleh pemanggil lain yang merujuk objek yang sama.
+3. **Ownership yang lebih jelas atau lebih kabur**  
+   Value cenderung lebih aman untuk isolasi, pointer lebih kuat untuk berbagi state.
+4. **Implikasi pada escape analysis**  
+   Bentuk penggunaan data bisa memengaruhi apakah compiler menaruhnya di stack atau memindahkannya ke heap.
 
 ### Analogi Model Mental
-- **Value**: Anda memfotokopi (copy) sebuah dokumen dan memberikannya ke teman. Jika teman mencoret-coret salinannya, dokumen asli Anda tetap bersih.
-- **Pointer**: Anda memberikan alamat rumah/koordinat (address) ke teman. Jika teman masuk ke rumah tersebut dan mengubah warna temboknya, saat Anda pulang, tembok rumah Anda juga sudah berubah warna.
+Value mirip seperti mengirim fotokopi dokumen: orang lain bisa mencoret-coret salinannya tanpa mengubah dokumen asli. Pointer mirip seperti memberi alamat gudang: siapa pun yang datang ke gudang yang sama akan melihat barang yang sama dan bisa mengubahnya di tempat.
 
----
+### Terminologi Teknis
+- **Value Semantics**: perpindahan data dengan copy.
+- **Pointer Semantics**: perpindahan referensi ke lokasi data.
+- **Shared Mutation**: perubahan bersama terhadap objek yang sama.
+- **Escape Analysis**: analisis compiler untuk menentukan apakah data cukup hidup di stack atau perlu pindah ke heap.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Model Mental (SVG)
 ![Visualisasi: Escape Analysis Mechanism](./assets/escape_analysis.svg)
-Model Mental (SVG)
-![Visualisasi: Escape Analysis Mechanism](./assets/escape_analysis.svg)
 
-### Alur Eksekusi (Mermaid)
 ```mermaid
 graph LR
-
     subgraph Stack
-        v[Variable: val]
-        p[Variable: ptr]
+        v[Value variable]
+        p[Pointer variable]
     end
     subgraph Heap
-        data[Data Object]
+        data[Shared data]
     end
-    v -->|Copy Value| f1[Function 1]
-    p -->|Points to Address| data
-    f2[Function 2] -->|Access via Pointer| data
+    v -->|copy| f1[Function A]
+    p -->|address| data
+    f2[Function B] -->|mutate via pointer| data
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di level implementasi, compiler Go melakukan escape analysis untuk membantu menentukan tempat hidup data.
+
+Poin desain yang penting di sini bukan sekadar "pointer lebih cepat" atau "value lebih aman", melainkan:
+- value sering membuat alur data lebih jelas;
+- pointer sering dibutuhkan saat berbagi atau mengubah objek yang sama;
+- keputusan ini berdampak pada biaya copy, keterbacaan, dan perilaku memori.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_stack_copy.go](./examples/01_stack_copy.go) - Menunjukkan bahwa perubahan pada value copy tidak mengubah asalnya.
+- [02_pointer_share.go](./examples/02_pointer_share.go) - Menunjukkan bagaimana pointer membuat data yang sama dibagi antar fungsi.
+- [03_escape_demo.go](./examples/03_escape_demo.go) - Melihat efek escape analysis dengan flag compiler.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go Compiler melakukan **Escape Analysis** selama kompilasi. Jika sebuah variabel direferensikan di luar scope fungsinya (misal: dikembalikan sebagai pointer), compiler akan memindahkannya ke Heap. Ini berbeda dengan C/C++ di mana programmer harus manual melakukan `new/malloc`.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_stack_copy.go`: Bukti bahwa modifikasi value tidak mengubah data asal.
-- `02_pointer_share.go`: Berbagi data antar fungsi dengan pointer.
-- `03_escape_demo.go`: Menggunakan `go build -gcflags="-m"` untuk melihat escape analysis.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*
