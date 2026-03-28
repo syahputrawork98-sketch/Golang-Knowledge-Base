@@ -1,45 +1,58 @@
-# CH-01: Functional Options (Robust API Design)
+# CH-01: Functional Options
 
-> **Source Link**: [Dave Cheney: Functional options for friendly APIs](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis) | [Self-referential functions and the design of options](https://blog.commandlineinterface.at/2021/01/29/functional-options/)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Dave Cheney: Functional options for friendly APIs](https://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis) | [Go Blog: First-Class Functions in Go](https://go.dev/blog/first-class-functions-in-go)
+- **Framing**: Pola ini dipakai saat sebuah constructor mulai butuh banyak konfigurasi opsional, tetapi kita tetap ingin API-nya terasa ringan saat dipakai.
 
-### Definisi ("Apa itu?")
-Functional Options adalah pola desain untuk membuat API yang fleksibel dan mudah dipahami, terutama untuk konstruktor (`New`) yang membutuhkan banyak argumen opsional. Setiap opsi direpresentasikan sebagai fungsi yang memodifikasi state objek.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Extensibility**: Menambah opsi baru di masa depan tidak akan mematikan kode yang sudah ada (tidak memecah API contract).
-2. **Readability**: Menghindari "Constructor Overloading" atau struct konfigurasi yang penuh dengan pointer/default values yang membingungkan.
-3. **Safety**: Memungkinkan pembuat API untuk memvalidasi konfigurasi secara atomik sebelum objek dibuat sepenuhnya.
+### Definisi
+Functional options adalah pola di mana konfigurasi tambahan dikirim sebagai daftar fungsi yang memodifikasi objek target saat proses konstruksi berlangsung.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Default tetap sederhana**  
+   Pemanggil cukup memakai `NewServer("localhost")` untuk kasus biasa tanpa harus mengisi banyak argumen kosong.
+2. **Ekstensi lebih aman**  
+   Opsi baru bisa ditambahkan tanpa memaksa perubahan signature constructor yang sudah dipakai di banyak tempat.
+3. **Konfigurasi lebih terbaca**  
+   Pemanggilan seperti `WithPort(9000)` biasanya lebih mudah dipahami daripada deretan argumen positional yang panjang.
 
 ### Analogi Model Mental
-Bayangkan memesan **Kopi Custom**.
-- **Tanpa Options**: Anda harus menyebutkan 10 variabel (Gula, Susu, Es, Ukuran, dst) saat memesan. Jika lupa satu, pesanan gagal.
-- **Functional Options**: Anda memesan "Kopi Hitam" (`NewCoffee`), lalu memberikan instruksi tambahan seperti `WithSugar(2)` atau `WithMilk()`. Jika Anda tidak memberikan instruksi, Anda tetap mendapatkan Kopi Hitam standar.
+Bayangkan memesan kopi. Dasarnya satu: kopi hitam. Setelah itu, tambahan seperti gula, susu, atau ukuran besar diberikan sebagai instruksi tambahan. Kalau tidak ada instruksi tambahan, minuman dasarnya tetap valid.
 
----
+### Terminologi Teknis
+- **Option**: fungsi yang mengubah state target saat inisialisasi.
+- **Variadic Parameters**: daftar argumen opsional yang dikirim dalam bentuk `opts ...Option`.
+- **Constructor Boundary**: titik pusat tempat default dan konfigurasi tambahan dipadukan.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    C[Constructor: NewServer] --> O1[Option: WithPort]
-    C --> O2[Option: WithTimeout]
-    O1 --> S[Server Struct Setup]
-    O2 --> S
+    C[NewServer addr opts] --> D[Create default Server]
+    D --> O1[Apply option 1]
+    O1 --> O2[Apply option N]
+    O2 --> R[Return configured Server]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di balik pola ini, Go memanfaatkan fungsi sebagai nilai. Setiap option biasanya berupa closure yang menangkap parameter tertentu, lalu menerapkannya ke struct target.
+
+Urutan mentalnya sederhana:
+- constructor membuat objek dengan nilai default;
+- semua option dijalankan satu per satu;
+- hasil akhirnya dikembalikan sebagai objek yang sudah terkonfigurasi.
+
+Yang penting untuk `RAK-04` bukan sekadar syntax-nya, tetapi alasan desainnya: Go sering memilih komposisi fungsi kecil yang mudah dirangkai daripada constructor yang makin lama makin gemuk.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_basic_options.go](./examples/01_basic_options.go) - Dasar functional options untuk memberi konfigurasi tambahan di atas nilai default.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Pola ini menggunakan closure. Fungsi opsi biasanya memiliki signature `func(*Server) error`. Dalam loop internal constructor, fungsi-fungsi ini dipanggil secara berurutan untuk mengisi field-field struct target.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_basic_options.go`: Implementasi sederhana pola functional options.
-- `02_validation_options.go`: Menambahkan logika validasi di dalam fungsi opsi.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

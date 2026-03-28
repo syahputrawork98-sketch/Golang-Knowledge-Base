@@ -17,4 +17,4 @@ Kenapa Go lebih mendorong komposisi daripada pewarisan kelas tradisional.
 - bukan tempat utama untuk pattern arsitektur tingkat aplikasi seperti middleware atau dependency inversion.
 
 ---
-*Status: [/] Partial*
+*Status: [x] Complete*

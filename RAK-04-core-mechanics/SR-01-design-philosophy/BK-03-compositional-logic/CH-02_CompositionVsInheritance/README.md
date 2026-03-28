@@ -1,23 +1,34 @@
-# CH-02: Composition vs Inheritance (Embedding Power)
+# CH-02: Composition vs Inheritance
 
-> **Source Link**: [Effective Go: Embedding](https://golang.org/doc/effective_go#embedding)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Effective Go: Embedding](https://go.dev/doc/effective_go#embedding)
+- **Framing**: Go tidak memberi inheritance klasik, tetapi memberi alat komposisi yang sengaja dirancang agar sistem lebih datar dan lebih fleksibel.
 
-### Definisi ("Apa itu?")
-Go tidak memiliki pewarisan (Inheritance) tradisional (is-a). Sebagai gantinya, Go menggunakan **Komposisi (Composition)** melalui **Struct Embedding** (has-a), di mana sebuah tipe dapat menyisipkan tipe lain ke dalamnya untuk "mewarisi" metode-metodenya tanpa membentuk hierarki kelas yang kaku.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Fragile Base Class Problem**: Di inheritance, perubahan di parent bisa merusak ribuan child. Komposisi lebih stabil karena setiap komponen tetap independen.
-2. **Concurrency-Friendly**: Hierarki yang dalam sangat sulit dikelola dalam sistem konkuren. Komposisi yang datar jauh lebih mudah dipahami dan didebug.
-3. **Flexibility**: Kita bisa mencampur banyak komponen (traits/mixins) ke dalam satu struct dengan sangat mudah.
+### Definisi
+Go tidak memakai inheritance tradisional berbasis class hierarchy. Sebagai gantinya, Go mendorong composition melalui struct embedding dan penggabungan komponen kecil yang punya tanggung jawab jelas.
+
+### Rasionalitas
+Pendekatan ini penting karena:
+
+1. **Mengurangi hierarki yang rapuh**  
+   Perubahan pada satu komponen tidak otomatis menciptakan efek berantai seperti base class yang terlalu besar.
+2. **Mendorong desain yang lebih modular**  
+   Komponen bisa dirakit ulang sesuai kebutuhan.
+3. **Lebih cocok dengan gaya Go**  
+   Go lebih nyaman dengan objek yang sederhana, tanggung jawab yang jelas, dan behavior yang dikomposisikan.
 
 ### Analogi Model Mental
-Bayangkan membangun sebuah **Mobil**. Bukannya membuat "Kendaraan -> Mobil" (Inheritance), kita memasang komponen **Mesin**, **Roda**, dan **Rangka** ke dalam satu unit Mobil. Jika kita ingin membuat mobil listrik, kita tinggal mengganti komponen Mesin dengan **Baterai**. Mesin dan Roda tetaplah Mesin dan Roda; mereka tidak perlu tahu mereka ada di dalam Mobil.
+Membangun mobil lebih masuk akal sebagai perakitan mesin, roda, rangka, dan kemudi daripada memaksa semua kendaraan hidup di pohon warisan kelas yang sangat dalam. Komposisi di Go bekerja seperti proses perakitan itu.
 
----
+### Terminologi Teknis
+- **Composition**: membangun objek dari komponen yang digabungkan.
+- **Embedding**: menyisipkan tipe lain ke dalam struct untuk membawa field atau method.
+- **Method Promotion**: method dari tipe yang di-embed bisa diakses dari struct luar.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 classDiagram
@@ -28,21 +39,22 @@ classDiagram
         Logger
         Query()
     }
-    DBHandler *-- Logger : Embeds
-    Note for DBHandler "DBHandler.Log() calls embedded Logger.Log()"
+    DBHandler *-- Logger : embeds
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat method dipanggil pada struct luar, compiler akan mencari method itu lebih dulu di tipe luar. Jika tidak ada, pencarian bisa diteruskan ke tipe yang di-embed. Inilah yang membuat embedding terasa seperti "membawa" perilaku tanpa benar-benar menciptakan inheritance tradisional.
+
+Pelajaran desain pentingnya:
+- komposisi memberi fleksibilitas;
+- embedding membantu ergonomi;
+- tetapi relasi antar komponen tetap lebih eksplisit daripada pewarisan class.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_embedding_basics.go](./examples/01_embedding_basics.go) - Dasar penggunaan struct embedding.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Saat kita memanggil metode pada tipe yang membungkus (outer), Go Compiler akan mencari metode tersebut terlebih dahulu pada tipe outer. Jika tidak ada, compiler akan mencari di level embedding (inner). Proses ini disebut **Method Promotion**.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_embedding_basics.go`: Cara menggunakan struct embedding sederhana.
-- `02_promotion_shaddowing.go`: Memahami prioritas metode antara tipe outer vs inner.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

@@ -1,47 +1,54 @@
-# CH-02: Accept Interfaces, Return Structs (The Go Mantra)
+# CH-02: Accept Interfaces, Return Structs
 
-> **Source Link**: [Go Wiki: Interface Design](https://github.com/golang/go/wiki/CodeReviewComments#interfaces)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Wiki: Code Review Comments - Interfaces](https://go.dev/wiki/CodeReviewComments#interfaces) | [Effective Go: Interfaces and other types](https://go.dev/doc/effective_go#interfaces_and_types)
+- **Framing**: Ini salah satu nasihat desain API yang paling sering dipakai di ekosistem Go: input dibuat fleksibel lewat interface, tetapi output dijaga konkret supaya mudah dipakai.
 
-### Definisi ("Apa itu?")
-Ini adalah prinsip desain API paling fundamental di Go:
-- **Accept Interfaces**: Parameter fungsi harus bertipe interface agar fungsi tersebut fleksibel menerima berbagai tipe data (Abstraksi Input).
-- **Return Structs**: Fungsi harus mengembalikan tipe konkret (struct) agar pemanggil (caller) memiliki kontrol penuh dan performa maksimal (Konkret Output).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Flexibility**: Memungkinkan ketergantungan dibalik (Dependency Inversion). Kita bisa mengganti implementasi input tanpa mengubah fungsi.
-2. **Predictability**: Caller tahu persis apa yang mereka dapatkan. Mereka bisa memanggil metode apa saja pada struct tersebut tanpa harus menebak interface mana yang dikembalikan.
-3. **Decoupling**: Menghindari pembuatan interface "prematur" sebelum benar-benar dibutuhkan.
+### Definisi
+Prinsip ini berarti fungsi atau komponen sebaiknya menerima interface pada sisi input ketika hanya perilaku tertentu yang dibutuhkan, lalu mengembalikan tipe konkret pada sisi output agar hasilnya jelas dan mudah digunakan pemanggil.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Input lebih fleksibel**  
+   Fungsi bisa menerima berbagai tipe selama semuanya memenuhi kontrak perilaku yang sama.
+2. **Output lebih jelas**  
+   Pemanggil tahu persis apa yang dikembalikan dan tidak perlu menebak kapabilitas tersembunyi di balik interface hasil return.
+3. **Desain interface jadi lebih disiplin**  
+   Interface dibuat saat benar-benar dibutuhkan oleh consumer, bukan dipaksakan terlalu dini.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Stopkontak (Function)**.
-- **Input**: Berbentuk interface lubang steker universal. Ia siap menerima beban listrik apa pun (Seterika, Kulkas, Lampu) asalkan kakinya cocok.
-- **Output**: Adalah **Energi Listrik Konkret (Watt)**. Anda tidak ingin mendapatkan "Sesuatu yang mirip energi"; Anda butuh Watt yang nyata untuk menyalakan perangkat Anda.
+Bayangkan loket layanan. Petugas menerima banyak bentuk identitas selama semuanya memenuhi syarat verifikasi tertentu. Tetapi saat selesai, petugas memberikan hasil yang konkret, misalnya kartu fisik atau dokumen final, bukan "sesuatu yang mirip hasil".
 
----
+### Terminologi Teknis
+- **Consumer-side Interface**: interface kecil yang didefinisikan oleh pihak yang memakai dependency.
+- **Concrete Return Type**: hasil return berupa tipe nyata yang method set-nya jelas.
+- **Premature Abstraction**: abstraksi yang dibuat terlalu cepat sebelum kebutuhan nyatanya terlihat.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    I[Input: io.Reader] --> F[Function: ProcessData]
-    F --> O[Output: *Report Struct]
-    Note over I: Accept Interfaces (Flexible)
-    Note over O: Return Structs (Concrete)
+    I[Input Interface] --> F[Function or Service]
+    F --> C[Concrete Return Type]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, interface sangat ringan karena kepuasannya implisit. Itu membuat sisi input cocok memakai interface kecil. Namun untuk sisi output, tipe konkret sering lebih berguna karena:
+- caller melihat kemampuan penuh objek yang dikembalikan;
+- dokumentasi API jadi lebih jelas;
+- evolusi implementasi internal tetap bisa dijaga tanpa menyembunyikan terlalu banyak hal di balik return interface.
+
+Poin pentingnya bukan "selalu" mengembalikan struct dalam semua kasus, tetapi bahwa abstraksi di sisi return harus dipakai dengan alasan yang benar-benar kuat.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_flexible_input.go](./examples/01_flexible_input.go) - Contoh fungsi yang menerima interface kecil agar input tetap fleksibel.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Menerima interface memungkinkan compiler melakukan pengecekan kepuasan tipe di sisi pemanggil. Mengembalikan struct memungkinkan compiler melakukan optimasi alokasi (seperti inlining) yang lebih baik karena tipe data sudah diketahui secara pasti saat compile time.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_flexible_input.go`: Fungsi yang menerima `fmt.Stringer` untuk fleksibilitas log.
-- `02_concrete_return.go`: Alasan kenapa mengembalikan struct mempermudah dokumentasi dan penggunaan API.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

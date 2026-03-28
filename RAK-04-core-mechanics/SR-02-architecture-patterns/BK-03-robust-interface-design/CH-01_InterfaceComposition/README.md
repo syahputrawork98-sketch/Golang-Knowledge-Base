@@ -1,51 +1,61 @@
-# CH-01: Interface Composition (Building Blocks)
+# CH-01: Interface Composition
 
-> **Source Link**: [The Go Programming Language Specification - Interface types](https://golang.org/ref/spec#Interface_types) | [Go Blog: Go Interfaces](https://blog.golang.org/interfaces)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Spec: Interface types](https://go.dev/ref/spec#Interface_types) | [Effective Go: Interfaces and other types](https://go.dev/doc/effective_go#interfaces_and_types)
+- **Framing**: Di Go, interface besar biasanya tidak ditulis dari awal. Yang lebih umum adalah mulai dari interface kecil, lalu menggabungkannya saat benar-benar dibutuhkan.
 
-### Definisi ("Apa itu?")
-Interface Composition adalah teknik menggabungkan beberapa interface kecil (atomic interfaces) menjadi satu interface yang lebih besar.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Granularity**: Interface kecil lebih mudah dipenuhi oleh tipe data sederhana.
-2. **Reusability**: Kita bisa mengombinasikan "perilaku" (behaviors) secara modular.
-3. **Mantra Go**: *"The bigger the interface, the weaker the abstraction."* (Rob Pike). Abstraksi yang paling kuat adalah yang paling kecil dan spesifik.
+### Definisi
+Interface composition adalah teknik membentuk interface yang lebih kaya dengan menggabungkan beberapa interface kecil yang masing-masing mewakili satu tanggung jawab.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Kontrak jadi lebih kecil dan jelas**  
+   Tipe cukup memenuhi perilaku yang memang dibutuhkan, bukan sekumpulan metode yang terlalu lebar.
+2. **Komposisi lebih fleksibel**  
+   Interface kecil bisa dipakai ulang dalam banyak kombinasi berbeda.
+3. **Abstraksi lebih kuat**  
+   Di Go, interface yang kecil biasanya lebih tahan perubahan daripada interface besar yang mencoba merangkum semuanya sekaligus.
 
 ### Analogi Model Mental
-Bayangkan sebuh **Peralatan Multifungsi (Swiss Army Knife)**.
-Interface kecil adalah **Pisau**, **Gunting**, dan **Pembuka Botol**. Kita bisa memiliki interface besar bernama **MultiTool** yang merupakan kombinasi dari ketiganya. Jika kita hanya butuh memotong kertas, kita cukup meminta tipe yang memenuhi interface `Gunting`, bukan keseluruhan `MultiTool`.
+Bayangkan toolkit. Ada obeng, tang, dan kunci pas sebagai alat-alat kecil yang punya fungsi spesifik. Kalau suatu pekerjaan butuh dua fungsi sekaligus, kita tinggal membawa kombinasi alat yang tepat, bukan memaksa semua pekerjaan memakai satu alat raksasa.
 
----
+### Terminologi Teknis
+- **Method Set**: kumpulan metode yang menentukan apakah suatu tipe memenuhi interface tertentu.
+- **Embedded Interface**: interface yang dimasukkan ke interface lain untuk membentuk kontrak gabungan.
+- **Behavior Contract**: kontrak perilaku yang diminta dari pemakai interface.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 classDiagram
-    class Reader { Read() }
-    class Writer { Write() }
-    class Closer { Close() }
-    class ReadWriteCloser {
-        Reader
-        Writer
-        Closer
+    class Reader {
+        +Read()
     }
-    ReadWriteCloser --|> Reader
-    ReadWriteCloser --|> Writer
-    ReadWriteCloser --|> Closer
+    class Writer {
+        +Write()
+    }
+    class ReadWriter
+    ReadWriter --|> Reader
+    ReadWriter --|> Writer
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di level bahasa, interface composition bukan inheritance. Go hanya menggabungkan daftar metode yang dibutuhkan. Saat sebuah tipe punya method set yang lengkap, tipe itu otomatis memenuhi interface gabungan tersebut.
+
+Yang penting untuk `RAK-04`:
+- kita tidak sedang membangun hierarki kelas;
+- kita sedang menyusun kontrak perilaku dari blok kecil;
+- komposisi ini membuat desain tetap modular tanpa menambah coupling yang tidak perlu.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_io_composition.go](./examples/01_io_composition.go) - Simulasi komposisi interface kecil menjadi kontrak `ReadWriter` yang lebih kaya.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Di bawah kap mesin, interface yang dikomposisi hanyalah daftar metode yang digabungkan. Go tidak menyimpan hierarki antara interface induk dan anak; yang penting adalah apakah sebuah tipe memiliki set metode yang lengkap untuk interface target.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_io_composition.go`: Simulasi pola `io.ReadWriter` dalam kode nyata.
-- `02_custom_composition.go`: Membuat kontrak API sendiri dengan komposisi.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

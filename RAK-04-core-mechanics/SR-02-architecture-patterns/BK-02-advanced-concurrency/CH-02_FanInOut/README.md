@@ -1,51 +1,61 @@
-# CH-02: Fan-In / Fan-Out (Parallel Orchestration)
+# CH-02: Fan-In and Fan-Out
 
-> **Source Link**: [Go Blog: Go Concurrency Patterns: Pipelines and cancellation](https://blog.golang.org/pipelines)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Blog: Pipelines and cancellation](https://go.dev/blog/pipelines)
+- **Framing**: Pola ini dipakai saat satu aliran kerja perlu dipecah ke banyak worker, lalu hasilnya dikumpulkan kembali ke satu jalur output.
 
-### Definisi ("Apa itu?")
-- **Fan-Out**: Memulai banyak goroutine untuk menangani input dari sebuah channel tunggal secara paralel.
-- **Fan-In**: Mengumpulkan hasil dari banyak channel ke dalam satu channel output terpadu.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Throughput**: Memanfaatkan CPU multi-core secara maksimal untuk tugas-tugas intensif (misal: pengolahan gambar, enkripsi).
-2. **Latency Reduction**: Menyelesaikan tugas besar dengan memecahnya menjadi sub-tugas kecil yang berjalan simultan.
+### Definisi
+- **Fan-Out**: menyebarkan beban dari satu sumber input ke beberapa worker paralel.
+- **Fan-In**: menggabungkan keluaran dari beberapa worker atau channel kembali ke satu jalur output.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Pemrosesan paralel lebih mudah diatur**  
+   Satu sumber kerja bisa dibagi ke beberapa unit eksekusi tanpa mengubah kontrak input utamanya.
+2. **Hasil bisa digabung lagi secara terstruktur**  
+   Output dari banyak worker tetap bisa disatukan ke satu channel konsumsi.
+3. **Cocok untuk sistem streaming dan batch**  
+   Pattern ini sering muncul saat throughput perlu dinaikkan tanpa mengubah bentuk data secara total.
 
 ### Analogi Model Mental
-- **Fan-Out**: Tim pembersih lapangan. Masuk ke lapangan lewat satu pintu, lalu berpencar (**Fan-Out**) ke seluruh sudut lapangan untuk menyisir sampah.
-- **Fan-In**: Semua sampah yang dikumpulkan dibawa kembali ke satu truk pengangkut (**Fan-In**) di pintu keluar.
+Bayangkan satu truk besar menurunkan banyak paket ke pusat distribusi. Paket itu lalu disebar ke beberapa kurir sekaligus untuk diproses. Setelah selesai, semua hasil pengiriman dikumpulkan lagi ke pusat pelaporan yang sama.
 
----
+### Terminologi Teknis
+- **Merge Channel**: channel gabungan tempat hasil banyak worker dikumpulkan.
+- **Parallel Worker Set**: sekumpulan goroutine yang memproses input yang sama secara paralel.
+- **Coordination Barrier**: mekanisme seperti `sync.WaitGroup` untuk memastikan semua jalur selesai sebelum output ditutup.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Fan Orchestration (SVG)
 ![Visualisasi: Fan-In / Fan-Out Orchestration](./assets/fanin_fanout.svg)
 
-### Alur Kerja Paralel (Mermaid)
 ```mermaid
 graph TD
-LR
-    In[Input] -->|Fan-Out| G1[Worker]
-    In -->|Fan-Out| G2[Worker]
-    In -->|Fan-Out| G3[Worker]
-    G1 -->|Fan-In| Out[Output]
-    G2 -->|Fan-In| Out
-    G3 -->|Fan-In| Out
+    In[Input] --> G1[Worker 1]
+    In --> G2[Worker 2]
+    In --> G3[Worker 3]
+    G1 --> Out[Output]
+    G2 --> Out
+    G3 --> Out
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, fan-out sering dibangun dengan banyak goroutine yang membaca dari sumber input yang sama. Fan-in biasanya dibangun dengan goroutine tambahan yang meneruskan hasil dari beberapa channel ke satu output channel, lalu menutup output itu saat semua sumber selesai.
+
+Nilai arsitekturnya:
+- distribusi kerja dan penggabungan hasil bisa dipisahkan;
+- scaling horizontal lebih mudah dimodelkan;
+- alur data paralel tetap bisa dibaca sebagai satu sistem utuh.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_fanout_processing.go](./examples/01_fanout_processing.go) - Contoh fan-out dari satu input channel ke beberapa worker, lalu hasilnya difan-in kembali.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Mekanisme Fan-In biasanya menggunakan `sync.WaitGroup` untuk menunggu semua worker selesai dan menutup channel output. Alternatifnya, fungsi `merge` membuat goroutine tambahan untuk memantau status semua input channel.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_fanout_processing.go`: Simulasi pemrosesan data masif secara paralel.
-- `02_fanin_merge.go`: Fungsi utilitas untuk menggabungkan hasil dari banyak channel.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

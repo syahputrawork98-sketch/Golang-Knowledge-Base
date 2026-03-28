@@ -1,52 +1,58 @@
-# CH-03: Pipeline Pattern (Stream Data Processing)
+# CH-03: Pipeline Pattern
 
-> **Source Link**: [Go Blog: Pipelines and cancellation](https://blog.golang.org/pipelines)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Blog: Pipelines and cancellation](https://go.dev/blog/pipelines)
+- **Framing**: Pipeline pattern dipakai saat data perlu mengalir melewati beberapa tahap pemrosesan yang saling terhubung tetapi tetap punya tanggung jawab terpisah.
 
-### Definisi ("Apa itu?")
-Pipeline adalah serangkaian tahapan (stages) di mana setiap tahap melakukan tugas tertentu dan meneruskan hasilnya ke tahap berikutnya melalui channel.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Composability**: Setiap tahap pipeline adalah unit logika independen yang bisa diganti-ganti seperti Lego.
-2. **Continuous Processing**: Data bisa diproses segera setelah tersedia di tahap sebelumnya tanpa menunggu seluruh batch selesai.
-3. **Graceful Cancellation**: Dengan mengintegrasikan sistem pembatalan (seperti `done` channel), seluruh pipeline bisa dihentikan secara aman tanpa kebocoran memori.
+### Definisi
+Pipeline adalah rangkaian stage di mana setiap stage menerima data dari input channel, mengolahnya, lalu meneruskan hasilnya ke output channel untuk stage berikutnya.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Stage mudah dikomposisikan**  
+   Tiap tahap bisa dikembangkan, diganti, atau diuji secara terpisah.
+2. **Data bisa diproses sambil mengalir**  
+   Kita tidak perlu menunggu seluruh batch selesai sebelum tahap berikutnya mulai bekerja.
+3. **Alur kerja lebih mudah dipahami**  
+   Pembaca bisa melihat jalur data dari sumber sampai hasil akhir secara bertahap.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Baris Perakitan Mobil (Assembly Line)**.
-- Tahap 1: Memasang Rangka.
-- Tahap 2: Memasang Mesin.
-- Tahap 3: Pengecatan.
-Saat mobil A sedang dicat, mobil B sedang dipasang mesin, dan mobil C mulai dipasang rangka. Pekerjaan mengalir terus-menerus (**Stream**).
+Bayangkan lini perakitan. Satu tim memasang rangka, tim berikutnya memasang komponen, lalu tim lain mengecat hasilnya. Produk bergerak terus dari satu tahap ke tahap berikutnya sampai selesai.
 
----
+### Terminologi Teknis
+- **Stage**: satu unit pemrosesan dalam pipeline.
+- **Stream Processing**: data diproses saat mengalir, bukan menunggu batch penuh selesai.
+- **Backpressure**: tekanan saat stage berikutnya lebih lambat sehingga aliran sebelumnya ikut tertahan.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Streaming Pipeline (SVG)
 ![Visualisasi: Pipeline Streaming Pattern](./assets/pipeline_flow.svg)
 
-### Alur Data Stages (Mermaid)
 ```mermaid
 graph LR
-
-    Src[Source] --> S1[Gen]
-    S1 -->|Ch| S2[Filter]
-    S2 -->|Ch| S3[Transform]
+    Src[Source] --> S1[Generate]
+    S1 --> S2[Filter]
+    S2 --> S3[Transform]
     S3 --> Out[Sink]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, setiap stage biasanya direpresentasikan sebagai fungsi yang menerima channel input dan mengembalikan channel output. Setiap stage berjalan di goroutine-nya sendiri, lalu sinkronisasi terjadi secara alami lewat operasi kirim dan terima pada channel.
+
+Untuk `RAK-04`, yang penting dipahami adalah:
+- pipeline membagi tanggung jawab pemrosesan menjadi blok berurutan;
+- antar stage tidak perlu saling tahu detail internal;
+- cancellation atau penghentian dini perlu dipikirkan agar pipeline tidak meninggalkan goroutine yang menggantung.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_data_pipeline.go](./examples/01_data_pipeline.go) - Contoh pipeline sederhana dari generator ke filter lalu transformasi hasil.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Setiap tahap pipeline direpresentasikan oleh sebuah fungsi yang mengambil channel input dan mengembalikan channel output. Penggunaan channel unbuffered memastikan sinkronisasi natural antar tahap, namun penggunaan buffered channel bisa meningkatkan throughput jika ada ketimpangan kecepatan antar tahap.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_data_pipeline.go`: Mengolah data angka dari generator hingga filter genap.
-- `02_pipeline_cancellation.go`: Menghentikan pipeline di tengah jalan dengan aman.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

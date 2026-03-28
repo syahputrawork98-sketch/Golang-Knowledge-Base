@@ -1,57 +1,64 @@
-# CH-01: Share by Communicating (The CSP Model)
+# CH-01: Share by Communicating
 
-> **Source Link**: [Effective Go: Share by communicating](https://golang.org/doc/effective_go#sharing) | [Communicating Sequential Processes (Hoare, 1978)](https://www.cs.cmu.edu/~crary/819-f09/Hoare78.pdf)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Effective Go: Share by communicating](https://go.dev/doc/effective_go#sharing)
+- **Framing**: Salah satu ide paling khas di Go adalah ini: data lebih aman dibagikan lewat komunikasi yang jelas daripada diperebutkan langsung lewat state bersama.
 
-### Definisi ("Apa itu?")
-Slogan filosofis terpenting Go adalah: *"Do not communicate by sharing memory; instead, share memory by communicating."* Ini merujuk pada penggunaan **Channels** untuk mengirim data antar goroutine, bukannya menggunakan variabel global atau state yang dilindungi oleh lock (Mutex).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Concurrency Safety**: Mengirim data via channel memberikan "kepemilikan" (ownership) data tersebut ke goroutine penerima, sehingga mencegah *Race Conditions*.
-2. **Simplified Logic**: Aliran data menjadi linear dan mudah dipahami, seperti ban berjalan (assembly line).
-3. **Internal Sync**: Channel secara internal sudah memiliki mekanisme sinkronisasi, sehingga programmer tidak perlu pusing dengan manajemen lock manual yang rawan bug.
+### Definisi
+Prinsip "share memory by communicating" berarti goroutine lebih disarankan bertukar data lewat channel daripada banyak goroutine mengakses state yang sama secara langsung.
+
+### Rasionalitas
+Pendekatan ini dipilih karena:
+
+1. **Alur data jadi lebih terlihat**  
+   Kita bisa melihat siapa mengirim, siapa menerima, dan kapan perpindahan kerja terjadi.
+2. **Ownership lebih mudah dipahami**  
+   Saat data dikirim ke channel, model mentalnya adalah tanggung jawab berpindah ke penerima.
+3. **Sinkronisasi jadi lebih terstruktur**  
+   Channel membantu menyatukan komunikasi dan koordinasi dalam satu mekanisme.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Dapur Restoran**.
-- **Share Memory**: Banyak koki berebut satu talenan yang sama. Mereka harus teriak "SAYA PAKAI!" (Lock) agar tidak saling potong tangan. Kelupaan teriak bisa berakibat fatal (**Panic/Crash**).
-- **Share by Communicating**: Setiap koki punya talenan sendiri. Jika bahan makanan siap, mereka menaruhnya di **Ban Berjalan (Channel)** ke koki berikutnya. Koki berikutnya hanya akan bekerja jika ada barang di ban berjalan tersebut. Tidak ada perebutan, alur kerja lancar.
+Bayangkan dapur restoran. Kalau semua koki berebut talenan yang sama, mereka perlu terus mengunci dan membuka akses. Tapi kalau bahan dipindahkan lewat ban berjalan dari satu koki ke koki berikutnya, alur kerja jadi lebih rapi dan konflik berkurang.
 
----
+### Terminologi Teknis
+- **Channel**: jalur komunikasi antar goroutine.
+- **Ownership Transfer**: perpindahan tanggung jawab pemrosesan data.
+- **Coordinated Concurrency**: concurrency yang dibangun dengan alur komunikasi yang jelas.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Model Mental (SVG)
 ![Visualisasi: Go Channel Internal Structure](./assets/channel_internals.svg)
 
-### Alur Komunikasi (Mermaid)
 ```mermaid
 graph LR
-
-    subgraph Goroutine1
-        A[Generate Data]
+    subgraph GoroutineA
+        A[Generate data]
     end
     subgraph Channel
-        C[Buffer/Queue]
+        C[Queue or handoff]
     end
-    subgraph Goroutine2
-        B[Process Data]
+    subgraph GoroutineB
+        B[Process data]
     end
-    A -->|Send| C
-    C -->|Receive| B
+    A -->|send| C
+    C -->|receive| B
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di level desain, channel menggabungkan dua hal sekaligus: perpindahan data dan sinkronisasi. Itulah kenapa channel terasa sangat kuat untuk membangun alur kerja concurrent.
+
+Yang penting untuk `RAK-04` adalah memahami kenapa model ini dipilih:
+- bukan karena channel selalu menggantikan semua alat lain;
+- tetapi karena Go sengaja memberi prioritas pada model komunikasi yang lebih mudah dibaca untuk banyak masalah concurrency.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_simple_channel.go](./examples/01_simple_channel.go) - Dasar pengiriman dan penerimaan data lewat channel.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go Channel didasarkan pada model matematis **CSP (Communicating Sequential Processes)** oleh Tony Hoare. Saat data dikirim melalui channel, runtime menangani pemindahan pointer atau penyalinan data secara aman di bawah kap mesin, termasuk memblokir goroutine yang mengirim jika buffer penuh atau menerima jika buffer kosong.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_simple_channel.go`: Dasar pengiriman dan penerimaan data.
-- `02_ownership_transfer.go`: Demonstrasi perpindahan tanggung jawab pemrosesan data.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

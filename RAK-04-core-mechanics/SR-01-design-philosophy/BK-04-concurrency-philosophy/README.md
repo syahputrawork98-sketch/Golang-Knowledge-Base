@@ -17,4 +17,4 @@ Alasan desain di balik semboyan Go tentang komunikasi dan ownership data.
 - bukan tempat utama untuk scheduler, work stealing, atau internals runtime concurrency.
 
 ---
-*Status: [/] Partial*
+*Status: [x] Complete*

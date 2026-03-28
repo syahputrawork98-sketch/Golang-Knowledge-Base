@@ -1,47 +1,60 @@
-# CH-02: Middleware Chaining (The Interceptor Pattern)
+# CH-02: Middleware Chaining
 
-> **Source Link**: [Go Blog: HTTP Pipeline](https://blog.golang.org/http-tracing) | [JustForFunc: Middleware in Go](https://www.youtube.com/watch?v=0w7S_iJid0I)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [net/http: Handler](https://pkg.go.dev/net/http#Handler) | [net/http: HandlerFunc](https://pkg.go.dev/net/http#HandlerFunc)
+- **Framing**: Middleware chaining menunjukkan kenapa Go nyaman membangun perilaku lintas fungsi sebagai lapisan kecil yang bisa dibungkus satu per satu.
 
-### Definisi ("Apa itu?")
-Middleware adalah fungsi yang membungkus fungsi lain (handler) untuk menangani logika lintas sektoral (cross-cutting concerns) seperti Logging, Autentikasi, atau Pemulihan dari Panic.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **DRY (Don't Repeat Yourself)**: Menghindari penulisan kode autentikasi yang sama di setiap endpoint.
-2. **Separation of Concerns**: Memisahkan logika bisnis inti dari infrastruktur (misal: monitoring).
-3. **Layered Architecture**: Memungkinkan penambahan lapisan keamanan secara dinamis tanpa menyentuh core logic.
+### Definisi
+Middleware adalah fungsi yang menerima handler lain, lalu mengembalikan handler baru dengan perilaku tambahan di sekeliling handler asli.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Cross-cutting concern tidak bocor ke business logic**  
+   Logging, authentication, metrics, atau recovery bisa ditempatkan di lapisan terpisah.
+2. **Penyusunan perilaku jadi modular**  
+   Kita bisa menambah atau melepas satu lapisan tanpa menulis ulang handler inti.
+3. **Alur request lebih mudah dibaca**  
+   Rangkaian middleware memperlihatkan urutan pemeriksaan sebelum request mencapai logic utama.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Bandara (Airport)**.
-- **Handler**: Terminal Pesawat (Tujuan Utama).
-- **Middleware**: Pos Pemeriksaan Tiket, Scan X-Ray, dan Imigrasi. Anda tidak bisa sampai ke Terminal tanpa melewati lapisan-lapisan ini. Setiap lapisan bisa menolak Anda (**Early Return**) jika syarat tidak terpenuhi.
+Bayangkan penumpang masuk ke area keberangkatan bandara. Sebelum sampai ke gate, ia melewati pemeriksaan tiket, scan keamanan, dan verifikasi identitas. Gate tetap sama, tetapi akses ke sana dibentuk oleh lapisan-lapisan yang membungkus jalur masuknya.
 
----
+### Terminologi Teknis
+- **Handler**: komponen yang memproses request utama.
+- **Wrapper**: fungsi pembungkus yang menambahkan perilaku sebelum atau sesudah handler asli.
+- **Cross-cutting Concern**: logika umum yang dipakai di banyak endpoint.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    R[Request] --> M1[Logging]
-    M1 --> M2[Auth]
-    M2 --> H[Handler]
-    H --> M2
-    M2 --> M1
-    M1 --> S[Response]
+    R[Request] --> L[Logging Middleware]
+    L --> A[Auth Middleware]
+    A --> H[Core Handler]
+    H --> A
+    A --> L
+    L --> S[Response]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, pola ini terasa natural karena function dan interface sama-sama ringan untuk dikomposisikan. Pada `net/http`, middleware biasanya menerima `http.Handler`, lalu mengembalikan `http.Handler` baru yang menjalankan logika tambahan sebelum atau sesudah `next.ServeHTTP(...)`.
+
+Inti desain yang perlu ditangkap:
+- handler inti tetap kecil dan fokus;
+- lapisan tambahan dirangkai dari luar;
+- urutan pembungkusan menentukan urutan eksekusi request dan response.
+
+Itulah kenapa pola ini penting di `RAK-04`: ia menunjukkan cara Go membangun arsitektur dari komposisi fungsi kecil, bukan dari inheritance yang berat.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_basic_middleware.go](./examples/01_basic_middleware.go) - Middleware logger sederhana yang membungkus handler HTTP dasar.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Mekanisme ini memanfaatkan fungsi tingkat tinggi (*Higher-order functions*) dan closure. Handler di Go adalah interface `http.Handler` dengan satu metode `ServeHTTP`. Middleware mengambil `http.Handler` dan mengembalikan `http.Handler` baru yang mengeksekusi logika tambahan sebelum/sesudah memanggil handler asli.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_basic_middleware.go`: Membuat logger middleware sederhana.
-- `02_middleware_chain.go`: Menggabungkan beberapa middleware menjadi satu kesatuan.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

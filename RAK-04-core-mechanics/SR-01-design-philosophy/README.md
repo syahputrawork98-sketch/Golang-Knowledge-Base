@@ -23,4 +23,4 @@ Filosofi komunikasi, ownership, dan alasan di balik model concurrency Go.
 - bukan tempat utama untuk tutorial sintaks dasar atau bedah source code runtime.
 
 ---
-*Status: [/] Partial*
+*Status: [x] Complete*

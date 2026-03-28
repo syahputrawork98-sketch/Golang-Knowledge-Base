@@ -1,23 +1,34 @@
-# CH-01: Implicit Satisfaction (Structural Typing)
+# CH-01: Implicit Satisfaction
 
-> **Source Link**: [The Go Programming Language Specification - Interface types](https://golang.org/ref/spec#Interface_types) | [Go Blog: Laws of Reflection](https://blog.golang.org/laws-of-reflection)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Specification: Interface types](https://go.dev/ref/spec#Interface_types)
+- **Framing**: Di Go, tipe tidak perlu mendaftarkan diri secara resmi untuk memenuhi interface. Kalau bentuk perilakunya cocok, interface itu otomatis terpenuhi.
 
-### Definisi ("Apa itu?")
-Di Go, sebuah tipe memuaskan sebuah interface secara **implisit**. Tidak ada kata kunci `implements`. Jika sebuah tipe memiliki semua metode yang didefinisikan oleh sebuah interface, maka tipe tersebut **secara otomatis** adalah interface tersebut.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Decoupling**: Paket pengirim tidak perlu tahu tentang interface yang akan digunakan oleh paket penerima. Ini memungkinkan integrasi yang sangat fleksibel tanpa harus memodifikasi kode asal.
-2. **Structural Typing**: Fokus pada *apa yang bisa dilakukan* sebuah tipe (behavior), bukan *siapa dia* (hierarchy).
-3. **Satisfaction by Accident**: Sebuah tipe bisa memuaskan banyak interface sekaligus tanpa perencanaan eksplisit di awal.
+### Definisi
+Implicit satisfaction berarti sebuah tipe dianggap memenuhi interface jika ia memiliki seluruh method yang diminta interface tersebut. Tidak ada kata kunci `implements` seperti di banyak bahasa lain.
+
+### Rasionalitas
+Desain ini penting karena:
+
+1. **Coupling antar paket jadi lebih rendah**  
+   Tipe konkret tidak perlu tahu interface mana saja yang akan memakainya.
+2. **Fokus bergeser ke perilaku**  
+   Yang penting bukan garis keturunan tipe, tetapi apa yang bisa dilakukan tipe itu.
+3. **Komposisi jadi lebih alami**  
+   Satu tipe bisa memenuhi banyak interface kecil tanpa deklarasi tambahan.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Stopkontak (Interface)** dengan lubang kaki tiga. Setiap **Peralatan Listrik (Type)** yang memiliki steker kaki tiga akan bisa masuk dan berfungsi, terlepas dari apakah peralatan itu Setrika, Laptop, atau Mesin Jahit. Pabrik Peralatan Listrik tidak perlu mendaftarkan diri secara formal ke Pabrik Stopkontak; cukup ikuti "bentuknya" (**Structural Identity**).
+Bayangkan stopkontak dan perangkat listrik. Perangkat tidak perlu mendaftar ke produsen stopkontak. Selama bentuk stekernya cocok, perangkat itu bisa langsung dipakai. Di Go, interface bekerja dengan logika kecocokan perilaku seperti itu.
 
----
+### Terminologi Teknis
+- **Implicit Satisfaction**: pemenuhan interface tanpa deklarasi eksplisit.
+- **Structural Typing**: kecocokan berdasarkan bentuk perilaku.
+- **Behavior Contract**: kontrak perilaku yang dinyatakan oleh interface.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 classDiagram
@@ -31,21 +42,20 @@ classDiagram
     class NetworkBuffer {
         Read(p []byte) (n int, err error)
     }
-    File ..|> Reader : Satisfies Implicity
-    NetworkBuffer ..|> Reader : Satisfies Implicity
+    File ..|> Reader : satisfies implicitly
+    NetworkBuffer ..|> Reader : satisfies implicitly
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Secara desain, implicit satisfaction membuat interface bisa didefinisikan di sisi pemakai, bukan harus di sisi pembuat tipe konkret. Itu membuat package lebih mudah dipisah dan diuji.
+
+Di level implementasi, runtime interface Go memang punya representasi internal seperti pasangan tipe dan data, tetapi pelajaran utamanya di `RAK-04` adalah: model ini sengaja dipilih untuk menjaga sistem tetap modular dan tidak terseret ke hierarki yang kaku.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_structural_typing.go](./examples/01_structural_typing.go) - Membuktikan pemenuhan interface tanpa deklarasi `implements`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go Runtime menggunakan struktur data `itab` (Interface Table) untuk menyimpan informasi tentang tipe konkret dan interface yang ia penuhi. Pencocokan metode dilakukan saat runtime (atau di-cache setelah pemanggilan pertama) untuk memastikan performa tetap optimal.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_structural_typing.go`: Membuktikan kepuasan implisit antar paket.
-- `02_interface_assertions.go`: Cara aman mengecek apakah tipe memenuhi interface tertentu.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*
