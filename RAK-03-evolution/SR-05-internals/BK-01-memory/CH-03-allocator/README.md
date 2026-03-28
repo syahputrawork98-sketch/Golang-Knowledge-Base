@@ -1,60 +1,58 @@
-# [BK-01-CH-03] Memory Allocator Architecture
+# CH-03: Runtime Allocator
 
-**The TCMalloc Inheritance**
-*Target: Memahami bagaimana Go membagi-bagi memori ke dalam span untuk alokasi super cepat dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Concepts (The Logic)
+- **Source Link**: [runtime package](https://pkg.go.dev/runtime) | [A Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide)
+- **Framing**: Untuk memahami performa alokasi Go, kita perlu tahu bahwa permintaan memori tidak selalu langsung pergi ke heap global. Ada jalur bertingkat yang dirancang agar alokasi umum tetap cepat.
 
-Allocator Go didasarkan pada **TCMalloc** (Thread-Caching Malloc). Alih-alih satu blok memori besar, Go membagi memori menjadi unit-unit kecil yang disebut **mspan**. Struktur ini berjenjang untuk meminimalkan lock contention antar thread saat melakukan alokasi.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **mspan**: Unit dasar pengelolaan memori yang berisi satu atau lebih halaman (8KB).
-- **mcache**: Cache memori lokal per-Processor (P). Alokasi kecil (<32KB) diambil dari sini tanpa lock.
-- **mcentral**: Penampung mspan global untuk ukuran objek tertentu. Digunakan jika mcache kosong.
-- **mheap**: Struktur data pusat yang mengelola seluruh heap Go dan meminta memori dari OS.
-- **Size Classes**: Go memiliki ~67 kategori ukuran objek untuk meminimalkan fragmentasi internal.
+### Definisi
+Allocator runtime Go mengelola memori lewat lapisan cache dan span, sehingga alokasi kecil bisa dilayani dekat dengan eksekusi goroutine, sementara koordinasi yang lebih berat hanya terjadi saat benar-benar perlu.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa desain hierarki ini sangat penting?
-- **Speed**: Sebagian besar alokasi terjadi di `mcache` (local), yang berarti tidak ada overhead mutex antar thread.
-- **Anti-Fragmentation**: Dengan menggunakan Size Classes, Go memastikan objek dengan ukuran mirip diletakkan berdampingan, menjaga memori tetap padat.
-- **Scalability**: Performa alokasi tetap stabil seiring bertambahnya jumlah core CPU (P).
+1. **Menjelaskan mengapa alokasi kecil sering tetap cepat**  
+   Tidak semua alokasi langsung berarti akses berat ke struktur global.
+2. **Membantu membaca hubungan allocator dan GC**  
+   Heap growth, reuse, dan sweeping saling terkait.
+3. **Membuat metrik memori lebih masuk akal**  
+   Engineer jadi lebih mudah menghubungkan perilaku aplikasi dengan statistik runtime.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Tiny Aloc (<16B)**: Digabungkan ke dalam satu blok 16-byte di mcache.
-2. **Small Alloc (16B - 32KB)**: Diambil dari daftar mspan yang sesuai di mcache.
-3. **Large Alloc (>32KB)**: Langsung dialokasikan dari mheap dengan lock global.
+### Analogi Model Mental
+Bayangkan sistem logistik dengan gudang kecil di tiap cabang, gudang regional, lalu gudang pusat. Permintaan barang kecil dilayani dulu dari stok terdekat agar cepat, baru naik ke tingkat yang lebih tinggi kalau stok lokal habis.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **mcache**: cache lokal yang melayani banyak alokasi kecil dengan cepat.
+- **mcentral**: pool bersama untuk kelas ukuran tertentu.
+- **mheap / span**: area yang mengelola blok memori dari tingkat yang lebih global.
 
-Lihat visualisasi konsumsi memori internal di [examples/](./examples/).
-1. `01-mem-stats`: Menggunakan `runtime.MemStats` untuk mengintip jumlah span yang aktif dan memori yang dipesan (Sys) vs yang terpakai (Alloc).
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Allocator Hierarchy](./assets/allocator-hierarchy.svg)
 
-### Go Allocator Hierarchy
 ```mermaid
 graph TD
-    subgraph "Local (No Lock)"
-    MC[mcache: Per-Processor P]
-    end
-    
-    subgraph "Central (Lock per SizeClass)"
-    MCE[mcentral: Shared across Ps]
-    end
-    
-    subgraph "Global (Shared Lock)"
-    MH[mheap: The whole heap]
-    end
-    
-    App[Go Code: new/make] --> MC
-    MC -- "Empty?" --> MCE
-    MCE -- "Empty?" --> MH
-    MH -- "More Mem?" --> OS[Operating System]
+    Alloc[Allocation request] --> Cache[mcache]
+    Cache -->|miss| Central[mcentral]
+    Central -->|miss| Heap[mheap]
+    Heap --> OS[OS memory]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Allocator Go memprioritaskan jalur lokal agar alokasi kecil tidak perlu terus berebut lock global. Saat cache lokal kehabisan span yang cocok, runtime meminta ke lapisan yang lebih tinggi. Model bertingkat ini menjaga banyak alokasi umum tetap cepat, tetapi juga tetap terhubung dengan sistem sweeping dan GC yang membersihkan heap.
+
+Nilai praktisnya:
+- membantu menjelaskan kenapa pola alokasi tertentu terasa lebih mahal;
+- memberi konteks terhadap statistik heap dan perilaku GC;
+- menjadi dasar pemahaman sebelum masuk ke internals runtime yang lebih dalam.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-mem-stats](./examples/01-mem-stats) - Contoh kecil untuk melihat statistik alokasi runtime dan perubahan heap saat program berjalan.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

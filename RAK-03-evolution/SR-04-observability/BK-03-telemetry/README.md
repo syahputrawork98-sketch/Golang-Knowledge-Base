@@ -1,22 +1,23 @@
-# BK-03: Metrics & Structured Logging
+# BK-03: Telemetry
 
-Buku ini membahas cara mengumpulkan data operasional (telemetry) dari aplikasi Go menggunakan standar modern. Fokusnya adalah pada efisiensi pengumpulan metrik runtime, integrasi dengan ekosistem monitoring industri (Prometheus), dan penerapan logging terstruktur yang dapat diproses oleh mesin.
+Buku ini membahas cara mengumpulkan, mengekspor, dan menyusun data operasional aplikasi Go lewat runtime metrics, Prometheus, dan structured logging.
 
-## Chapters
+## Struktur
 
-| Chapter | Topik | Konsep Inti |
-|---------|-------|------------|
-| [CH-01](./CH-01-metrics/README.md) | runtime/metrics | Modern telemetry API, Low overhead, Histogram semantics |
-| [CH-02](./CH-02-prometheus/README.md) | Prometheus Integration | Pull model, Registry, Metrics exposition (/metrics) |
-| [CH-03](./CH-03-slog/README.md) | Structured Logging | slog (Go 1.21+), JSON Handlers, Attributes & Groups |
+### [CH-01-metrics](./CH-01-metrics/)
+`runtime/metrics` sebagai API modern untuk membaca data internal runtime.
 
-## Key Visual Assets
+### [CH-02-prometheus](./CH-02-prometheus/)
+Prometheus sebagai pola umum untuk ekspor dan scraping metrik aplikasi.
 
-| Asset | Description |
-|-------|-------------|
-| `CH-01/assets/metric-semantics.svg` | Counter, Gauge, and Histogram data models |
-| `CH-02/assets/prom-pull-model.svg` | Scraper architecture and time-series propagation |
-| `CH-03/assets/slog-pipeline.svg` | From log record to serialized JSON output pipeline |
+### [CH-03-slog](./CH-03-slog/)
+Structured logging dengan `log/slog` untuk observability yang lebih mudah diproses mesin.
+
+## Boundary
+
+- fokus pada telemetry yang bisa langsung dipakai engineer aplikasi;
+- membantu pembaca membangun jalur data operasional dari runtime sampai dashboard dan log pipeline;
+- bukan tempat utama untuk tracing distributed atau internals metric collector yang terlalu vendor-specific.
 
 ---
-*Back to [SR-04 Page](../README.md)*
+*Status: [x] Complete*

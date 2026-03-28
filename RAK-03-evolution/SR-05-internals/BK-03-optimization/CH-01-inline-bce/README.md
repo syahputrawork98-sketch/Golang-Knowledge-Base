@@ -1,47 +1,59 @@
-# [BK-03-CH-01] Inlining & Bounds Check Elimination (BCE)
+# CH-01: Inlining and Bounds Check Elimination
 
-**Compiler-Driven Performance Boosts**
-*Target: Memahami bagaimana compiler Go menghapus overhead fungsi dan pengecekan array dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Wiki: Compiler Optimizations](https://go.dev/wiki/CompilerOptimizations) | [cmd/compile](https://pkg.go.dev/cmd/compile)
+- **Framing**: Banyak optimisasi Go yang paling terasa justru terjadi sebelum program jalan. Inlining dan BCE membantu kode tetap rapi tanpa membayar overhead yang sebenarnya bisa dihapus compiler.
 
-Optimization dalam Go seringkali dilakukan oleh compiler tanpa intervensi manual yang besar. Dua teknik paling powerful adalah **Inlining** (memasukkan isi fungsi langsung ke pemanggil) dan **Bounds Check Elimination (BCE)** (menghapus pengecekan batas array yang tidak perlu).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Inlining**: Menghapus overhead panggilan fungsi (push/pop stack) dengan mengganti pemanggilan fungsi dengan body fungsi tersebut.
-- **Leaf Function**: Fungsi kecil yang tidak memanggil fungsi lain, kandidat utama inlining.
-- **BCE**: Proses di mana compiler membuktikan bahwa sebuah indeks pasti berada dalam batas array, sehingga instruksi pengecekan batas (panic check) bisa dihapus.
-- **GC Flags**: Bendera compiler (`-gcflags`) untuk menampilkan laporan optimasi.
+### Definisi
+**Inlining** adalah saat compiler memasukkan isi fungsi kecil langsung ke lokasi pemanggilan. **Bounds Check Elimination (BCE)** adalah saat compiler membuktikan indeks pasti aman sehingga pengecekan batas array atau slice tidak perlu dijalankan terus-menerus.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini penting karena:
 
-Mengapa optimasi ini penting bagi Senior Developer?
-- **Zero Overhead**: Inlining memungkinkan abstraksi kode (fungsi kecil) tetap rapi tanpa mengorbankan performa runtime.
-- **CPU Cycle Savings**: BCE dapat mempercepat loop intensif (seperti pengolahan image atau kriptografi) dengan menghilangkan instruksi percabangan yang tidak perlu di setiap iterasi.
-- **Mechanical Sympathy**: Menulis kode yang "mudah dioptimasi" oleh compiler (misal: struktur loop yang standar).
+1. **Abstraksi kecil tidak selalu mahal**  
+   Fungsi helper yang sederhana sering tetap murah karena bisa di-inline.
+2. **Loop panas bisa jadi lebih efisien**  
+   BCE mengurangi cabang tambahan di jalur yang sering dieksekusi.
+3. **Engineer bisa menulis kode yang lebih ramah compiler**  
+   Dengan tahu polanya, kita bisa menghindari struktur yang mempersulit optimisasi.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Inlining Decision**: Compiler menghitung "budget" kompleksitas sebuah fungsi. Jika cukup sederhana, body fungsi di-*paste* ke lokasi pemanggilan.
-2. **BCE Proof**: Jika Anda melakukan `_ = a[3]` sebelum loop yang mengakses `a[0...3]`, compiler tahu bahwa akses di dalam loop pasti aman dan akan menghapus cek batas internal.
+### Analogi Model Mental
+Bayangkan instruksi kerja singkat yang ditempel langsung di meja operator, bukan harus menelepon supervisor setiap kali langkah itu dibutuhkan. Itu gambaran sederhananya inlining.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Inlining Budget**: batas kompleksitas yang dipakai compiler untuk menilai apakah fungsi layak di-inline.
+- **Bounds Check**: pengecekan bahwa indeks masih berada di dalam batas slice atau array.
+- **Hot Path**: jalur eksekusi yang berjalan sangat sering dan sensitif terhadap overhead kecil.
 
-Lihat laporan optimasi compiler di [examples/](./examples/).
-1. `01-inline-verify`: Gunakan perintah `go build -gcflags="-m -l"` untuk melihat fungsi mana yang di-*inline* dan di mana pengecekan batas array dihapus.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Inlining Logic](./assets/inlining-logic.svg)
 
-### Inlining Optimization Logic
 ```mermaid
 graph LR
-    Call[Func A Calls Func B] -- "Complexity Budget Check" --> Decision{Inline?}
-    Decision -- Yes --> Integrated[Body of B copied into A]
-    Decision -- No --> Stack[Traditional Call with Stack Push/Pop]
-    
-    Integrated -- Benefit --> Fast[No overhead, better CPU caching]
+    Call[Call helper function] --> Decide{Inline candidate?}
+    Decide -->|Yes| Inline[Copy body into caller]
+    Decide -->|No| Regular[Keep normal function call]
+    Inline --> Loop[Opportunity for BCE in loop]
+    Regular --> Loop
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Compiler Go menganalisis ukuran dan bentuk fungsi untuk memutuskan apakah inlining menguntungkan. Pada saat yang sama, compiler juga mencoba membuktikan bahwa indeks tertentu aman, sehingga pengecekan batas tidak perlu diulang di setiap iterasi.
+
+Nilai praktisnya:
+- membantu engineer membaca output `-gcflags=-m` dengan lebih bermakna;
+- membuat optimisasi tidak terasa seperti tebakan buta;
+- menunjukkan bahwa performa sering berasal dari kerja sama antara desain kode dan compiler.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-inline-verify](./examples/01-inline-verify) - Contoh kecil untuk membaca sinyal inlining dan BCE lewat output compiler.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

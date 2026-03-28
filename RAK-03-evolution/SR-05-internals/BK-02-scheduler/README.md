@@ -1,22 +1,23 @@
-# BK-02: Runtime Scheduler (G-M-P)
+# BK-02: Scheduler and Runtime Flow
 
-Buku ini membahas orkestrasi internal bagaimana Go menjadwalkan ribuan goroutine di atas thread sistem operasi secara efisien. Fokusnya adalah pada model G-M-P, penanganan I/O yang memblokir, serta mekanisme preemption untuk menjaga keadilan distribusi CPU.
+Buku ini membahas perilaku scheduler Go yang paling penting dipahami engineer: model G-M-P, penanganan blocking syscall, dan preemption yang menjaga distribusi CPU tetap sehat.
 
-## Chapters
+## Struktur
 
-| Chapter | Topik | Konsep Inti |
-|---------|-------|------------|
-| [CH-01](./CH-01-gmp-model/README.md) | G-M-P Model | Processor (P), OS Thread (M), Work Stealing, M:N Scheduling |
-| [CH-02](./CH-02-syscall-poller/README.md) | Syscall & Netpoller | Sinkron vs Asinkron I/O, Netpoller (epoll), Syscall Handoff |
-| [CH-03](./CH-03-preemption/README.md) | Preemption | Cooperative vs Asynchronous, SIGURG signaling, sysmon |
+### [CH-01-gmp-model](./CH-01-gmp-model/)
+Model G-M-P sebagai fondasi penjadwalan goroutine di atas thread OS.
 
-## Key Visual Assets
+### [CH-02-syscall-poller](./CH-02-syscall-poller/)
+Blocking syscall, netpoller, dan dampaknya pada aliran kerja scheduler.
 
-| Asset | Description |
-|-------|-------------|
-| `CH-01/assets/gmp-architecture.svg` | Hierarchical relationship between G, M, and P |
-| `CH-02/assets/io-management.svg` | Decision tree for Network Wait vs File Syscall |
-| `CH-03/assets/preemption-signal.svg` | The sysmon to M signaling flow for greedy goroutines |
+### [CH-03-preemption](./CH-03-preemption/)
+Preemption untuk mencegah goroutine rakus memonopoli CPU terlalu lama.
+
+## Boundary
+
+- fokus pada perilaku scheduler yang berguna untuk engineer aplikasi dan performance tuning;
+- menjadi jembatan menuju runtime internals yang lebih dalam tanpa pindah penuh ke `RAK-06`;
+- bukan tempat utama untuk bedah source scheduler Go secara lengkap.
 
 ---
-*Back to [SR-05 Page](../README.md)*
+*Status: [x] Complete*

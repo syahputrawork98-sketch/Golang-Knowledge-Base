@@ -1,49 +1,59 @@
-# [BK-03-CH-01] Rate Limiting
+# CH-01: Rate Limiting
 
-**System Resilience & Flow Control**
-*Target: Memahami cara melindungi sistem dari overload permintaan dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [golang.org/x/time/rate](https://pkg.go.dev/golang.org/x/time/rate)
+- **Framing**: Rate limiting dipakai saat sistem perlu tetap waras di bawah lonjakan traffic, bukan sekadar membatasi request secara asal.
 
-**Rate Limiting** adalah teknik untuk mengontrol kecepatan masuknya permintaan atau operasi dalam sistem. Tujuannya adalah memastikan sistem tetap stabil (Resilient) meskipun terjadi lonjakan trafik (Traffic Spikes) atau serangan DDoS.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Token Bucket**: Algoritma di mana token ditambahkan ke "ember" secara berkala. Permintaan hanya diproses jika ada token tersedia. Mendukung *burstiness*.
-- **Leaky Bucket**: Algoritma di mana permintaan masuk ke antrian dan keluar (diproses) dengan kecepatan tetap yang stabil.
-- **Burst Capacity**: Jumlah maksimum permintaan yang boleh diproses secara instan dalam satu waktu singkat.
+### Definisi
+Rate limiting adalah teknik untuk mengatur seberapa cepat request atau operasi boleh lewat. Di Go, pola yang paling umum adalah **token bucket**, di mana token diisi berkala dan tiap request harus "membayar" satu token.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa butuh Rate Limiting di level aplikasi?
-- **Resource Protection**: Mencegah database atau API downstream tumbang karena terlalu banyak request.
-- **Fairness**: Memastikan satu pengguna/client tidak menghabiskan seluruh kuota resource sistem (Noisy Neighbor problem).
-- **Cost Control**: Menghindari pembengkakan biaya jika menggunakan layanan cloud berbasis pay-per-request.
+1. **Sistem tidak gampang overload**  
+   Database, API downstream, atau worker pool tidak langsung tumbang saat ada lonjakan trafik.
+2. **Burst masih bisa diizinkan secara terukur**  
+   Token bucket memberi ruang untuk ledakan kecil tanpa membuka pintu lebar-lebar.
+3. **Kontrol flow jadi eksplisit**  
+   Engineer bisa memilih apakah request ditolak cepat atau menunggu giliran.
 
-### Mekanisme Kerja Under-the-Hood
-Di Go, Rate Limiter standar diimplementasikan dalam paket `golang.org/x/time/rate`.
-1. **`Limit`**: Kecepatan regenerasi token per detik.
-2. **`Burst`**: Ukuran maksimum ember (bucket).
-3. **`Allow()`**: Mengecek apakah ada token, jika tidak ada langsung return `false` (non-blocking).
-4. **`Wait()`**: Menunggu hingga token tersedia (blocking).
+### Analogi Model Mental
+Bayangkan pintu masuk venue dengan gelang akses terbatas. Orang bisa masuk selama masih ada gelang tersisa. Kalau gelang habis, mereka harus menunggu stok baru atau ditolak.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Token Bucket**: model limiter berbasis token yang diisi ulang berkala.
+- **Burst Capacity**: jumlah token maksimum yang boleh menumpuk.
+- **Backpressure**: tekanan yang memaksa produsen menunggu atau melambat.
 
-Lihat proteksi API di [examples/](./examples/).
-1. `01-token-bucket**: Simulasi API middleware yang membatasi request per detik menggunakan `x/time/rate`.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Token Bucket](./assets/token-bucket.svg)
 
-### Token Bucket Logic
 ```mermaid
 graph TD
-    Refill[Refill Engine: +N tokens/sec] --> Bucket[Token Bucket]
-    Request[Incoming Request] --> Check{Token Available?}
-    Check -->|Yes| Consume[Consume 1 Token & Process]
-    Check -->|No| Reject[Rate Limit Exceeded: 429]
-    Bucket -->|Capacity Limit| Over[Discard Extra Tokens]
+    Refill[Refill token] --> Bucket[Token bucket]
+    Request[Incoming request] --> Check{Token available?}
+    Bucket --> Check
+    Check -->|Yes| Process[Process request]
+    Check -->|No| Reject[Reject or wait]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Paket `golang.org/x/time/rate` memberi limiter yang menyimpan state jumlah token dan waktu refill. Method seperti `Allow()` cocok untuk penolakan cepat, sedangkan `Wait()` cocok saat sistem lebih baik menahan laju daripada langsung menolak.
+
+Nilai praktisnya:
+- menjaga service tetap stabil saat trafik naik;
+- memberi engineer kontrol antara throughput dan fairness;
+- mencegah resource penting dipakai habis oleh segelintir request yang datang bersamaan.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-token-bucket](./examples/01-token-bucket) - Simulasi limiter sederhana berbasis `x/time/rate` untuk menunjukkan perilaku burst dan pembatasan laju.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

@@ -1,58 +1,62 @@
-# [BK-02-CH-01] Fan-In & Fan-Out
+# CH-01: Fan-Out and Fan-In
 
-**Industrial-Scale Concurrent Orchestration**
-*Target: Memahami pola distribusi beban kerja dan konsolidasi hasil dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Concurrency Patterns: Pipelines and cancellation](https://go.dev/blog/pipelines) | [Effective Go: Channels](https://go.dev/doc/effective_go#channels)
+- **Framing**: Fan-out dan fan-in dipakai saat satu aliran kerja perlu dibagi ke banyak worker, lalu hasilnya digabung lagi tanpa kehilangan kontrol terhadap lifecycle goroutine.
 
-**Fan-Out** adalah pola di mana sebuah channel tunggal dibaca oleh banyak worker (goroutine) untuk memproses data secara paralel. Ini sangat efektif untuk tugas-tugas berat (CPU-bound atau I/O-bound).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-**Fan-In** adalah pola sebaliknya, di mana banyak channel (biasanya output dari para worker) dikonsolidasikan menjadi satu channel tunggal untuk diproses lebih lanjut secara sekuensial.
+### Definisi
+**Fan-out** adalah pola saat satu sumber pekerjaan dikonsumsi banyak worker secara paralel. **Fan-in** adalah pola saat hasil dari banyak worker digabung kembali ke satu aliran hasil.
 
-### Terminologi Utama (Senior Terms)
-- **Worker Pool**: Kumpulan goroutine tetap yang menunggu pekerjaan untuk menghindari overhead pembuatan goroutine berulang kali.
-- **Multiplexing**: Proses menggabungkan beberapa aliran data menjadi satu aliran (inti dari Fan-In).
-- **Poison Pill**: Sinyal khusus (biasanya penutupan channel) untuk memerintahkan semua worker berhenti.
+### Rasionalitas
+Pola ini dipilih karena:
 
-## 2. Rasionalitas (Why & How?)
+1. **Throughput bisa dinaikkan**  
+   Beban kerja berat dapat dibagi ke beberapa goroutine tanpa membuat arsitektur jadi acak.
+2. **Batas resource lebih mudah dijaga**  
+   Jumlah worker dapat dikontrol, jadi sistem tidak asal membuat goroutine atau koneksi terlalu banyak.
+3. **Hasil tetap punya jalur konsolidasi yang jelas**  
+   Setelah kerja paralel selesai, output tetap kembali ke satu titik konsumsi yang mudah dikelola.
 
-Mengapa menggunakan pola ini?
-- **Throughput**: Memanfaatkan seluruh CPU Core yang tersedia (`GOMAXPROCS`).
-- **Resource Limiting**: Dengan membatasi jumlah worker, Anda mencegah aplikasi "meledak" karena terlalu banyak membuat koneksi atau memori.
-- **Sequential Consolidation**: Memastikan hasil dari banyak worker yang selesai di waktu berbeda dapat dikumpulkan dengan rapi.
+### Analogi Model Mental
+Bayangkan satu truk besar membawa banyak paket ke gudang. Paket-paket itu dibagi ke beberapa meja sortir agar prosesnya cepat, lalu semua paket yang sudah diproses dikumpulkan lagi ke satu conveyor sebelum dikirim keluar.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Fan-Out**: Satu channel (Jobs) diteruskan ke `n` goroutine. `select` atau `for-range` pada channel yang sama secara otomatis melakukan distribusi beban (maupun tidak merata, tapi aman).
-2. **Fan-In**: Menggunakan `sync.WaitGroup` untuk menunggu semua worker selesai, lalu menutup channel hasil (Results), atau menggunakan `select` di atas slice of channels.
+### Terminologi Teknis
+- **Worker Pool**: sekumpulan worker yang mengambil job dari channel yang sama.
+- **Multiplexing**: penggabungan banyak aliran hasil ke satu output channel.
+- **Backpressure**: tekanan saat produsen lebih cepat dari konsumen.
 
-## 3. Implementasi Utama (The Lab)
-
-Lihat orkestrasi beban kerja di [examples/](./examples/).
-1. `01-industrial-worker-pool`: Pola lengkap Pipeline -> Fan-Out (Workers) -> Fan-In (Consolidator).
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Fan-Out/In](./assets/fan-out-in.svg)
 
-### Fan-Out/Fan-In Flow
 ```mermaid
 graph LR
-    Source[Data Source] --> JobChan[(Jobs Channel)]
-    
-    subgraph Fan-Out
-    JobChan --> W1[Worker 1]
-    JobChan --> W2[Worker 2]
-    JobChan --> W3[Worker 3]
-    end
-    
-    subgraph Fan-In
-    W1 --> ResChan[(Results Channel)]
-    W2 --> ResChan
-    W3 --> ResChan
-    end
-    
-    ResChan --> Sink[Final Consumer]
+    Source[Source jobs] --> Jobs[(Jobs Channel)]
+    Jobs --> W1[Worker 1]
+    Jobs --> W2[Worker 2]
+    Jobs --> W3[Worker 3]
+    W1 --> Results[(Results Channel)]
+    W2 --> Results
+    W3 --> Results
+    Results --> Consumer[Final consumer]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, fan-out biasanya lahir secara alami karena banyak goroutine membaca dari channel yang sama. Fan-in biasanya butuh mekanisme penggabungan, misalnya goroutine pengumpul plus `sync.WaitGroup`, agar output channel baru ditutup hanya setelah semua worker selesai.
+
+Nilai praktisnya untuk `RAK-03`:
+- concurrency dipakai untuk menaikkan throughput tanpa kehilangan struktur;
+- engineer bisa membatasi jumlah worker agar resource tetap aman;
+- tahap konsolidasi membuat hasil paralel lebih mudah diolah lebih lanjut.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-industrial-worker-pool](./examples/01-industrial-worker-pool) - Pipeline sederhana yang mendistribusikan job ke banyak worker lalu menggabungkan hasilnya kembali.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

@@ -1,45 +1,57 @@
-# [BK-01-CH-03] Golden Files Testing
+# CH-03: Golden Files
 
-**Testing Large-Scale Complex Outputs**
-*Target: Memahami teknik pengujian output besar (seperti JSON/HTML) tanpa mengotori test code dengan string raksasa dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [go test and testdata convention](https://pkg.go.dev/cmd/go#hdr-Test_packages) | [testing package](https://pkg.go.dev/testing)
+- **Framing**: Golden files berguna saat output yang diuji terlalu besar atau terlalu berisik untuk ditulis langsung sebagai string panjang di dalam test.
 
-**Golden Files Testing** adalah teknik di mana hasil output sesungguhnya dari sebuah fungsi dibandingkan dengan file referensi "Emas" yang disimpan di disk. Alih-alih menulis `if actual != expectedString`, Anda membandingkan `actual` dengan isi dari file (misal: `testdata/output.golden`).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **`testdata` Directory**: Folder khusus yang diabaikan oleh tool Go biasa tapi bisa diakses oleh pengujian untuk menyimpan aset statis.
-- **`-update` Flag**: Pola idiomatis menggunakan `flag.Bool` untuk memperbarui file Golden secara otomatis jika output aslinya memang sengaja diubah.
-- **`os.ReadFile`**: Fungsi standar untuk memuat referensi dari disk.
+### Definisi
+Golden file testing adalah pola di mana output aktual dari sebuah fungsi dibandingkan dengan file referensi yang disimpan di disk, biasanya di bawah folder `testdata`.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Kapan harus menggunakan Golden Files?
-- **Complex Outputs**: Response API JSON yang panjang, struktur XML, atau template HTML.
-- **Maintainability**: Jika format output berubah, Anda tidak perlu mengedit 100 baris string di kode pengujian. Cukup jalankan pengujian dengan flag `-update`.
+1. **Output besar lebih mudah dikelola**  
+   JSON, HTML, atau teks panjang bisa dipisahkan dari kode test.
+2. **Perubahan output lebih mudah direview**  
+   File referensi bisa diperbarui secara sadar saat perilaku memang berubah.
+3. **Keterbacaan test tetap terjaga**  
+   Test tidak dipenuhi string panjang yang menyulitkan pembacaan logika utamanya.
 
-### Mekanisme Kerja Under-the-Hood
-1. Jalankan test.
-2. Jika flag `-update` aktif, tulis `actual` ke file `.golden`.
-3. Jika flag tidak aktif, baca file `.golden` lama dan bandingkan dengan `actual`.
-4. Jika berbeda, test gagal dan menunjukkan diff-nya.
+### Analogi Model Mental
+Bayangkan pemeriksa dokumen yang membandingkan cetakan terbaru dengan salinan acuan yang disimpan di arsip. Fokusnya bukan menulis ulang seluruh isi dokumen di form pemeriksaan, tetapi memastikan hasil terbaru masih cocok dengan referensi resmi.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Golden File**: file referensi hasil yang dianggap benar.
+- **`testdata`**: direktori konvensional untuk asset pengujian.
+- **Update Flag**: pola untuk memperbarui golden file saat perubahan memang disengaja.
 
-Lihat teknik perbandingan data besar di [examples/](./examples/).
-1. `01-json-golden`: Menguji response JSON kompleks menggunakan file referensi di folder `testdata/`.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
-
-### Golden File Workflow
 ```mermaid
 graph LR
-    Code[Function Output] --> Check{Update Flag?}
-    Check -->|Yes| Save[Write to testdata/*.golden]
-    Check -->|No| Compare[Compare Code Output vs Golden File]
-    Compare -->|Match| Pass[PASS]
-    Compare -->|Mismatch| Fail[FAIL]
+    Output[Actual output] --> Check{Update mode?}
+    Check -->|Yes| Save[Write golden file]
+    Check -->|No| Compare[Compare with stored golden]
+    Compare --> Pass[PASS]
+    Compare --> Fail[FAIL]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Test biasanya menghasilkan output aktual, lalu memilih dua jalur: memperbarui file golden jika sedang dalam mode update, atau membaca file golden lama untuk dibandingkan. Dengan pola ini, perubahan perilaku menjadi eksplisit dan mudah diaudit.
+
+Nilai evolusinya untuk `RAK-03`:
+- suite test lebih siap menangani output realistis;
+- struktur pengujian tetap rapi walau data yang diverifikasi besar;
+- maintenance test jadi lebih mudah saat format output berkembang.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-json-golden](./examples/01-json-golden) - Contoh perbandingan output JSON dengan golden file.
+
 ---
-*Back to [BK-01 Page](../README.md)*
+*Status: [x] Complete*

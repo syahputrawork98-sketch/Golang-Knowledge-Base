@@ -1,22 +1,23 @@
-# BK-02: Pipeline & Flow Patterns
+# BK-02: Pipelines and Flow Patterns
 
-Buku ini membahas pola arsitektur aliran data (data flow) konkuren di Go. Dari distribusi beban ke banyak worker hingga penghasil data yang efisien secara memori.
+Buku ini membahas pola aliran kerja concurrent di Go: distribusi kerja, pipeline bertahap, dan generator lazy yang menjaga aliran data tetap efisien.
 
-## Chapters
+## Struktur
 
-| Chapter | Topik | Konsep Inti |
-|---------|-------|------------|
-| [CH-01](./CH-01-fan-out-in/README.md) | Fan-In & Fan-Out | Worker Pool, Multiplexing, Poison Pill |
-| [CH-02](./CH-02-orchestration/README.md) | Pipeline Orchestration | Context Propagation, Stage Isolation, Graceful Teardown |
-| [CH-03](./CH-03-generators/README.md) | Generator Patterns | Lazy Evaluation, Infinite Streams, Closure-based Generators |
+### [CH-01-fan-out-in](./CH-01-fan-out-in/)
+Fan-out dan fan-in untuk membagi beban kerja ke banyak worker lalu menggabungkan hasilnya kembali.
 
-## Key Visual Assets
+### [CH-02-orchestration](./CH-02-orchestration/)
+Pipeline bertahap dengan `context.Context` untuk cancellation, teardown, dan koordinasi lintas stage.
 
-| Asset | Description |
-|-------|-------------|
-| `CH-01/assets/fan-out-in.svg` | Industrial worker pool pipeline visualization |
-| `CH-02/assets/pipeline-orchestration.svg` | Multi-stage context termination flow |
-| `CH-03/assets/lazy-generator.svg` | On-demand streaming architecture |
+### [CH-03-generators](./CH-03-generators/)
+Generator berbasis goroutine dan channel untuk aliran data lazy dan memory-efficient.
+
+## Boundary
+
+- fokus pada pola aliran kerja concurrent yang dipakai engineer aplikasi;
+- membantu pembaca merancang stage, cancellation, dan konsolidasi hasil dengan rapi;
+- bukan tempat utama untuk membahas scheduler runtime atau observability pipeline produksi.
 
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

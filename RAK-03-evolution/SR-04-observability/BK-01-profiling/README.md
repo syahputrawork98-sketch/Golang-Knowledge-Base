@@ -1,22 +1,23 @@
-# BK-01: Profiling & Deep Inspection
+# BK-01: Profiling
 
-Buku ini membahas teknik inspeksi mendalam terhadap performa aplikasi Go menggunakan `pprof`. Fokusnya adalah menemukan bottleneck CPU, pemborosan memori (Heap), kebocoran Goroutine, hingga hambatan sinkronisasi (Mutex Contention).
+Buku ini membahas cara membaca biaya eksekusi program Go lewat `pprof`, profiling goroutine, dan analisis contention agar bottleneck nyata bisa terlihat dari data, bukan tebakan.
 
-## Chapters
+## Struktur
 
-| Chapter | Topik | Konsep Inti |
-|---------|-------|------------|
-| [CH-01](./CH-01-pprof/README.md) | CPU & Heap Analysis | Flat/Cum Time, Flamegraphs, Allocation sampling |
-| [CH-02](./CH-02-goroutines/README.md) | Goroutine & Thread | Leak detection, Stack grouping, Thread profiling |
-| [CH-03](./CH-03-contention/README.md) | Block & Mutex Contention | Lock wait identification, SetMutexProfileFraction |
+### [CH-01-pprof](./CH-01-pprof/)
+CPU dan heap profiling untuk menemukan hot path dan pola alokasi yang mahal.
 
-## Key Visual Assets
+### [CH-02-goroutines](./CH-02-goroutines/)
+Profil goroutine dan thread untuk mendeteksi leak serta pola blocking yang tidak sehat.
 
-| Asset | Description |
-|-------|-------------|
-| `CH-01/assets/pprof-sampling.svg` | CPU/Heap sampling and pprof data pipeline |
-| `CH-02/assets/goroutine-leak.svg` | Leak detection via stack trace grouping |
-| `CH-03/assets/mutex-contention.svg` | Mutex wait queue and accumulated wait visualization |
+### [CH-03-contention](./CH-03-contention/)
+Block dan mutex contention untuk membaca biaya sinkronisasi di bawah load.
+
+## Boundary
+
+- fokus pada observability performa dari sisi engineer aplikasi;
+- membantu pembaca menemukan bottleneck nyata melalui profile dan laporan runtime;
+- bukan tempat utama untuk bedah scheduler atau internals allocator yang lebih cocok di rak lain.
 
 ---
-*Back to [SR-04 Page](../README.md)*
+*Status: [x] Complete*

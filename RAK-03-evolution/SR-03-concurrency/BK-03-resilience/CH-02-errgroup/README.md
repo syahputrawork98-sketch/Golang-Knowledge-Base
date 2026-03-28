@@ -1,53 +1,61 @@
-# [BK-03-CH-02] Concurrent Error Handling (errgroup)
+# CH-02: `errgroup` for Concurrent Error Handling
 
-**WaitGroups on Steroids**
-*Target: Memahami cara mengelola banyak goroutine dan menangkap error pertama yang muncul dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [golang.org/x/sync/errgroup](https://pkg.go.dev/golang.org/x/sync/errgroup) | [context package](https://pkg.go.dev/context)
+- **Framing**: `errgroup` berguna saat banyak goroutine harus bergerak bersama, dan kegagalan satu goroutine seharusnya menghentikan pekerjaan yang lain.
 
-**`errgroup`** (dari paket `golang.org/x/sync/errgroup`) adalah grup goroutine yang bekerja bersama untuk menyelesaikan subtugas. Berbeda dengan `sync.WaitGroup` standar, `errgroup` secara otomatis menangkap error pertama yang dikembalikan oleh salah satu goroutine dan membatalkan goroutine lain dalam grup tersebut.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Error Propagation**: Proses meneruskan error dari worker ke thread utama secara otomatis.
-- **Short-Circuiting**: Menghentikan seluruh grup segera setelah satu worker gagal.
-- **Group Context**: Context yang secara otomatis di-cancel jika salah satu goroutine mengembalikan error.
+### Definisi
+`errgroup` adalah helper untuk menjalankan beberapa goroutine sebagai satu grup kerja. Ia mengumpulkan error pertama yang muncul dan, bila dipakai dengan context, membantu membatalkan pekerjaan lain secara terkoordinasi.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa menggunakan `errgroup` daripada `sync.WaitGroup` + channel error manual?
-- **Simplicity**: Mengurangi boilerplate untuk menangani slice of errors atau channel buffer.
-- **Safety**: Satu tahap gagal, sisa tahap tidak berjalan sia-sia (mencegah pemborosan CPU/IO).
-- **Context Integration**: Mudah digabungkan dengan `context.WithCancel` untuk pembatalan kaskade.
+1. **Boilerplate koordinasi jadi lebih kecil**  
+   Engineer tidak perlu merakit `WaitGroup`, error channel, dan cancellation manual untuk kasus umum.
+2. **Failure handling lebih tegas**  
+   Begitu satu tugas gagal, grup bisa langsung berhenti tanpa membuang kerja tambahan.
+3. **Context integration sudah alami**  
+   Sinyal berhenti mudah diteruskan ke semua worker.
 
-### Mekanisme Kerja Under-the-Hood
-1. Buat grup: `g, ctx := errgroup.WithContext(mainCtx)`.
-2. Picu goroutine: `g.Go(func() error { ... })`.
-3. Tunggu: `err := g.Wait()`.
-4. Jika ada error, `g.Wait()` mengembalikan **error pertama** yang terjadi, context otomatis di-cancel.
+### Analogi Model Mental
+Bayangkan tim teknisi yang sedang menangani satu insiden. Kalau satu orang menemukan bahwa sumber masalah membutuhkan shutdown total, anggota lain tidak perlu lanjut kerja seolah semua baik-baik saja.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Short-Circuit**: menghentikan grup lebih awal saat satu jalur gagal.
+- **Error Propagation**: meneruskan error dari worker ke pemanggil utama.
+- **Shared Context**: context yang dipakai bersama agar pembatalan konsisten.
 
-Lihat orkestrasi error yang elegan di [examples/](./examples/).
-1. `01-parallel-fetch`: Mengambil data dari banyak sumber secara paralel; kegagalan satu sumber membatalkan semua.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![errgroup Short-Circuit](./assets/errgroup-shortcircuit.svg)
 
-### errgroup Short-Circuit Logic
 ```mermaid
 graph TD
-    Group[errgroup.WithContext] --> G1[Goroutine 1: OK]
-    Group --> G2[Goroutine 2: FAIL!]
-    Group --> G3[Goroutine 3: OK]
-    
-    G2 -->|Return Error| Wait[g.Wait]
-    Wait -->|Auto Cancel| Done[ctx.Done Signal]
-    Done -.->|Stop| G1
-    Done -.->|Stop| G3
-    
-    Wait --> Caller[Caller receives first error]
+    Group[errgroup.WithContext] --> G1[Worker 1]
+    Group --> G2[Worker 2]
+    Group --> G3[Worker 3]
+    G2 -->|returns error| Wait[g.Wait]
+    Wait --> Cancel[Cancel shared context]
+    Cancel -.-> G1
+    Cancel -.-> G3
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Dengan `errgroup.WithContext`, setiap worker menerima context turunan yang akan di-cancel saat ada error pertama. Ini membuat penghentian grup tidak perlu diatur dengan banyak sinyal terpisah. `g.Wait()` lalu menjadi satu titik sinkronisasi sekaligus tempat menerima error utama.
+
+Nilai praktisnya:
+- cocok untuk fetch paralel, fan-out task, atau batch operasi yang punya nasib bersama;
+- mencegah goroutine lain terus bekerja saat hasil akhirnya sudah pasti gagal;
+- membuat koordinasi concurrency lebih ringkas dan lebih aman.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-parallel-fetch](./examples/01-parallel-fetch) - Beberapa fetch paralel yang memakai `errgroup` untuk short-circuit saat satu jalur gagal.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

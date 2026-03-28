@@ -1,54 +1,57 @@
-# [BK-03-CH-02] Data Alignment & Cache Efficiency
+# CH-02: Alignment and Struct Padding
 
-**The Art of Struct Layout**
-*Target: Memahami bagaimana urutan variabel dalam struct memengaruhi penggunaan RAM dan kecepatan CPU dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [unsafe package](https://pkg.go.dev/unsafe) | [Go Wiki: Compiler Optimizations](https://go.dev/wiki/CompilerOptimizations)
+- **Framing**: Layout struct yang terlihat sepele bisa membuat ukuran data membesar diam-diam. Alignment dan padding membantu kita membaca biaya itu dengan mata yang lebih tajam.
 
-CPU modern tidak membaca memori per-byte, melainkan dalam blok yang disebut **Word** (biasanya 8 byte pada sistem 64-bit). Agar pembacaan efisien, data harus "selaras" (aligned) dengan batasan word tersebut. Go menyisipkan **Padding** (kosong/sampah) jika data tidak selaras, yang bisa menyebabkan pemborosan memori.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Data Alignment**: Penempatan data di alamat memori yang merupakan kelipatan dari ukuran data tersebut.
-- **Padding**: Byte kosong yang ditambahkan compiler di antara field struct untuk memenuhi aturan alignment.
-- **CPU Cache Line**: Unit terkecil data yang dipindahkan antara memori utama dan CPU cache (biasanya 64 byte).
-- **False Sharing**: Masalah performa di mana dua thread memodifikasi variabel berbeda yang berada dalam satu cache line yang sama.
+### Definisi
+Alignment adalah aturan bahwa field tertentu harus diletakkan pada batas alamat tertentu. Jika urutan field tidak cocok, compiler akan menambah **padding** agar alignment tetap benar.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa Senior Developer harus peduli urutan field struct?
-- **Memory Footprint**: Dengan mengurutkan field dari yang terbesar ke yang terkecil, Anda bisa mengurangi ukuran struct secara signifikan (misal dari 24 byte menjadi 16 byte).
-- **Cache Locality**: Data yang sering diakses bersama sebaiknya diletakkan berdekatan agar masuk ke satu cache line yang sama.
-- **Atomic Operations**: Operasi atomik pada sistem 32-bit wajib selaras 8-byte, jika tidak program akan panic.
+1. **Ukuran struct bisa membengkak tanpa terlihat**  
+   Urutan field yang kurang tepat menambah byte kosong yang tetap ikut dibawa ke memori.
+2. **Efisiensi cache ikut terpengaruh**  
+   Data yang lebih padat biasanya lebih ramah untuk cache dan throughput.
+3. **Keputusan desain jadi lebih sadar biaya**  
+   Engineer bisa memilih kapan perlu merapikan layout dan kapan tidak perlu terlalu agresif.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Rule of Thumb**: Urutkan field struct mulai dari tipe data terbesar (int64, float64, pointer) ke yang terkecil (int8, bool).
-2. **Impact**: Alamat memori untuk `int64` harus kelipatan 8. Jika sebelumnya ada `bool` (1 byte), compiler menambah 7 byte padding sebelum `int64`.
+### Analogi Model Mental
+Bayangkan rak barang dengan slot ukuran berbeda. Kalau kita menaruh barang besar-kecil secara acak, akan ada ruang kosong yang terbuang di antaranya. Padding adalah ruang kosong itu.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Alignment Boundary**: batas alamat yang diinginkan suatu tipe.
+- **Padding**: byte tambahan yang disisipkan compiler agar layout tetap valid.
+- **Memory Footprint**: total ukuran data yang benar-benar dibawa di memori.
 
-Lihat perbedaan ukuran struct di [examples/](./examples/).
-1. `01-padding-demo`: Eksperimen menggunakan `unsafe.Sizeof` dan `unsafe.Offsetof` untuk membuktikan adanya padding tersembunyi dalam struct.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Struct Padding](./assets/struct-padding.svg)
 
-### Struct Padding & Alignment
 ```mermaid
 graph TD
-    subgraph "Bad Layout: Unaligned"
-    B1[bool - 1B] --- P7[Padding - 7B]
-    P7 --- I8[int64 - 8B]
-    I8 --- B2[bool - 1B]
-    B2 --- P77[Padding - 7B]
-    end
-    
-    subgraph "Good Layout: Aligned"
-    GA1[int64 - 8B] --- GB1[bool - 1B]
-    GB1 --- GB2[bool - 1B]
-    GB2 --- GP6[Padding - 6B]
-    end
+    Order[Field order] --> Layout[Compiler layout]
+    Layout --> Gap[Padding inserted]
+    Gap --> Size[Struct size grows]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Compiler menghitung alignment setiap field lalu menyusun offset yang aman. Jika sebuah field butuh posisi yang lebih "rapi" di memori, compiler mengisi sela sebelumnya dengan padding. Karena itu, mengganti urutan field kadang cukup untuk mengecilkan ukuran struct tanpa mengubah perilaku logika program.
+
+Nilai praktisnya:
+- relevan saat struct dibuat sangat banyak;
+- membantu membaca hasil `unsafe.Sizeof` dan `unsafe.Alignof`;
+- mengajarkan bahwa desain data berpengaruh langsung ke biaya memori.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-padding-demo](./examples/01-padding-demo) - Contoh perbandingan layout struct untuk melihat efek urutan field terhadap ukuran akhir.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

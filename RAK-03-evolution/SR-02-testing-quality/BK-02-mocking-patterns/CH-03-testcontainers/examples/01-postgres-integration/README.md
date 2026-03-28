@@ -1,30 +1,21 @@
-# Lab 01: PostgreSQL Integration with Testcontainers
+# Example 01: Postgres Integration with Testcontainers
 
-## Objective
-Mempraktikkan cara setup infrastruktur database nyata secara otomatis untuk pengujian integrasi.
+## Tujuan
 
-## Struktur Labs
-- `postgres_test.go`: File pengujian yang memicu Docker container.
+Menunjukkan pola dasar pengujian integrasi yang menyalakan PostgreSQL sementara lewat Testcontainers.
 
-## Pre-requisites
-- Docker Desktop / Engine harus berjalan.
-- Library `testcontainers-go` harus terinstal (`go get github.com/testcontainers/testcontainers-go`).
+## Isi Folder
 
-## Workflow
-1. Inisialisasi Postgres Container dengan image resmi.
-2. Dapatkan connection string (IP & Port dinamis).
-3. Buat koneksi `sql.DB`.
-4. Jalankan query nyata.
-5. `Terminate` container saat selesai.
+- `postgres_test.go` - contoh test integrasi yang menyiapkan container Postgres
 
-## Execution
-```go
-// Inti dari setup:
-postgresContainer, err := postgres.RunContainer(ctx,
-    testcontainers.WithImage("postgres:16-alpine"),
-    postgres.WithDatabase("testdb"),
-    postgres.WithUsername("user"),
-    postgres.WithPassword("password"),
-)
-```
-Metode ini menjamin pengujian integrasi yang bersih dan terisolasi.
+## Cara Coba
+
+1. Pastikan Docker berjalan.
+2. Pastikan dependency Go untuk testcontainers dan driver database yang dibutuhkan sudah tersedia di module context Anda.
+3. Jalankan `go test` dari folder yang sesuai.
+4. Amati lifecycle container dan koneksi database selama test berlangsung.
+
+## Catatan
+
+- Sidecar ini menjelaskan snippet integrasi, bukan setup module lengkap yang sepenuhnya mandiri.
+- Jika dependency belum tersedia, Anda perlu menambahkannya terlebih dahulu sebelum test dapat berjalan penuh.

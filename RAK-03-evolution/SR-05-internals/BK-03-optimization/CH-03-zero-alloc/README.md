@@ -1,52 +1,61 @@
-# [BK-03-CH-03] Zero-Allocation Patterns
+# CH-03: Zero-Allocation Patterns
 
-**Winning the GC War with sync.Pool**
-*Target: Mengurangi alokasi heap hingga 0% untuk hot-path aplikasi dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [sync.Pool](https://pkg.go.dev/sync#Pool) | [A Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide)
+- **Framing**: Zero-allocation bukan tujuan mutlak, tetapi penting saat jalur panas terlalu sering membuat objek baru dan memberi tekanan berlebih ke heap serta GC.
 
-**Zero-Allocation** adalah gaya pemrograman di mana kita menghindari pembuatan objek baru di Heap selama fase kritis (hot-path) aplikasi. Hal ini dicapai dengan mendaur ulang objek lama menggunakan **`sync.Pool`** atau pola desain **Reset**.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Object Pooling**: Strategi menyimpan objek yang sudah tidak terpakai dalam penampung (pool) untuk diambil kembali nanti, alih-alih membiarkannya dihapus GC.
-- **Hot Path**: Jalur kode yang paling sering dieksekusi (misal: loop utama parser atau handler API).
-- **Reset Pattern**: Metode pada struct untuk membersihkan isinya tanpa mengalokasikan memori baru (misal: `buf.Reset()`).
-- **Victim Cache**: Mekanisme internal `sync.Pool` di mana objek tidak langsung dihapus saat GC, tapi dipindahkan ke area "korban" untuk satu siklus GC lagi.
+### Definisi
+Zero-allocation patterns adalah pendekatan untuk mengurangi atau menunda alokasi baru, misalnya lewat object reuse, buffer reuse, atau pemakaian `sync.Pool` pada jalur yang sensitif terhadap performa.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa Senior Developer terobsesi dengan Zero-Allocation?
-- **Extreme Throughput**: Alokasi memori adalah operasi yang relatif mahal. Menghilangkan alokasi berarti CPU bisa fokus 100% pada logika bisnis.
-- **GC Silence**: Aplikasi dengan alokasi nol tidak akan pernah memicu Garbage Collection, menghilangkan latensi "Stop The World" sepenuhnya.
-- **Predictability**: Konsumsi memori menjadi jauh lebih stabil dan dapat diprediksi di bawah beban tinggi.
+1. **GC pressure bisa turun**  
+   Semakin sedikit objek singkat yang dibuat, semakin ringan kerja garbage collector.
+2. **Latency di hot path bisa lebih stabil**  
+   Jalur yang sering dipanggil tidak terus-menerus memicu alokasi baru.
+3. **Engineer belajar membedakan optimisasi yang sehat dari yang berlebihan**  
+   Tidak semua kode perlu nol alokasi, tetapi beberapa jalur memang pantas diberi perlakuan khusus.
 
-### Mekanisme Kerja Under-the-Hood (`sync.Pool`)
-1. **Get()**: Mencoba mengambil objek dari pool lokal thread (P). Jika kosong, cari di P lain (steal), atau buat baru lewat fungsi `New`.
-2. **Put()**: Mengembalikan objek ke pool. Penting: Selalu `Reset()` data sebelum dimasukkan kembali agar tidak ada kebocoran data (dirty state).
-3. **GC Integration**: `sync.Pool` otomatis dibersihkan oleh runtime saat GC berjalan untuk mencegah kebocoran memori permanen.
+### Analogi Model Mental
+Bayangkan dapur restoran yang mencuci dan memakai ulang wadah prep yang sama untuk pesanan cepat, daripada terus membuka wadah baru untuk setiap langkah kecil.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Object Reuse**: memakai ulang objek yang sudah ada daripada membuat baru.
+- **GC Pressure**: beban tambahan pada garbage collector akibat banyak objek heap.
+- **Hot Allocation Path**: jalur kode yang sangat sering membuat objek.
 
-Lihat perbandingan performa alokasi di [examples/](./examples/).
-1. `01-pool-benchmark`: Gunakan `go test -bench . -benchmem` untuk membandingkan kecepatan dan jumlah alokasi antara pendekatan standar vs menggunakan `sync.Pool`.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Pool Lifecycle](./assets/pool-lifecycle.svg)
 
-### sync.Pool Lifecycle
 ```mermaid
 graph LR
-    App[Go Request] -- Get() --> Pool{sync.Pool}
-    Pool -- "Available?" --> Use[Use Object]
-    Pool -- "Empty?" --> New[New() Allocation]
-    
-    Use -- Reset() & Put() --> Pool
-    
-    subgraph "GC Phase"
-    Pool -- "Sweep" --> Removed[Objects Cleared]
-    end
+    Request[Need object] --> Pool{sync.Pool}
+    Pool -->|hit| Reuse[Reuse object]
+    Pool -->|miss| New[Create object]
+    Reuse --> Work[Use object]
+    New --> Work
+    Work --> Reset[Reset state]
+    Reset --> Put[Put back to pool]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`sync.Pool` menyimpan objek sementara yang bisa dipakai ulang oleh goroutine lain. Ia bukan cache permanen, melainkan alat untuk meredam alokasi jangka pendek. Karena runtime bebas membuang isi pool saat GC, pola ini cocok untuk object reuse oportunistik, bukan untuk state yang wajib bertahan.
+
+Nilai praktisnya:
+- membantu mengurangi alokasi di jalur sibuk;
+- cocok untuk buffer, scratch object, atau wrapper singkat;
+- mengingatkan pembaca bahwa reuse selalu perlu disertai reset state yang aman.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-pool-benchmark](./examples/01-pool-benchmark) - Benchmark sederhana untuk melihat pengaruh object reuse terhadap pola alokasi.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

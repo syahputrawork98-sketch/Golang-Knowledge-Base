@@ -1,22 +1,24 @@
-# Lab 01: Multi-Module Workspace Sync
+# Example 01: Multi-Module Workspace Sync
 
-## Objective
-Mempraktikkan penggunaan `go.work` untuk mengelola aplikasi dan library lokal secara simultan tanpa `replace`.
+## Tujuan
 
-## Struktur Labs
-- `app/`: Modul aplikasi utama.
-- `lib/`: Modul library pendukung.
-- `go.work`: File kontrol workspace.
+Menunjukkan bagaimana `go.work` menyatukan beberapa modul lokal tanpa perlu `replace` di `go.mod` aplikasi.
 
-## Workflow
-1. Inisialisasi workspace: `go work init ./app ./lib`.
-2. Edit `lib/lib.go`.
-3. Jalankan `app/main.go` dan lihat perubahannya langsung teraplikasi tanpa update versi di `go.mod`.
+## Isi Folder
 
-## Execution
-```bash
-go work init ./app ./lib
-cd app
-go run main.go
-```
-Go akan mendeteksi `example.com/lib` ada di direktori `./lib` melalui konfigurasi `go.work`.
+- `app/` - modul aplikasi
+- `lib/` - modul library lokal
+- `go.work` - konfigurasi workspace
+
+## Cara Coba
+
+1. Pastikan posisi terminal berada di folder example ini.
+2. Jalankan `go work sync` bila perlu untuk menyelaraskan workspace.
+3. Masuk ke folder `app/`.
+4. Jalankan `go run main.go`.
+5. Ubah isi `lib/` lalu jalankan lagi aplikasi untuk melihat perubahan lokal langsung terbaca.
+
+## Catatan
+
+- Lab ini runnable, tetapi perilaku persisnya bergantung pada keadaan workspace lokal dan akses dependency yang dibutuhkan.
+- Fokus utamanya adalah hubungan `app`, `lib`, dan `go.work`.

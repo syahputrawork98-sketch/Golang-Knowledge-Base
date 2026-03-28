@@ -1,12 +1,23 @@
-# BK-02: The Art of Mocking
+# BK-02: Mocking Patterns
 
-## Overview
-Bagian ini mengeksplorasi seni memisahkan logika bisnis dari dependensi eksternal (seperti database, API, atau filesystem) menggunakan teknik mocking yang idiomatik.
+Buku ini membahas cara memisahkan logika dari dependency eksternal lewat interface injection, function injection, dan integration testing dengan container nyata saat mock tidak lagi cukup.
 
-## Chapters (CH)
-- [CH-01: Interface Injection](./CH-01-interface-mock/README.md)
-- [CH-02: Higher-Order Function Mocks](./CH-02-func-mock/README.md)
-- [CH-03: Testcontainers & Real DBs](./CH-03-testcontainers/README.md)
+## Struktur
+
+### [CH-01-interface-mock](./CH-01-interface-mock/)
+Mocking berbasis interface kecil untuk menjaga isolasi dan testability.
+
+### [CH-02-func-mock](./CH-02-func-mock/)
+Mocking berbasis function injection untuk kasus yang lebih ringan dan ringkas.
+
+### [CH-03-testcontainers](./CH-03-testcontainers/)
+Integration testing dengan container ephemeral saat kita perlu menguji sistem nyata, bukan tiruannya.
+
+## Boundary
+
+- fokus pada teknik memisahkan logika dari dependency untuk kebutuhan testing;
+- membantu pembaca memilih kapan cukup memakai mock, dan kapan perlu integration test nyata;
+- bukan tempat utama untuk reliability tooling seperti fuzzing, race detector, atau coverage.
 
 ---
-*Back to [SR-02 Page](../README.md)*
+*Status: [x] Complete*

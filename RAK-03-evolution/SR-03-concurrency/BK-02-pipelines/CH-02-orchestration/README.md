@@ -1,54 +1,60 @@
-# [BK-02-CH-02] Pipeline Orchestration
+# CH-02: Pipeline Orchestration
 
-**Context-Aware Multi-Stage Processing**
-*Target: Memahami cara mengelola aliran data antar tahap secara aman dan terkontrol dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Concurrency Patterns: Pipelines and cancellation](https://go.dev/blog/pipelines) | [context package](https://pkg.go.dev/context)
+- **Framing**: Pipeline yang bagus bukan cuma soal memindahkan data antar stage, tapi juga soal tahu kapan seluruh aliran harus berhenti agar tidak meninggalkan goroutine yang bocor.
 
-**Pipeline** adalah serangkaian tahap (stages) di mana setiap tahap mengambil input dari channel, melakukan operasi, dan mengirimkan output ke channel berikutnya.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-**Orchestration** dalam konteks ini adalah pengelolaan lifecycle seluruh pipeline, terutama bagaimana menghentikan seluruh tahap secara serentak jika terjadi error atau timeout menggunakan **`context.Context`**.
+### Definisi
+Pipeline adalah rangkaian stage yang menerima input dari channel, memprosesnya, lalu mengirim hasil ke channel berikutnya. Orchestration berarti mengatur lifecycle seluruh stage, terutama cancellation, shutdown, dan penutupan channel yang benar.
 
-### Terminologi Utama (Senior Terms)
-- **Pipeline Stage**: Fungsi yang menerima `<-chan` (read-only) dan mengembalikan `<-chan` baru.
-- **Context Propagation**: Meneruskan sinyal pembatalan (`ctx.Done()`) ke setiap goroutine di setiap tahap pipeline.
-- **Graceful Teardown**: Memastikan tidak ada goroutine yang "bocor" (running forever) setelah pipeline selesai atau dibatalkan.
+### Rasionalitas
+Pola ini dipilih karena:
 
-## 2. Rasionalitas (Why & How?)
+1. **Setiap stage jadi fokus pada satu tugas**  
+   Source, transform, dan sink bisa dipisah agar perubahan di satu titik tidak merusak semua alur.
+2. **Cancellation bisa dipropagasikan dengan jelas**  
+   Saat timeout atau error terjadi, seluruh stage bisa berhenti bersama.
+3. **Goroutine leak lebih mudah dicegah**  
+   Channel dan context dipakai sebagai kontrak lifecycle, bukan hanya alat kirim data.
 
-Mengapa butuh orchestrasi formal?
-- **Decoupling**: Setiap tahap pipeline hanya tahu cara memproses datanya sendiri, tidak peduli dari mana asal data atau ke mana tujuannya.
-- **Error Propagation**: Jika tahap kedua gagal, tahap pertama dan ketiga harus tahu untuk berhenti membersihkan resource.
-- **Memory Safety**: Tanpa pembatalan yang jelas, goroutine pengirim bisa terblokir selamanya (Deadlock) jika penerimanya sudah berhenti.
+### Analogi Model Mental
+Bayangkan jalur produksi bertahap di pabrik. Tiap meja punya tugas sendiri, tetapi semua meja juga terhubung ke satu tombol stop darurat. Kalau ada masalah di satu tahap, seluruh jalur bisa dihentikan dengan rapi.
 
-### Mekanisme Kerja Under-the-Hood
-1. Setiap fungsi tahap menerima parameter `ctx context.Context`.
-2. Di dalam setiap loop pemrosesan, gunakan `select` untuk mengecek `case <-ctx.Done():`.
-3. Gunakan `defer close(out)` pada setiap tahap untuk memastikan aliran data hilir (downstream) tahu kapan stream berakhir.
+### Terminologi Teknis
+- **Pipeline Stage**: fungsi yang membaca dari channel input lalu mengembalikan channel output.
+- **Context Propagation**: meneruskan sinyal berhenti ke semua stage melalui `context.Context`.
+- **Graceful Teardown**: penghentian aliran kerja tanpa meninggalkan worker yang menggantung.
 
-## 3. Implementasi Utama (The Lab)
-
-Lihat teknik pemrosesan berantai di [examples/](./examples/).
-1. `01-multistage-pipeline`: Pipeline 3 tahap (Source -> Square -> Print) dengan pembatalan via Context.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Pipeline Orchestration](./assets/pipeline-orchestration.svg)
 
-### Pipeline Stages with Context
 ```mermaid
 graph LR
-    Source[Stage 1: Source] -- chan --> Square[Stage 2: Square]
-    Square -- chan --> Print[Stage 3: Print]
-    
+    Source[Stage 1: Source] --> Square[Stage 2: Transform]
+    Square --> Sink[Stage 3: Sink]
     Ctx((Context)) -.-> Source
     Ctx -.-> Square
-    Ctx -.-> Print
-    
-    subgraph "Cancellation Flow"
-    Ctx
-    end
+    Ctx -.-> Sink
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di praktik Go, tiap stage biasanya:
+- menerima `ctx context.Context`;
+- menulis ke output channel sendiri;
+- menutup output itu saat selesai;
+- memeriksa `ctx.Done()` agar bisa berhenti lebih awal.
+
+Model ini membuat pembatalan tidak tersebar ke banyak flag manual. Begitu ada timeout atau kondisi gagal, aliran berhenti dari satu sumber kontrol yang sama.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-multistage-pipeline](./examples/01-multistage-pipeline) - Pipeline tiga tahap dengan cancellation berbasis `context.Context`.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

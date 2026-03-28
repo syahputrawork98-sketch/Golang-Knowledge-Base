@@ -1,16 +1,20 @@
-# Lab 01: Visual Coverage Analysis
+# Example 01: Visual Coverage
 
-## Objective
-Mempraktikkan cara melihat jalur kode yang belum teruji secara visual.
+## Tujuan
 
-## Workflow
-1. Jalankan test dengan profile: `go test -coverprofile=coverage.out ./...`.
-2. Buka laporan visual: `go tool cover -html=coverage.out`.
-3. Amati baris berwarna **merah** (belum teruji) vs **hijau** (sudah teruji).
+Memberi langkah singkat untuk membaca hasil coverage secara visual setelah test dijalankan.
 
-## Execution
-```bash
-go test -coverprofile=coverage.out
-go tool cover -html=coverage.out
-```
-Gunakan informasi ini untuk menambah test case pada jalur kode yang masih berwarna merah.
+## Isi Folder
+
+- `README.md` - panduan command-only untuk analisis coverage
+
+## Cara Coba
+
+1. Jalankan `go test -coverprofile=coverage.out ./...` pada module target.
+2. Jalankan `go tool cover -html=coverage.out`.
+3. Baca bagian hijau sebagai jalur yang teruji dan bagian merah sebagai jalur yang belum tersentuh test.
+
+## Catatan
+
+- Folder ini memang tidak menyertakan source code demo tambahan.
+- Gunakan panduan ini bersama project atau example lain yang memang punya file test nyata.

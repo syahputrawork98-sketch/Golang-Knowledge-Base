@@ -1,22 +1,23 @@
-# BK-01: Memory Management Internals
+# BK-01: Memory Internals
 
-Buku ini membahas mekanisme bagaimana Go mengelola memori di bawah kap. Fokusnya adalah memahami perbedaan antara alokasi Stack dan Heap, bagaimana Garbage Collector bekerja secara konkuren, serta arsitektur allocator berbasis span (TCMalloc).
+Buku ini membahas bagaimana Go mengelola memori dari sudut pandang engineer: escape analysis, perilaku garbage collector, dan allocator runtime yang memengaruhi performa nyata.
 
-## Chapters
+## Struktur
 
-| Chapter | Topik | Konsep Inti |
-|---------|-------|------------|
-| [CH-01](./CH-01-escape-analysis/README.md) | Escape Analysis | Heap vs Stack, `-gcflags="-m"`, Share-up vs Share-down |
-| [CH-02](./CH-02-gc-deep-dive/README.md) | Garbage Collection | Tri-color marking, STW, Write Barriers, Pacing |
-| [CH-03](./CH-03-allocator/README.md) | Memory Allocator | mspan, mcache, mcentral, mheap architecture |
+### [CH-01-escape-analysis](./CH-01-escape-analysis/)
+Escape analysis untuk memahami kapan data tetap di stack dan kapan dipaksa naik ke heap.
 
-## Key Visual Assets
+### [CH-02-gc-deep-dive](./CH-02-gc-deep-dive/)
+Garbage collector Go dari perspektif kerja konkuren, pacing, dan biaya latensi.
 
-| Asset | Description |
-|-------|-------------|
-| `CH-01/assets/escape-logic.svg` | Decision tree for stack vs heap allocation |
-| `CH-02/assets/tri-color-marking.svg` | The Black, Grey, and White object states in GC |
-| `CH-03/assets/allocator-hierarchy.svg` | Hierarchical memory request flow (Local to Global) |
+### [CH-03-allocator](./CH-03-allocator/)
+Allocator runtime untuk membaca jalur permintaan memori dari cache lokal sampai heap global.
+
+## Boundary
+
+- fokus pada internals memori yang berguna untuk membaca perilaku performa aplikasi;
+- membantu pembaca menjembatani kode sehari-hari dengan keputusan runtime di bawahnya;
+- bukan tempat utama untuk bedah source runtime Go secara penuh.
 
 ---
-*Back to [SR-05 Page](../README.md)*
+*Status: [x] Complete*

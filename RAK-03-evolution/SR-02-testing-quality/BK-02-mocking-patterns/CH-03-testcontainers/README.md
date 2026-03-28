@@ -1,49 +1,59 @@
-# [BK-02-CH-03] Testcontainers & Real DBs
+# CH-03: Testcontainers and Real Databases
 
-**Integration Testing Without Mocks**
-*Target: Memahami standar tertinggi pengujian integrasi menggunakan container ephemeral dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [testcontainers-go](https://pkg.go.dev/github.com/testcontainers/testcontainers-go) | [Go Blog: Testing Techniques](https://go.dev/blog/subtests)
+- **Framing**: Ada titik di mana mock tidak cukup lagi. Saat perilaku asli database atau service eksternal perlu diuji, container ephemeral menjadi alat yang jauh lebih jujur.
 
-**Testcontainers** adalah library Go yang memungkinkan Anda memicu container Docker (seperti PostgreSQL, Redis, atau Kafka) secara otomatis dari dalam kode pengujian. Ini memastikan bahwa pengujian integrasi Anda berjalan melawan sistem nyata, bukan sekadar tiruan (Mock), namun tetap terisolasi dan mudah dibersihkan.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Ephemeral Infrastructure**: Infrastruktur sementara yang dibuat hanya untuk durasi pengujian dan langsung dihapus setelah selesai.
-- **Port Mapping**: Proses menghubungkan port di dalam container Docker ke port acak di host untuk menghindari konflik.
-- **Wait Strategy**: Mekanisme untuk memastikan service di dalam container (misal: Postgres) sudah benar-benar siap menerima koneksi sebelum test dimulai.
+### Definisi
+Testcontainers adalah pendekatan integration testing yang menjalankan dependency nyata, seperti PostgreSQL atau Redis, di dalam container sementara selama test berlangsung.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa butuh Testcontainers jika sudah ada Mock?
-- **Mock Flaws**: Mock seringkali tidak mencerminkan perilaku asli database (misal: constraint, trigger, atau sintaks SQL spesifik).
-- **Confidence**: Pengujian integrasi memberikan kepercayaan diri 100% bahwa kode Anda benar-benar bisa berkomunikasi dengan sistem nyata.
-- **CI/CD Alignment**: Selama runner CI Anda memiliki Docker, test suite Anda akan berjalan secara konsisten di mana saja.
+1. **Perilaku sistem nyata bisa diuji**  
+   Constraint database, error koneksi, dan perilaku driver tidak selalu bisa direpresentasikan dengan mock.
+2. **Isolasi tetap terjaga**  
+   Container dibuat khusus untuk test dan dibersihkan setelah selesai.
+3. **Confidence integration lebih tinggi**  
+   Test memverifikasi interaksi nyata antar komponen, bukan hanya kontrak tiruan.
 
-### Mekanisme Kerja Under-the-Hood
-1. Saat test dimulai, `testcontainers-go` mengirim perintah ke Docker Host.
-2. Container diunduh (jika belum ada) dan dijalankan.
-3. Testcontainers menunggu hingga service "Ready" (via Log matching atau Port checking).
-4. `t.Cleanup` atau `defer container.Terminate` memastikan container dihapus meskipun test gagal.
+### Analogi Model Mental
+Bayangkan latihan penerbangan. Mock seperti simulator kokpit untuk menguji prosedur logika. Testcontainers seperti pesawat latihan sungguhan di landasan kecil: lebih mahal, tetapi memberi keyakinan yang jauh lebih realistis untuk skenario tertentu.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Ephemeral Infrastructure**: infrastruktur sementara yang hanya hidup selama test.
+- **Wait Strategy**: strategi untuk memastikan service di dalam container sudah siap dipakai.
+- **Integration Test**: pengujian yang memverifikasi interaksi nyata antar komponen.
 
-Lihat teknik integrasi modern di [examples/](./examples/).
-1. `01-postgres-integration**: Panduan setup container PostgreSQL ephemeral untuk pengujian repository layer.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Testcontainers Lifecycle](./assets/testcontainers-lifecycle.svg)
 
-### Testcontainers Lifecycle
 ```mermaid
 graph TD
-    Start[Test Case Starts] --> Pull[Docker: Pull Image]
-    Pull --> Run[Docker: Run Container]
-    Run --> Wait[Wait Strategy: DB Ready?]
-    Wait --> Exec[Execute Tests against Real DB]
-    Exec --> Terminate[Terminating Container]
-    Terminate --> End[Result: Pass/Fail]
+    Start[Test starts] --> Pull[Pull image]
+    Pull --> Run[Run container]
+    Run --> Wait[Wait until service ready]
+    Wait --> Test[Run integration test]
+    Test --> Cleanup[Terminate container]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Library testcontainers berkomunikasi dengan Docker untuk menyalakan container, memetakan port, dan menunggu service siap. Setelah itu, test menggunakan dependency nyata yang berjalan dalam lingkungan terisolasi, lalu menutupnya kembali saat test selesai.
+
+Nilai evolusinya untuk `RAK-03`:
+- engineer bisa memilih kapan mock cukup dan kapan integrasi nyata dibutuhkan;
+- reliability test meningkat karena perilaku eksternal benar-benar disentuh;
+- testing modern di Go bergerak dari sekadar unit ke confidence yang lebih luas.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh integration test di folder [examples/](./examples):
+- [01-postgres-integration](./examples/01-postgres-integration) - Setup container PostgreSQL ephemeral untuk menguji repository layer.
+
 ---
-*Back to [BK-02 Page](../README.md)*
+*Status: [x] Complete*

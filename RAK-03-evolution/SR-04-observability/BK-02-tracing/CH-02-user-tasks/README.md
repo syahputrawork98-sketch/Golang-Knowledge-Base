@@ -1,54 +1,57 @@
-# [BK-02-CH-02] User-defined Tasks & Regions
+# CH-02: User-defined Tasks and Regions
 
-**Adding Semantic Meaning to Traces**
-*Target: Mengelompokkan event trace ke dalam unit logis (seperti "Request" atau "DatabaseQuery") dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [runtime/trace package](https://pkg.go.dev/runtime/trace) | [Go execution tracer](https://pkg.go.dev/cmd/trace)
+- **Framing**: Trace runtime mentah sangat detail, tetapi tanpa semantik tambahan sering sulit dikaitkan dengan unit kerja aplikasi. Task dan region membantu menjembatani dua dunia itu.
 
-Meskipun `runtime/trace` memberikan detail luar biasa tentang goroutine, seringkali sulit untuk menghubungkan goroutine-goroutine tersebut dengan unit kerja tingkat aplikasi (seperti satu HTTP Request). **User-defined Tasks** dan **Regions** memungkinkan Anda memberi label pada blok kode sehingga muncul sebagai "Spans" yang bermakna dalam visualisasi trace.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Task**: Satu unit kerja logis yang bisa mencakup banyak goroutine (mirip dengan 'Span' di OpenTelemetry).
-- **Region**: Sub-bagian dari tugas yang terjadi dalam satu goroutine tunggal. Digunakan untuk menandai fase spesifik (misal: "JSON.Unmarshal").
-- **Log**: Menempelkan pesan teks singkat ke dalam tugas tertentu untuk keperluan debugging detail.
+### Definisi
+User-defined tasks dan regions adalah label semantik yang bisa ditambahkan ke trace agar event runtime dapat dikelompokkan ke dalam unit kerja logis, seperti request, job, atau fase pemrosesan tertentu.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa menggunakan Task & Region?
-- **Context Awareness**: Memudahkan identifikasi goroutine mana yang bekerja untuk request ID yang mana.
-- **Latency Attribution**: Mengetahui fase mana dari sebuah tugas (misal: "Validation" vs "DB Save") yang memakan waktu paling lama.
-- **Correlation**: Menghubungkan log aplikasi langsung ke garis waktu eksekusi scheduler.
+1. **Trace jadi lebih mudah dibaca**  
+   Engineer bisa melihat event runtime dalam konteks tugas bisnis yang nyata.
+2. **Atribusi latensi lebih jelas**  
+   Fase kerja seperti validasi, parsing, atau database update bisa dibedakan di dalam satu task.
+3. **Korelasi antar goroutine meningkat**  
+   Beberapa goroutine yang bekerja untuk tujuan sama bisa dipahami sebagai satu unit logis.
 
-### Mekanisme Kerja Under-the-Hood
-1. `trace.NewTask` menciptakan context baru yang membawa task ID.
-2. Setiap goroutine yang dibuat dengan context tersebut secara otomatis akan diasosiasikan dengan task yang sama.
-3. Region dicatat sebagai entry/exit points dalam file trace, memungkinkan tool visualisasi menggambar baris horizontal (gantt chart) untuk region tersebut.
+### Analogi Model Mental
+Bayangkan gedung kantor yang punya CCTV di semua koridor. Tanpa label, kita hanya melihat orang bergerak. Dengan badge tamu dan label ruangan, kita tahu siapa datang untuk urusan apa dan di bagian mana waktu paling banyak terbuang.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Task**: satu unit kerja logis yang dapat melibatkan banyak goroutine.
+- **Region**: fase spesifik di dalam satu task atau satu goroutine.
+- **Trace Log**: catatan teks kecil yang ditautkan ke task untuk memberi konteks tambahan.
 
-Lihat penambahan semantik trace di [examples/](./examples/).
-1. `01-semantic-trace`: Simulasi pemrosesan pesanan (Order Processing) dengan label Task dan Region yang jelas.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Semantic Trace](./assets/semantic-trace.svg)
 
-### Task & Region Hierarchy
 ```mermaid
 graph TD
-    T[trace.Task: ProcessOrder] --> R1[trace.Region: Validation]
-    T --> R2[trace.Region: DBUpdate]
-    
-    subgraph "Goroutine A"
-    R1
-    end
-    
-    subgraph "Goroutine B"
-    R2
-    end
-    
-    T -- logs --> Msg[OrderID: 12345]
+    Task[ProcessOrder task] --> Region1[Validation region]
+    Task --> Region2[Database region]
+    Task --> Region3[Notification region]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Dengan `trace.NewTask` dan region terkait, context trace membawa identitas task ke sepanjang eksekusi yang relevan. Visualizer kemudian dapat menampilkan event runtime bukan hanya sebagai deretan goroutine, tetapi sebagai unit kerja yang lebih dekat ke domain aplikasi.
+
+Nilai observability-nya di `RAK-03`:
+- trace menjadi lebih ramah bagi engineer aplikasi, bukan hanya bagi orang yang fokus pada runtime;
+- bottleneck bisa diatribusikan ke fase bisnis yang nyata;
+- observability menjadi jembatan antara event low-level dan makna high-level.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian semantic trace di folder [examples/](./examples):
+- [01-semantic-trace](./examples/01-semantic-trace) - Contoh task dan region untuk memberi label semantik pada alur eksekusi.
+
 ---
-*Back to [SR-04 Page](../../README.md)*
+*Status: [x] Complete*

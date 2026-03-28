@@ -1,54 +1,58 @@
-# [BK-01-CH-02] Garbage Collection Deep Dive
+# CH-02: Garbage Collector Deep Dive
 
-**Mastering the Tri-Color Mark & Sweep**
-*Target: Memahami bagaimana Go membersihkan memori tanpa jeda panjang (STW) dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [A Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide) | [runtime package](https://pkg.go.dev/runtime)
+- **Framing**: GC Go dirancang supaya aplikasi tetap berjalan sambil pembersihan memori berlangsung, tetapi biaya dan ritmenya tetap perlu dipahami oleh engineer yang peduli latency dan throughput.
 
-Garbage Collector (GC) Go adalah kolektor **Concurrent, Tri-color, Mark-and-Sweep**. Tujuannya adalah membebaskan memori yang tidak lagi dirujuk oleh stack atau variabel global. GC Go dioptimalkan untuk **Low Latency**, bukan throughput maksimal, dengan cara menjalankan sebagian besar pekerjaannya secara konkuren bareng aplikasi.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **STW (Stop The World)**: Fase singkat di mana seluruh goroutine dihentikan (untuk memulai marking dan mengakhiri marking).
-- **Tri-color Marking**: Algoritma yang membagi objek menjadi 3 warna: Putih (kandidat hapus), Abu-abu (sedang diproses), dan Hitam (aman/terpakai).
-- **Write Barrier**: Kode kecil yang disisipkan compiler saat program berjalan untuk memastikan integritas "warna" saat objek dipindahkan selama fase marking.
-- **Pacing**: Logika runtime untuk menentukan kapan GC harus mulai berjalan berdasarkan target CPU usage (default: 25%) dan pertumbuhan heap.
+### Definisi
+Garbage collector Go adalah collector konkuren yang memakai model mark-and-sweep dengan pacing, write barrier, dan fase singkat stop-the-world pada titik-titik tertentu.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa desain GC Go berbeda dari Java?
-- **Predictability**: Go lebih memilih jeda yang sangat singkat (< 1ms) secara konsisten daripada jeda panjang sesekali.
-- **No Compaction**: Go jarang memindahkan objek di heap (non-moving GC), yang memudahkan integrasi dengan kode C/C++ via cgo.
-- **Efficiency**: Menggunakan GOMEMLIMIT (sejak 1.19) untuk menghindari GC thrashing saat memori hampir penuh.
+1. **GC memengaruhi latency aplikasi**  
+   Semakin banyak heap aktif dan alokasi baru, semakin penting memahami kapan GC bekerja lebih keras.
+2. **Trade-off throughput vs memory jadi lebih jelas**  
+   Menekan GC terlalu agresif atau terlalu longgar sama-sama punya biaya.
+3. **Engineer jadi lebih paham efek pola alokasi**  
+   Topik ini menghubungkan desain objek, reuse, dan pressure pada heap.
 
-### Mekanisme Kerja Under-the-Hood (The Colors)
-1. **Initial STW**: Menyalakan Write Barrier dan menandai "Roots" (stack, global) sebagai Abu-abu.
-2. **Concurrent Marking**: Pindai objek Abu-abu, ubah jadi Hitam, dan tandai anak-anaknya sebagai Abu-abu. Melibatkan "Mark Assist" jika aplikasi mengalokasi terlalu cepat.
-3. **Finish STW**: Finalisasi marking dan pembersihan stack.
-4. **Concurrent Sweeping**: Membebaskan memori Putih kembali ke allocator.
+### Analogi Model Mental
+Bayangkan petugas kebersihan mal yang bekerja saat mal tetap buka. Mereka terus menandai area yang masih dipakai, membersihkan yang sudah tidak dipakai, dan sesekali menahan arus singkat agar penandaan tetap konsisten.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Tri-Color Marking**: model objek putih, abu-abu, dan hitam saat proses marking.
+- **Write Barrier**: mekanisme agar perubahan pointer tetap aman saat GC berjalan konkuren.
+- **Pacing**: cara runtime mengatur ritme kerja GC terhadap laju alokasi.
 
-Lihat inspeksi GC di [examples/](./examples/).
-1. `01-gc-trace`: Program alokasi tinggi. Gunakan `GODEBUG=gctrace=1` untuk melihat detail durasi STW dan utilisasi CPU oleh GC.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
+![Tri-Color Marking](./assets/tri-color-marking.svg)
 
-![Tri-color Marking](./assets/tri-color-marking.svg)
-
-### Tri-color Marking Process
 ```mermaid
-graph TD
-    subgraph "Phase: Active Marking"
-    B[Black: Scanned & Live] --- G[Grey: To be Scanned]
-    G --- W[White: Candidate for GC]
-    end
-    
-    Root((Roots)) --> B
-    B --> G
-    G --> W
-    
-    WriteBarrier[Write Barrier: Prevents Black pointing to White]
+graph LR
+    White[White: unknown] --> Gray[Gray: discovered]
+    Gray --> Black[Black: scanned]
+    Mutator[Program writes pointer] -.-> Barrier[Write barrier]
+    Barrier -.-> Gray
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Runtime Go menyeimbangkan kerja aplikasi dan kerja collector. Objek ditandai, lalu disapu ketika sudah dipastikan tidak lagi dirujuk. Karena proses ini berjalan beriringan dengan program, write barrier dan pacing sangat penting untuk menjaga konsistensi tanpa membuat aplikasi berhenti lama.
+
+Nilai praktisnya:
+- membantu pembaca membaca `gctrace` dan `MemStats` dengan lebih percaya diri;
+- menjelaskan mengapa alokasi berlebihan sering berubah menjadi masalah latency;
+- menjadi jembatan penting menuju optimisasi memori yang lebih sadar risiko.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-gc-trace](./examples/01-gc-trace) - Program kecil untuk melihat jejak perilaku GC saat beban alokasi dinaikkan.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

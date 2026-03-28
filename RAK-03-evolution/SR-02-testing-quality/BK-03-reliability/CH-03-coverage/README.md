@@ -1,46 +1,58 @@
-# [BK-03-CH-03] Coverage Analysis & Enforcement
+# CH-03: Coverage Analysis
 
-**Measuring Test Quality, Not Just Quantity**
-*Target: Memahami cara mengukur seberapa jauh pengujian Anda melindungi kode dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Cover story](https://go.dev/blog/cover) | [go tool cover](https://pkg.go.dev/cmd/cover)
+- **Framing**: Coverage membantu melihat bagian kode mana yang benar-benar tersentuh oleh test, tetapi ia harus dibaca sebagai alat diagnosis, bukan angka sakral.
 
-**Code Coverage** adalah metrik yang menunjukkan persentase baris kode (atau blok kode) yang dieksekusi selama pengujian dijalankan. Go memiliki dukungan native untuk menghitung dan memvisualisasikan data ini tanpa perlu library eksternal.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Statement Coverage**: Persentase pernyataan (statements) yang dijalankan.
-- **Coverage Profile**: File output (biasanya `.out`) yang berisi data mentah eksekusi kode setiap baris.
-- **`go tool cover`**: Alat bantu untuk mengubah profile mentah menjadi visualisasi HTML yang interaktif.
+### Definisi
+Coverage analysis adalah pengukuran seberapa banyak blok atau statement kode yang dieksekusi saat suite test dijalankan.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa coverage itu penting tapi bisa menipu?
-- **Gap Identification**: Membantu menemukan jalur kode (misal: penanganan error tertentu) yang ternyata belum pernah diuji sama sekali.
-- **The Myth of 100%**: Coverage tinggi tidak menjamin kode bebas bug. Ia hanya menjamin kode tersebut *pernah dijalankan*. Logika yang salah tetap bisa memiliki coverage 100%.
+1. **Gap pengujian lebih mudah ditemukan**  
+   Jalur error atau cabang logika yang tidak pernah disentuh bisa terlihat lebih cepat.
+2. **Perubahan suite test bisa dipantau**  
+   Coverage memberi sinyal apakah perluasan test benar-benar menjangkau bagian kode baru.
+3. **Visualisasi membantu review**  
+   Laporan HTML memudahkan pembaca melihat area mana yang masih kosong.
 
-### Mekanisme Kerja Under-the-Hood
-1. Saat `-cover` aktif, Go compiler menyisipkan "counter" pada tiap blok kode.
-2. Setiap kali blok dijalankan, counter bertambah.
-3. Di akhir pengujian, Go menghitung (Blok Terjamah / Total Blok) * 100%.
-4. Dengan `-coverprofile`, Go mencatat koordinat file/baris mana saja yang terjamah.
+### Analogi Model Mental
+Bayangkan peta bangunan yang diberi warna pada ruangan yang sudah diperiksa tim audit. Coverage tidak menjamin isi ruangan itu benar, tetapi ia memberi tahu ruangan mana yang belum pernah dilihat sama sekali.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Statement Coverage**: persentase statement yang dijalankan.
+- **Coverage Profile**: file hasil yang menyimpan data coverage mentah.
+- **`go tool cover`**: alat untuk membaca dan memvisualisasikan coverage profile.
 
-Lihat cara visualisasi coverage di [examples/](./examples/).
-1. `01-visual-coverage`: Panduan langkah-demi-langkah menghasilkan laporan HTML berwarna.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Coverage Pipeline](./assets/coverage-pipeline.svg)
 
-### Coverage Pipeline
 ```mermaid
 graph LR
-    Code[Source Code] --> Test[go test -coverprofile=c.out]
-    Test --> Profile[c.out Data File]
-    Profile --> Tool[go tool cover -html=c.out]
-    Tool --> Result[Interactive HTML Report]
+    Code[Source code] --> Test[go test with coverprofile]
+    Test --> Profile[Coverage profile]
+    Profile --> Tool[go tool cover]
+    Tool --> Report[Coverage report]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat coverage diaktifkan, compiler menambahkan counter pada blok kode tertentu. Setelah test selesai, counter itu dikumpulkan menjadi profile. Dari sana, toolchain bisa menghitung persentase cakupan dan menampilkan laporan visual.
+
+Yang penting untuk `RAK-03`:
+- coverage adalah alat untuk menemukan blind spot;
+- angka tinggi tidak otomatis berarti test berkualitas tinggi;
+- nilainya paling kuat saat dipakai bersama pembacaan kritis terhadap jalur logika yang penting.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian coverage di folder [examples/](./examples):
+- [01-visual-coverage](./examples/01-visual-coverage) - Panduan menghasilkan dan membaca laporan coverage HTML.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

@@ -1,51 +1,57 @@
-# [BK-02-CH-03] Generator Patterns
+# CH-03: Generator Patterns
 
-**Lazy Sequence & Memory-Efficient Streaming**
-*Target: Memahami cara menghasilkan aliran data secara on-demand dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Concurrency Patterns: Pipelines and cancellation](https://go.dev/blog/pipelines) | [Effective Go: Channels](https://go.dev/doc/effective_go#channels)
+- **Framing**: Generator berguna saat data tidak perlu dibentuk sekaligus di memori, melainkan bisa dihasilkan sedikit demi sedikit sesuai kebutuhan konsumen.
 
-**Generator** adalah fungsi yang menghasilkan urutan nilai (sequence) dan mengirimkannya melalui channel. Konsumen dapat membaca nilai tersebut satu per satu ("lazy") tanpa harus menunggu seluruh urutan dibuat di dalam memori (slice).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Lazy Evaluation**: Menghitung nilai hanya saat dibutuhkan oleh konsumen.
-- **Infinite Streams**: Generator yang tidak pernah berhenti mengirim data (misal: ID Generator atau Heartbeat).
-- **Closure-based Generator**: Menggunakan closure untuk mempertahankan *state* internal antar iterasi.
+### Definisi
+Generator adalah fungsi yang menghasilkan aliran nilai melalui channel, biasanya dengan bantuan goroutine. Nilai dikirim satu per satu sehingga konsumen bisa memprosesnya secara lazy.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa menggunakan Generator daripada return Slice?
-- **Memory Efficiency**: Jika Anda menghasilkan 10 juta angka, menyimpannya dalam `[]int` akan memakan ratusan MB RAM. Generator hanya memakan ruang untuk satu nilai pada satu waktu.
-- **Responsiveness**: Konsumen bisa mulai memproses data pertama segera setelah dihasilkan, tanpa menunggu data ke-10 juta selesai dibuat.
-- **Decoupling Production & Consumption**: Memungkinkan produsen data berjalan di goroutine terpisah dengan kecepatan yang berbeda dari konsumen (menggunakan buffering jika perlu).
+1. **Memori lebih hemat**  
+   Data besar tidak harus ditampung penuh dalam slice sebelum mulai diproses.
+2. **Konsumen bisa mulai lebih cepat**  
+   Nilai pertama bisa dipakai segera, tanpa menunggu seluruh urutan selesai dibuat.
+3. **Produksi dan konsumsi jadi lebih longgar keterikatannya**  
+   Produsen dan konsumen bisa berjalan dengan ritme berbeda selama kontrak channel-nya jelas.
 
-### Mekanisme Kerja Under-the-Hood
-1. Fungsi generator membuat channel.
-2. Memulai goroutine yang menjalankan loop produksi.
-3. Mengembalikan channel tersebut sebagai `<-chan` (read-only) ke pemanggil.
-4. Penting: Selalu sediakan mekanisme `done` atau `context` agar generator tidak bocor jika konsumen berhenti membaca lebih awal.
+### Analogi Model Mental
+Bayangkan mesin tiket yang mencetak nomor antrean saat orang datang. Mesin tidak mencetak sejuta tiket di awal. Ia hanya membuat tiket baru saat memang ada yang meminta.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Lazy Evaluation**: nilai baru dihitung saat dibutuhkan.
+- **Infinite Stream**: aliran yang secara teori tidak punya akhir tetap.
+- **Cancellation Signal**: mekanisme berhenti agar generator tidak bocor ketika konsumen selesai lebih dulu.
 
-Lihat pola penghasil data efisien di [examples/](./examples/).
-1. `01-lazy-seq`: Implementasi generator angka Fibonacci sebagai aliran data tak terbatas (infinite) yang dikontrol via context.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Lazy Generator](./assets/lazy-generator.svg)
 
-### Generator Output Stream
 ```mermaid
 graph LR
-    Gen[Generator Function] -- starts --> Goroutine[Internal Goroutine]
-    Goroutine -- Send v1 --> Chan[(Channel)]
-    Goroutine -- Send v2 --> Chan
-    Goroutine -- Send v3 --> Chan
-    
-    Chan -- Receive v1 --> User[User Code]
-    User -- processes --> User
-    User -- Ready for next --> Chan
+    Gen[Generator function] --> Goroutine[Producer goroutine]
+    Goroutine --> Stream[(Channel)]
+    Stream --> User[Consumer]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Generator biasanya membuat channel, lalu menjalankan goroutine yang mengirim nilai ke channel tersebut. Tantangan utamanya bukan hanya "menghasilkan data", tetapi juga "berhenti dengan rapi" saat konsumen tidak lagi membaca. Karena itu, pola generator yang sehat sering dipasangkan dengan `context.Context` atau sinyal done channel.
+
+Nilai praktisnya:
+- cocok untuk stream nilai yang panjang atau tak terbatas;
+- memperkecil alokasi memori besar yang sebenarnya belum tentu langsung dibutuhkan;
+- membantu engineer memisahkan logika produksi data dari logika konsumsi data.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-lazy-seq](./examples/01-lazy-seq) - Generator Fibonacci berbasis channel yang menunjukkan pola lazy streaming dengan kontrol cancellation.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

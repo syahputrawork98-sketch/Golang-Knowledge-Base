@@ -1,54 +1,60 @@
-# [BK-03-CH-03] Singleflight
+# CH-03: `singleflight` and Duplicate Request Coalescing
 
-**Eliminating Cache Stampedes**
-*Target: Memahami cara menggabungkan (coalesce) permintaan duplikat untuk mencegah overload dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [golang.org/x/sync/singleflight](https://pkg.go.dev/golang.org/x/sync/singleflight)
+- **Framing**: `singleflight` dipakai saat banyak request identik datang bersamaan, dan sistem perlu memastikan kerja mahal hanya dieksekusi sekali.
 
-**`singleflight`** (dari paket `golang.org/x/sync/singleflight`) adalah mekanisme untuk memastikan bahwa hanya **satu** goroutine yang melakukan operasi mahal (seperti query ke database atau fetch ke API) pada satu waktu untuk kunci (key) yang sama. Semua goroutine lain yang meminta kunci yang sama akan **menunggu** dan kemudian **menerima hasil yang sama** dari goroutine pertama.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Cache Stampede** (Thundering Herd): Kondisi ketika banyak goroutine secara bersamaan melihat cache kosong dan semuanya berlomba-lomba untuk melakukan query ke database, menyebabkan overload.
-- **Request Coalescing**: Proses menggabungkan banyak permintaan identik menjadi satu eksekusi.
-- **Shared Result**: Hasil dari satu eksekusi yang diberikan ke semua goroutine yang menunggu.
+### Definisi
+`singleflight` adalah mekanisme untuk menggabungkan request duplikat berdasarkan key. Saat satu goroutine sedang mengerjakan key tertentu, goroutine lain dengan key yang sama akan menunggu lalu menerima hasil yang sama.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Skenario masalah: Cache Redis di-invalidate saat deployment. Tiba-tiba 500 request masuk untuk item yang sama secara bersamaan.
-- **Tanpa `singleflight`**: Semua 500 goroutine melakukan query ke DB secara bersamaan → DB crash.
-- **Dengan `singleflight`**: Satu goroutine melakukan query. 499 goroutine lainnya menunggu dan menerima hasil yang sama.
+1. **Cache stampede bisa dicegah**  
+   Saat cache miss terjadi serentak, backend tidak dihajar oleh query yang sama berulang-ulang.
+2. **Kerja mahal tidak diduplikasi**  
+   Database fetch, API call, atau komputasi berat cukup dilakukan sekali per key aktif.
+3. **Pola cache jadi lebih tahan tekanan**  
+   Sistem tetap efisien walau banyak caller meminta data identik di waktu hampir bersamaan.
 
-### Mekanisme Kerja Under-the-Hood
-1. Anda memanggil `g.Do(key, fn)`.
-2. Jika tidak ada goroutine yang sudah mengerjakan `key` tersebut, `fn` dieksekusi.
-3. Jika sudah ada goroutine yang mengerjakan `key` yang sama, goroutine Anda ditambahkan ke antrian tunggu.
-4. Saat `fn` selesai, hasilnya (termasuk error) di-broadcast ke semua goroutine yang menunggu.
+### Analogi Model Mental
+Bayangkan banyak orang datang ke meja informasi dan menanyakan dokumen yang sama. Daripada setiap petugas lari ke arsip sendiri-sendiri, satu petugas mengambil dokumen itu sekali lalu membagikan hasilnya ke semua orang yang menunggu.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Cache Stampede**: ledakan request identik saat cache kosong atau baru invalid.
+- **Request Coalescing**: penggabungan permintaan yang sama menjadi satu kerja bersama.
+- **Shared Result**: hasil tunggal yang dibagikan ke semua penunggu.
 
-Lihat solusi Cache Stampede di [examples/](./examples/).
-1. `01-cache-stampede`: Simulasi 50 goroutine yang meminta data yang sama; singleflight memastikan DB hanya dipanggil sekali.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Singleflight Coalescing](./assets/singleflight-coalescing.svg)
 
-### Singleflight Coalescing
 ```mermaid
 graph LR
-    R1[Request: key=user-1] --> SF{singleflight.Do}
-    R2[Request: key=user-1] --> SF
-    R3[Request: key=user-1] --> SF
-    
-    SF -->|First| DB[(Database Query)]
-    SF -->|Wait| R2
-    SF -->|Wait| R3
-    
-    DB -->|Single Result| SF
-    SF -->|Share Same Result| R1
-    SF -->|Share Same Result| R2
-    SF -->|Share Same Result| R3
+    R1[Request A] --> SF{singleflight.Do key=user-1}
+    R2[Request B] --> SF
+    R3[Request C] --> SF
+    SF -->|first caller| Work[Expensive work]
+    Work --> SF
+    SF --> Shared[Shared result]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat `Do(key, fn)` dipanggil, `singleflight` melacak apakah key itu sudah sedang dikerjakan. Jika belum, `fn` dijalankan. Jika sudah, caller baru tidak membuat kerja baru, tetapi menunggu hasil caller pertama. Ketika kerja selesai, hasilnya dibagikan ke seluruh penunggu.
+
+Nilai praktisnya:
+- sangat cocok untuk cache-backed service;
+- mengurangi beban database atau API upstream saat cache miss massal;
+- menjadi pelengkap rate limiting dan caching dalam sistem concurrent yang sibuk.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-cache-stampede](./examples/01-cache-stampede) - Simulasi banyak request identik yang dikoalesikan menjadi satu kerja mahal.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

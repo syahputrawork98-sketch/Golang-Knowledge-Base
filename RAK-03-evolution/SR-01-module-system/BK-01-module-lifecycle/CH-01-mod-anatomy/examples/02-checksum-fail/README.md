@@ -1,19 +1,21 @@
-# Lab 02: Checksum Verification Failure Simulation
+# Example 02: Checksum Failure
 
-## Objective
-Membuktikan perlindungan Go terhadap modifikasi paket dengan sengaja merusak file `go.sum`.
+## Tujuan
 
-## Workflow
-1. Inisialisasi proyek dengan modul valid.
-2. Edit `go.sum` secara manual (ubah hash).
+Menunjukkan bahwa integritas dependency di Go dijaga lewat checksum, dan perubahan manual pada hash akan memicu kegagalan verifikasi.
+
+## Isi Folder
+
+- `go.mod` - titik awal modul demo
+
+## Cara Coba
+
+1. Jalankan `go mod tidy` agar `go.sum` terbentuk.
+2. Ubah salah satu hash di `go.sum` secara manual.
 3. Jalankan `go build`.
-4. Amati pesan error `checksum mismatch`.
+4. Amati error `checksum mismatch` atau error verifikasi serupa.
 
-## Execution
-Jalankan di terminal:
-```bash
-go mod tidy
-# Edit go.sum, ubah satu karakter di hash
-go build
-```
-Go akan menolak melakukan build karena integritas paket tidak lagi terjamin.
+## Catatan
+
+- `go.sum` memang belum ada di awal folder ini; file itu dibuat saat dependency diselesaikan pertama kali.
+- Lab ini sengaja kecil karena fokusnya ada pada perilaku verifikasi, bukan pada aplikasi contoh.

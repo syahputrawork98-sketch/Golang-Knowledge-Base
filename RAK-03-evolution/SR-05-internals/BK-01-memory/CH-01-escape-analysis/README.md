@@ -1,54 +1,58 @@
-# [BK-01-CH-01] Heap vs Stack & Escape Analysis
+# CH-01: Escape Analysis
 
-**The Anatomy of Allocation**
-*Target: Memahami kapan data diletakkan di Stack atau dipaksa ke Heap dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Wiki: Compiler Optimizations](https://go.dev/wiki/CompilerOptimizations) | [A Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide)
+- **Framing**: Escape analysis membantu menjawab pertanyaan yang sangat praktis: kapan sebuah nilai tetap murah di stack, dan kapan ia menjadi beban heap yang nanti harus dibersihkan GC.
 
-Dalam Go, memori dibagi menjadi dua area utama: **Stack** (cepat, dikelola per-goroutine) dan **Heap** (lambat, dikelola oleh Garbage Collector). **Escape Analysis** adalah fase kompilasi di mana compiler memutuskan apakah suatu variabel "lolos" (escapes) dari fungsi dan harus dialokasikan di Heap.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Stack Allocation**: Sangat cepat (hanya menggerakkan pointer stack), memori otomatis bersih saat fungsi selesai.
-- **Heap Allocation**: Lebih lambat, menambah beban Garbage Collector (GC), dan berisiko fragmentasi.
-- **Escape Analysis**: Algoritma statis compiler untuk menentukan masa hidup (lifetime) sebuah variabel.
-- **Pointer Indirection**: Salah satu pemicu utama variabel pindah ke heap jika pointer-nya dikirim keluar fungsi.
+### Definisi
+Escape analysis adalah analisis compiler untuk menentukan apakah sebuah nilai bisa hidup aman di stack atau harus dialokasikan di heap karena lifetime atau pola pemakaiannya melampaui konteks lokal.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa Anda harus peduli ke mana variabel dialokasikan?
-- **Performance**: Alokasi stack hampir gratis secara komputasi. Mengurangi alokasi heap secara drastis meningkatkan *throughput* aplikasi.
-- **GC Pressure**: Semakin sedikit objek di heap, semakin jarang GC perlu berjalan, mengurangi latensi "Stop The World".
-- **Mechanical Sympathy**: Menulis kode yang ramah terhadap cara kerja compiler Go.
+1. **Heap allocation punya biaya nyata**  
+   Saat nilai lolos ke heap, efeknya bukan cuma alokasi, tetapi juga beban untuk garbage collector.
+2. **Desain API memengaruhi lokasi alokasi**  
+   Mengembalikan pointer, menyimpan nilai ke interface, atau mengirim data ke goroutine lain bisa mengubah keputusan compiler.
+3. **Output compiler jadi lebih mudah dibaca**  
+   Engineer bisa memakai `-gcflags=-m` untuk memahami mengapa sebuah nilai "escapes".
 
-### Mekanisme Kerja Under-the-Hood
-Pemicu umum alokasi Heap (Escaping):
-1. **Sharing Up**: Mengirim pointer ke variabel lokal keluar dari fungsi (return pointer).
-2. **Sharing Down**: Mengirim pointer ke interface (karena tipe data di dalam interface tidak diketahui saat kompilasi).
-3. **Large Objects**: Variabel yang ukurannya terlalu besar untuk masuk ke stack limit (biasanya ~2GB total, tapi per-object limit lebih kecil).
-4. **Dynamic Size**: Variabel yang ukurannya ditentukan saat runtime (misal: `make([]byte, n)`).
+### Analogi Model Mental
+Bayangkan barang kerja sementara di meja pribadi. Selama barang itu tidak dibawa keluar ruangan, ia bisa tetap di meja. Begitu barang harus dibagikan ke area umum, ia harus dipindah ke gudang bersama.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Stack Allocation**: alokasi lokal yang sangat murah dan dibersihkan otomatis saat frame selesai.
+- **Heap Allocation**: alokasi yang dikelola runtime dan GC.
+- **Escape**: kondisi saat lifetime nilai melampaui batas aman stack lokal.
 
-Lihat investigasi compiler di [examples/](./examples/).
-1. `01-escape-demo`: Gunakan perintah `go build -gcflags="-m"` untuk melihat laporan rahasia compiler tentang nasib setiap variabel.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Escape Logic](./assets/escape-logic.svg)
 
-### Allocation Flow Decision
 ```mermaid
 graph TD
-    Var[New Variable] --> Lifetime{Known Lifetime?}
-    Lifetime -- Yes --> Size{Small Enough?}
-    Size -- Yes --> Stack[Allocate on Stack]
-    
-    Lifetime -- No (Escaped) --> Heap[Allocate on Heap]
-    Size -- No (Too Large) --> Heap
-    
-    Stack -- Fast --> Done[End of Function: Auto Cleanup]
-    Heap -- Slow --> GC[End of Use: Wait for GC]
+    Value[New value] --> Share{Shared outside local scope?}
+    Share -->|No| Stack[Keep on stack]
+    Share -->|Yes| Heap[Move to heap]
+    Heap --> GC[Observed by GC]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Compiler Go menganalisis aliran nilai: apakah alamatnya dikembalikan, disimpan ke tempat yang lebih lama hidupnya, atau dipakai dengan cara yang tidak aman bila tetap di stack. Jika iya, nilai dipindah ke heap. Karena itu, escape analysis bukan tebakan runtime, tetapi keputusan kompilasi yang sangat memengaruhi performa.
+
+Nilai praktisnya:
+- membantu engineer membaca trade-off pointer vs value dengan lebih sadar;
+- memperjelas hubungan antara desain kode dan GC pressure;
+- membuat optimisasi memori terasa lebih mekanis, bukan mistis.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-escape-demo](./examples/01-escape-demo) - Contoh sederhana untuk membaca keputusan escape analysis dari output compiler.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

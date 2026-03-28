@@ -1,53 +1,59 @@
-# [BK-02-CH-01] G-M-P Model & Work Stealing
+# CH-01: G-M-P Scheduler Model
 
-**The Engine Behind Concurrency**
-*Target: Memahami bagaimana 1 juta goroutine bisa berjalan di atas 8 core CPU dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [runtime package](https://pkg.go.dev/runtime) | [runtime.GOMAXPROCS](https://pkg.go.dev/runtime#GOMAXPROCS)
+- **Framing**: Model G-M-P menjelaskan mengapa Go bisa menjalankan banyak goroutine tanpa harus membuat satu thread OS untuk masing-masing pekerjaan.
 
-Runtime Go menggunakan model penjadwalan **M:N**, di mana M goroutine dipetakan ke N thread sistem operasi. Struktur ini dikelola melalui tiga entitas utama yang disebut **G-M-P**.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **G (Goroutine)**: Unit eksekusi terkecil (mirip thread tapi sangat ringan, ~2KB stack awal).
-- **M (Machine)**: Thread Sistem Operasi (OS Thread). M menjalankan kode Go tapi harus memiliki P.
-- **P (Processor)**: Resource yang dibutuhkan oleh M untuk mengeksekusi G. Jumlah P dibatasi oleh `GOMAXPROCS`.
-- **LRQ (Local Run Queue)**: Antrean goroutine lokal milik setiap P.
-- **GRQ (Global Run Queue)**: Antrean goroutine global untuk G yang belum masuk ke P manapun.
+### Definisi
+Scheduler Go memakai tiga aktor utama: **G** untuk goroutine, **M** untuk thread OS, dan **P** untuk resource logis yang memungkinkan goroutine dijalankan. Kombinasi ketiganya membuat runtime bisa menjadwalkan banyak goroutine di atas jumlah thread yang lebih terbatas.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa Go tidak menggunakan thread OS secara langsung?
-- **Context Switch Fast**: Berpindah antar goroutine jauh lebih murah daripada berpindah antar thread OS karena dilakukan di user space.
-- **Efficient Scaling**: Ribuan goroutine bisa "mengantre" di satu P, menghindari overhead manajemen ribuan thread di kernel.
-- **Work Stealing**: Jika satu P kehabisan pekerjaan (LRQ kosong), dia akan "mencuri" 50% goroutine dari LRQ milik P lain untuk menjaga utilitas CPU tetap tinggi.
+1. **Menjelaskan skalabilitas goroutine**  
+   Ribuan goroutine bisa dikelola tanpa biaya satu-thread-per-task.
+2. **Membantu membaca efek `GOMAXPROCS`**  
+   Jumlah `P` memengaruhi seberapa banyak kerja CPU-bound bisa benar-benar paralel.
+3. **Membuka pemahaman tentang work stealing**  
+   Scheduler tidak sekadar antrean tunggal, tetapi sistem distribusi kerja yang aktif.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Creation**: Saat `go func()` dipanggil, G baru dimasukkan ke LRQ milik P saat ini.
-2. **Execution**: M mengambil G dari LRQ milik P yang sedang dipegangnya dan mengeksekusinya.
-3. **Blocking**: Jika G melakukan syscall yang memblokir, M akan melepaskan P agar P bisa digunakan oleh thread (M) lain untuk menjalankan goroutine lain.
+### Analogi Model Mental
+Bayangkan dapur besar: pesanan adalah `G`, koki adalah `M`, dan stasiun kerja aktif adalah `P`. Koki hanya bisa memasak jika punya stasiun kerja. Jika satu stasiun kehabisan pesanan, ia bisa mengambil dari stasiun lain.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Local Run Queue**: antrean goroutine lokal milik sebuah `P`.
+- **Global Run Queue**: antrean global saat kerja belum terikat ke `P` tertentu.
+- **Work Stealing**: pengambilan kerja dari `P` lain saat antrean lokal kosong.
 
-Lihat pengaruh GOMAXPROCS di [examples/](./examples/).
-1. `01-gmp-visual`: Program yang mensimulasikan beban kerja tinggi dan menunjukkan bagaimana runtime membagi tugas antar-Processor (P).
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![G-M-P Architecture](./assets/gmp-architecture.svg)
 
-### G-M-P Relationship
 ```mermaid
 graph TD
-    M[M: OS Thread] --- P[P: Processor Resource]
-    P --- LRQ[Local Run Queue]
-    LRQ --- G1[G1]
-    LRQ --- G2[G2]
-    
-    GRQ[Global Run Queue] --- G3[G3]
-    GRQ --- G4[G4]
-    
-    P -- Work Stealing --> P2[Other P]
+    P[P: processor] --> LRQ[Local run queue]
+    LRQ --> G1[Goroutine]
+    LRQ --> G2[Goroutine]
+    M[M: OS thread] --- P
+    GRQ[Global run queue] --> P
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat sebuah goroutine dibuat, scheduler mencoba menaruhnya ke antrean lokal `P` yang aktif. `M` menjalankan `G` lewat `P` yang sedang dipegangnya. Jika satu `P` kehabisan kerja, runtime bisa mencuri sebagian kerja dari antrean `P` lain agar CPU tetap terpakai merata.
+
+Nilai praktisnya:
+- membantu memahami mengapa concurrency Go terasa ringan;
+- memberi konteks saat membaca performa CPU-bound vs I/O-bound;
+- menjadi dasar sebelum masuk ke topik blocking syscall dan preemption.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-gmp-visual](./examples/01-gmp-visual) - Contoh kecil untuk melihat hubungan `GOMAXPROCS`, goroutine, dan pembagian kerja scheduler.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

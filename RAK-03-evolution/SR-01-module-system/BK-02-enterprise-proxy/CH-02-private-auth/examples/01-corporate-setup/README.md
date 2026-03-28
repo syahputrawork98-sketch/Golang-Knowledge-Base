@@ -1,18 +1,21 @@
-# Lab 01: Corporate GOPRIVATE & .netrc Setup
+# Example 01: Corporate GOPRIVATE Setup
 
-## Objective
-Mensimulasikan konfigurasi akses ke modul privat menggunakan token personal.
+## Tujuan
 
-## Workflow (Conceptual)
-1. Setel domain privat: `go env -w GOPRIVATE=github.company.com`.
-2. Buat file `.netrc` (Linux/macOS) atau `_netrc` (Windows) di Home directory.
-3. Tambahkan entry:
-   ```text
-   machine github.company.com
-   login [YOUR_GITHUB_TOKEN]
-   password x-oauth-basic
-   ```
-4. Jalankan `go get github.company.com/org/repo`.
+Memberi panduan dasar untuk konfigurasi `GOPRIVATE` dan kredensial HTTPS saat mengakses modul privat di lingkungan perusahaan.
 
-## Result
-Go akan mendeteksi `GOPRIVATE`, melewati Proxy/SumDB, dan menggunakan kredensial di `.netrc` untuk melakukan autentikasi HTTPS ke Git.
+## Isi Folder
+
+- `README.md` - panduan konfigurasi konseptual
+
+## Cara Coba
+
+1. Setel domain privat dengan `go env -w GOPRIVATE=<domain-privat>`.
+2. Siapkan `.netrc` atau `_netrc` sesuai sistem operasi.
+3. Isi kredensial yang dibutuhkan oleh host Git privat.
+4. Coba jalankan perintah seperti `go get` atau `go mod tidy` pada modul privat yang relevan.
+
+## Catatan
+
+- Folder ini tidak membawa token, host nyata, atau modul privat sungguhan.
+- Perlakukan lab ini sebagai checklist setup, bukan contoh runnable penuh.

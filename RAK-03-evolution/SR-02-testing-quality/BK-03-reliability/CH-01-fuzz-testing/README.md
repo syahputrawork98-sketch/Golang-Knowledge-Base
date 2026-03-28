@@ -1,49 +1,60 @@
-# [BK-03-CH-01] Fuzz Testing
+# CH-01: Fuzz Testing
 
-**Breaking Your Logic With Random Data**
-*Target: Memahami cara menggunakan native fuzzer Go untuk menemukan bug tersembunyi dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Fuzzing Documentation](https://go.dev/doc/fuzz/) | [testing package](https://pkg.go.dev/testing)
+- **Framing**: Fuzz testing membantu kita keluar dari bias test case buatan manusia dengan mendorong fungsi menerima input yang aneh, agresif, dan tidak terduga.
 
-**Fuzz Testing** (atau Fuzzing) adalah teknik pengujian otomatis yang memberikan input acak, ter-mutasi, dan tidak terduga ke dalam fungsi Anda untuk mencari crash, panic, atau kegagalan logika. Sejak Go 1.18, Fuzzing telah menjadi bagian integral dari toolchain standar Go.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Seed Corpus**: Kumpulan input awal yang valid yang diberikan oleh developer sebagai panduan bagi fuzzer.
-- **Mutator**: Mesin di dalam Go yang mengubah (mutasi) input bit-demi-bit untuk mengeksplorasi jalur kode baru.
-- **Fuzzing Engine**: Proses yang berjalan terus-menerus mencoba ribuan kombinasi input hingga menemukan "Counter-example" (input yang menyebabkan kegagalan).
+### Definisi
+Fuzz testing adalah teknik pengujian otomatis yang menjalankan fungsi terhadap banyak input hasil mutasi untuk menemukan panic, crash, atau pelanggaran properti yang seharusnya tetap benar.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa butuh Fuzzing jika sudah ada Unit Test?
-- **Human Bias**: Developer cenderung menulis test case untuk input yang mereka *pikirkan*. Fuzzer mencoba input yang *tidak pernah* Anda pikirkan (misal: string dengan karakter null, integer overflow, dsb).
-- **Security**: Fuzzing sangat efektif untuk menemukan celah keamanan seperti *buffer overflow* atau *SQL Injection* pada parser.
+1. **Edge case lebih mudah ditemukan**  
+   Input yang tidak terpikir oleh penulis test bisa tetap dicoba oleh fuzzer.
+2. **Robustness meningkat**  
+   Fungsi tidak hanya diuji pada jalur normal, tetapi juga pada variasi data yang jauh lebih liar.
+3. **Toolchain Go mendukung langsung**  
+   Fuzzing menjadi bagian alami dari workflow testing, bukan alat terpisah.
 
-### Mekanisme Kerja Under-the-Hood
-1. Anda menulis fungsi `FuzzXxx(f *testing.F)`.
-2. Anda menambahkan seed: `f.Add("input awal")`.
-3. Anda memanggil `f.Fuzz(func(t *testing.T, data string) { ... })`.
-4. Go akan menjalankan fungsi tersebut secara paralel dengan ribuan input hasil mutasi.
-5. Jika gagal, Go akan menyimpan input penyebab gagal tersebut ke dalam folder `testdata/fuzz` agar Anda bisa memperbaikinya dan menjadikannya unit test permanen.
+### Analogi Model Mental
+Bayangkan alat stres-tes untuk produk pabrik. Produk tidak hanya diuji dalam kondisi ideal, tetapi juga didorong ke kondisi yang aneh untuk melihat di mana ia retak.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Seed Corpus**: kumpulan input awal yang diberikan ke fuzzer.
+- **Mutator**: mesin yang memodifikasi input untuk membuka jalur perilaku baru.
+- **Counterexample**: input yang memicu kegagalan dan menjadi bukti bug.
 
-Lihat teknik stres-tes otomatis di [examples/](./examples/).
-1. `01-reverse-fuzz`: Mencari bug pada fungsi pembalik string menggunakan data acak.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Fuzzing Mutation Engine](./assets/fuzzing-mutation.svg)
 
-### Fuzzing Feedback Loop
 ```mermaid
 graph LR
-    Seed[Seed Corpus] --> Mutator[Mutator Engine]
-    Mutator --> Input[Mutated Input]
-    Input --> Func[Your Function]
-    Func --> Status{Crash?}
-    Status -->|No| Mutator
-    Status -->|Yes| Log[Save to testdata/fuzz]
+    Seed[Seed corpus] --> Mutator[Mutation engine]
+    Mutator --> Input[Mutated input]
+    Input --> Func[Function under test]
+    Func --> Check{Failure?}
+    Check -->|No| Mutator
+    Check -->|Yes| Save[Save failing input]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, fuzzer berjalan lewat fungsi `FuzzXxx` dan memakai seed corpus sebagai titik awal. Input kemudian dimodifikasi untuk mengejar jalur eksekusi baru. Jika ditemukan kegagalan, input itu disimpan agar bisa direproduksi dan dijadikan regression test.
+
+Nilai evolusinya untuk `RAK-03`:
+- reliability tidak hanya bergantung pada test case yang dibayangkan developer;
+- bug yang tersembunyi di input aneh lebih mudah muncul;
+- confidence terhadap parser, transformasi data, dan fungsi sensitif input meningkat.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian fuzzing di folder [examples/](./examples):
+- [01-reverse-fuzz](./examples/01-reverse-fuzz) - Fuzz test sederhana untuk fungsi pembalik string.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

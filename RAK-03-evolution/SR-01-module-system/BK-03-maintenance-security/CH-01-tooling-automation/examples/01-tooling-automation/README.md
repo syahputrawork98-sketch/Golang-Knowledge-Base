@@ -1,22 +1,20 @@
-# Lab 01: go list & go mod edit Automation
+# Example 01: Tooling Automation Commands
 
-## Objective
-Menguasai penggunaan CLI untuk inspeksi dan manipulasi modul tanpa editor visual.
+## Tujuan
 
-## Workflow
-1. Gunakan `go list -m -json all` untuk melihat metadata dependensi.
-2. Gunakan `go mod why -m [module-name]` untuk mencari tahu alasan sebuah modul ada di proyek.
-3. Gunakan `go mod edit -require=[module@version]` untuk menambah/mengubah dependensi secara paksa.
+Merangkum perintah CLI yang sering dipakai untuk menginspeksi dan mengubah metadata modul tanpa editor manual.
 
-## Execution
-```bash
-# Inspeksi dalam format JSON
-go list -m -json all | jq .
+## Isi Folder
 
-# Kenapa ada uuid?
-go mod why -m github.com/google/uuid
+- `README.md` - panduan command-only
 
-# Hapus require (hati-hati, gunakan tidy setelahnya)
-go mod edit -droprequire=github.com/google/uuid
-```
-Penting untuk administrator sistem dan insinyur devops.
+## Cara Coba
+
+1. Jalankan `go list -m -json all` untuk melihat metadata dependency.
+2. Gunakan `go mod why -m <module>` untuk mengetahui alasan sebuah modul masuk ke graph.
+3. Gunakan `go mod edit` untuk menambah atau menghapus entri tertentu secara eksplisit.
+
+## Catatan
+
+- Folder ini tidak menyertakan proyek demo sendiri.
+- Perintah di sini paling berguna saat dijalankan pada modul nyata yang sedang Anda audit.

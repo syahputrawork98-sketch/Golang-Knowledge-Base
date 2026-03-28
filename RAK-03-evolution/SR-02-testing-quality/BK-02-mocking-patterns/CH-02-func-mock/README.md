@@ -1,48 +1,56 @@
-# [BK-02-CH-02] Higher-Order Function Mocks
+# CH-02: Higher-Order Function Mocks
 
-**Lightweight Mocking without Interfaces**
-*Target: Memahami teknik mocking fungsional untuk pengujian yang lebih ringkas tanpa overhead struct dalam waktu < 3 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [First-Class Functions in Go](https://go.dev/blog/first-class-functions-in-go) | [testing package](https://pkg.go.dev/testing)
+- **Framing**: Tidak semua dependency perlu dibungkus dalam interface. Untuk kasus yang kecil, function injection sering lebih ringan dan tetap sangat efektif untuk testing.
 
-Tidak semua dependensi harus dibungkus dalam Interface. Dalam beberapa kasus, Anda bisa menggunakan **Higher-Order Functions** (fungsi yang menerima fungsi lain sebagai parameter) untuk melakukan mocking. Ini sering disebut sebagai "Functional Mocking".
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Function Signature as Type**: Mendefinisikan tipe data berdasarkan tanda tangan fungsi (misal: `type Saver func(data string) error`).
-- **Dependency Closure**: Teknik mengunci dependensi dalam sebuah variabel fungsi yang bisa diganti sesuka hati saat pengujian.
-- **Overhead Reduction**: Menghindari pembuatan boilerplate interface dan struct jika tujuan utamanya hanya melakukan mocking satu fungsi.
+### Definisi
+Higher-order function mocking adalah teknik mengganti dependency lewat fungsi yang diterima sebagai parameter atau variabel yang bisa ditimpa saat pengujian.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Kapan menggunakan teknik ini?
-- **Small Logic**: Modul kecil yang hanya memiliki satu dependensi fungsional.
-- **Legacy Refactor**: Jika Anda berurusan dengan kode lama yang sulit diubah menjadi interface, menambahkan parameter fungsi seringkali lebih aman.
+1. **Boilerplate lebih rendah**  
+   Untuk dependency yang bentuknya hanya satu aksi, function injection sering lebih sederhana daripada membuat interface dan struct tambahan.
+2. **Refactor lebih ringan**  
+   Cocok untuk kode kecil atau legacy code yang ingin dibuat lebih testable tanpa banyak perubahan struktur.
+3. **Perilaku mock tetap eksplisit**  
+   Test bisa mengatur fungsi pengganti dengan cepat untuk mensimulasikan hasil tertentu.
 
-### Mekanisme Kerja Under-the-Hood
-1. Anda membuat variabel fungsi: `var externalCall = func() { ... }`.
-2. Saat pengujian, Anda menimpa variabel tersebut: `externalCall = func() { mockBehavior() }`.
-3. Gunakan `t.Cleanup` untuk mengembalikan variabel fungsi ke aslinya agar tidak merusak test lain (Global State danger).
+### Analogi Model Mental
+Bayangkan sebuah tombol aksi di panel kontrol. Dalam mode produksi, tombol itu terhubung ke mesin asli. Dalam mode pengujian, kabelnya dipindah sementara ke simulator agar perilaku mesin bisa diuji tanpa menyalakan alat nyata.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Higher-Order Function**: fungsi yang menerima fungsi lain atau mengembalikan fungsi.
+- **Function Injection**: teknik menyuplai dependency dalam bentuk fungsi.
+- **Global Function Override**: pola yang perlu diimbangi cleanup agar tidak bocor ke test lain.
 
-Lihat teknik mocking fungsional di [examples/](./examples/).
-1. `01-func-injection`: Menyuntikkan logika pencarian data melalui parameter fungsi.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Functional Mocking](./assets/func-mock-pattern.svg)
 
-### Functional Mocking Flow
 ```mermaid
 graph LR
-    subgraph "Production"
-    A[Logic] --> B[Real Action Func]
-    end
-
-    subgraph "Test"
-    A --> C[Mock Action Func]
-    end
+    Logic[Business logic] --> Real[Real function]
+    Logic --> Mock[Injected mock function]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, fungsi adalah nilai, jadi dependency bisa diperlakukan sebagai parameter atau variabel yang bisa diganti saat test berjalan. Pola ini sangat kuat untuk kasus sederhana, tetapi perlu disiplin jika dependency disimpan sebagai global variable karena state-nya bisa bocor antar test.
+
+Nilai evolusinya untuk `RAK-03`:
+- testing jadi lebih luwes untuk komponen kecil;
+- tidak semua masalah perlu diselesaikan dengan interface;
+- engineer bisa memilih abstraksi yang paling ringan untuk kebutuhan test yang nyata.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh function injection di folder [examples/](./examples):
+- [01-func-injection](./examples/01-func-injection) - Mocking fungsi secara langsung untuk skenario test yang ringkas.
+
 ---
-*Back to [BK-02 Page](../README.md)*
+*Status: [x] Complete*

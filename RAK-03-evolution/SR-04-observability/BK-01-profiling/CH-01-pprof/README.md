@@ -1,45 +1,58 @@
-# [BK-01-CH-01] pprof CPU & Heap Analysis
+# CH-01: `pprof` CPU and Heap Analysis
 
-**Precision Bottleneck Identification**
-*Target: Mengidentifikasi fungsi yang memakan CPU atau RAM terbanyak dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Profiling Go Programs](https://go.dev/blog/profiling-go-programs) | [runtime/pprof package](https://pkg.go.dev/runtime/pprof)
+- **Framing**: `pprof` penting saat performa terasa buruk tetapi sumber masalahnya belum jelas. Ia membantu menunjukkan fungsi mana yang benar-benar menghabiskan CPU atau memori.
 
-**`pprof`** adalah alat standar Go untuk mengumpulkan dan memvisualisasikan data profil dari program yang sedang berjalan. Profil CPU menunjukkan fungsi mana yang paling banyak menggunakan waktu prosesor, sementara profil Heap menunjukkan fungsi mana yang mengalokasikan memori paling banyak atau memegang memori paling lama.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Flat Time**: Waktu yang dihabiskan langsung di dalam fungsi tersebut (tidak termasuk fungsi yang dipanggil).
-- **Cum (Cumulative) Time**: Total waktu yang dihabiskan di fungsi tersebut DAN semua fungsi di bawahnya dalam call stack.
-- **Flamegraph**: Visualisasi hierarki yang memudahkan identifikasi "jalur panas" (hot paths) dalam eksekusi kode.
-- **Sampling Rate**: Seberapa sering pprof mengambil snapshot state eksekusi (default: 100Hz untuk CPU).
+### Definisi
+`pprof` adalah alat profiling standar Go untuk mengumpulkan dan menganalisis data CPU, heap, dan jenis profil runtime lain dari program yang berjalan.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa menggunakan `pprof` daripada menebak-nebak?
-- **Scientific Optimization**: Menghilangkan optimasi prematur dengan memfokuskan tenaga pada 5% kode yang menyebabkan 80% perlambatan.
-- **Visual Clarity**: Melihat hubungan antar fungsi dalam graph yang intuitif daripada membaca baris kode yang ribuan.
-- **Production-Ready**: Dapat diaktifkan melalui HTTP endpoint (`net/http/pprof`) tanpa overhead besar jika tidak sedang dalam proses sampling.
+1. **Optimasi jadi berbasis bukti**  
+   Engineer bisa melihat fungsi mana yang benar-benar mahal, bukan menebak-nebak dari intuisi.
+2. **Hubungan antar fungsi lebih terlihat**  
+   Data profil menunjukkan jalur eksekusi dan akumulasi biaya di call stack.
+3. **Perubahan performa lebih mudah dievaluasi**  
+   Hasil profil bisa dibandingkan sebelum dan sesudah perbaikan.
 
-### Mekanisme Kerja Under-the-Hood
-1. **CPU Profiling**: Runtime menyetel timer yang memicu signal `SIGPROF` secara berkala. Stack trace dicatat pada setiap interupsi.
-2. **Heap Profiling**: Alokasi dicatat dengan menginterupsi allocator (`runtime.mallocgc`). Ukuran sampling default adalah 512KB.
+### Analogi Model Mental
+Bayangkan hasil CT-scan untuk aplikasi. Daripada menebak bagian tubuh mana yang bermasalah, kita bisa melihat area mana yang benar-benar aktif berlebihan atau menyimpan beban paling besar.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Flat Time**: biaya yang langsung dihabiskan di fungsi itu sendiri.
+- **Cumulative Time**: total biaya fungsi beserta fungsi-fungsi di bawahnya.
+- **Sampling**: pengambilan snapshot berkala selama program berjalan.
 
-Lihat teknik inspeksi mendalam di [examples/](./examples/).
-1. `01-bottleneck-demo`: Program yang sengaja lambat dan boros memori. Gunakan `go tool pprof` untuk menemukan penyebabnya.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![pprof Sampling](./assets/pprof-sampling.svg)
 
-### pprof Data Pipeline
 ```mermaid
 graph LR
-    App[Running Go App] -- runtime/pprof --> Profile[binary.pprof]
-    Profile -- go tool pprof --> UI[Web Interface / Graph]
-    UI -- Analyze --> Developer[Targeted Optimization]
+    App[Running Go app] --> Collect[runtime/pprof]
+    Collect --> Profile[Profile data]
+    Profile --> Analyze[go tool pprof]
+    Analyze --> Hot[Hot paths and allocators]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Untuk CPU profiling, runtime mengambil sampel stack secara berkala. Untuk heap profiling, runtime mencatat informasi alokasi yang relevan sehingga kita bisa melihat fungsi mana yang menyebabkan tekanan memori. Hasil mentah ini kemudian dianalisis dengan `go tool pprof`.
+
+Nilai observability-nya di `RAK-03`:
+- performa dilihat sebagai perilaku terukur;
+- bottleneck bisa ditelusuri sampai ke call path yang relevan;
+- engineer mendapat dasar yang lebih kuat untuk memilih optimasi berikutnya.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian profiling di folder [examples/](./examples):
+- [01-bottleneck-demo](./examples/01-bottleneck-demo) - Program sederhana untuk menghasilkan profil CPU atau heap dan dianalisis dengan `pprof`.
+
 ---
-*Back to [SR-04 Page](../../README.md)*
+*Status: [x] Complete*

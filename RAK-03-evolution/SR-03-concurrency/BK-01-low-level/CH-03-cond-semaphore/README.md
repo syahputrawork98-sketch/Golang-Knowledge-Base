@@ -1,56 +1,58 @@
-# [BK-01-CH-03] Semaphores & sync.Cond
+# CH-03: Semaphores and `sync.Cond`
 
-**Advanced Signaling & Resource Orchestration**
-*Target: Memahami koordinasi antar goroutine yang kompleks dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [sync package](https://pkg.go.dev/sync) | [x/sync/semaphore](https://pkg.go.dev/golang.org/x/sync/semaphore)
+- **Framing**: Saat kita perlu menunggu kondisi tertentu atau membatasi jumlah worker aktif, channel tidak selalu menjadi alat yang paling jelas. Di situlah `sync.Cond` dan semaphore mulai relevan.
 
-**`sync.Cond`** (Condition Variable) adalah primitif sinkronisasi untuk titik temu goroutine yang menunggu atau mengumumkan terjadinya suatu peristiwa/kondisi tertentu. Berbeda dengan channel yang digunakan untuk transfer data, `sync.Cond` murni digunakan untuk **signaling**.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-**Semaphores** (biasanya diimplementasikan via `golang.org/x/sync/semaphore`) adalah cara untuk membatasi akses ke sumber daya yang jumlahnya terbatas (misal: hanya boleh 10 koneksi database aktif).
+### Definisi
+`sync.Cond` adalah primitive signaling berbasis kondisi bersama, sedangkan semaphore adalah mekanisme untuk membatasi jumlah pemakai aktif terhadap resource tertentu.
 
-### Terminologi Utama (Senior Terms)
-- **Signal**: Membangunkan satu goroutine yang sedang menunggu.
-- **Broadcast**: Membangunkan **semua** goroutine yang sedang menunggu kondisi yang sama.
-- **Wait Queue**: Antrian internal goroutine yang sedang tertidur menunggu sinyal.
-- **Spurious Wakeup**: Kondisi di mana goroutine terbangun tanpa sinyal (di Go diminimalisir, tapi tetap harus dicek dalam loop `for`).
+### Rasionalitas
+Pola ini dipilih karena:
 
-## 2. Rasionalitas (Why & How?)
+1. **Signaling kompleks lebih mudah dimodelkan**  
+   `sync.Cond` cocok saat goroutine menunggu perubahan state tertentu, bukan transfer data.
+2. **Pembatasan resource lebih eksplisit**  
+   Semaphore memudahkan kita mengatakan "hanya N pekerjaan yang boleh aktif bersamaan".
+3. **Koordinasi bisa dipisah dari payload**  
+   Tidak semua masalah concurrency perlu membawa data lewat channel.
 
-Mengapa tidak pakai Channel saja?
-- **Fan-out Signaling**: Mengirim sinyal ke banyak penerima sekaligus (Broadcast) lebih efisien dengan `sync.Cond` daripada menutup banyak channel.
-- **State-Dependent Wait**: Jika Anda butuh goroutine menunggu hingga sebuah status variabel kompleks berubah (misal: `queue.length > 5 && queue.isReady`), `sync.Cond` lebih fleksibel.
+### Analogi Model Mental
+Bayangkan ruang rapat dengan kapasitas terbatas. Semaphore adalah petugas pintu yang memastikan hanya sejumlah orang tertentu yang boleh masuk. `sync.Cond` seperti papan pengumuman yang membangunkan semua orang saat status ruangan berubah.
 
-### Mekanisme Kerja Under-the-Hood
-1. `sync.Cond` selalu membutuhkan `Locker` (biasanya `sync.Mutex`).
-2. `Wait()`: Melepaskan lock, menidurkan goroutine, dan memasukkannya ke antrian. Saat bangun, ia otomatis mengambil kembali lock tersebut.
-3. `Signal()` / `Broadcast()`: Memindahkan goroutine dari antrian tidur ke antrian 'siap jalan' (runnable).
+### Terminologi Teknis
+- **Signal**: membangunkan satu goroutine yang menunggu.
+- **Broadcast**: membangunkan semua goroutine yang menunggu kondisi yang sama.
+- **Wait Queue**: antrean goroutine yang sedang menunggu perubahan kondisi.
 
-## 3. Implementasi Utama (The Lab)
-
-Lihat koordinasi event di [examples/](./examples/).
-1. `01-cond-signal`: Simulasi sistem antrian di mana banyak worker menunggu status "Ready" dari manager.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![sync.Cond Orchestration](./assets/sync-cond-orchestration.svg)
 
-### sync.Cond Wait & Broadcast Flow
 ```mermaid
 graph TD
-    G1[Goroutine 1: Wait] --> Queue[Internal Wait Queue]
-    G2[Goroutine 2: Wait] --> Queue
-    G3[Goroutine 3: Wait] --> Queue
-    
-    Manager[Manager: State Changed] --> Broadcast[Broadcast]
-    Broadcast -->|Wake Up All| G1
-    Broadcast -->|Wake Up All| G2
-    Broadcast -->|Wake Up All| G3
-    
-    G1 --> Lock[Re-acquire Mutex]
-    G2 --> Lock
-    G3 --> Lock
+    Waiters[Waiting goroutines] --> Queue[Condition wait queue]
+    State[State change] --> Notify[Signal or Broadcast]
+    Notify --> Queue
+    Queue --> Wake[Wake and re-check condition]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`sync.Cond` bekerja di atas lock bersama. Goroutine akan menunggu sambil melepas lock, lalu saat dibangunkan ia mengambil lock lagi untuk memeriksa kondisi yang relevan. Semaphore, di sisi lain, bekerja sebagai kuota untuk membatasi concurrency aktif terhadap resource atau pekerjaan tertentu.
+
+Nilai concurrency-nya untuk `RAK-03`:
+- engineer punya opsi koordinasi selain channel;
+- antrean tunggu dan pembatasan resource bisa dimodelkan lebih eksplisit;
+- pola concurrent jadi lebih cocok untuk kebutuhan produksi yang kompleks.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian koordinasi di folder [examples/](./examples):
+- [01-cond-signal](./examples/01-cond-signal) - Simulasi signaling berbasis kondisi menggunakan `sync.Cond`.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

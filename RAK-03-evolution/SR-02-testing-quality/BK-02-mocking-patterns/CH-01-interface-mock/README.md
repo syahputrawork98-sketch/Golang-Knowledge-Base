@@ -1,52 +1,57 @@
-# [BK-02-CH-01] Interface Injection
+# CH-01: Interface Injection
 
-**Decoupling for Testability**
-*Target: Memahami alasan mengapa Interface adalah nyawa dari pengujian unit di Go dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Wiki: CodeReviewComments - Interfaces](https://go.dev/wiki/CodeReviewComments#interfaces) | [Effective Go: Interfaces and other types](https://go.dev/doc/effective_go#interfaces_and_types)
+- **Framing**: Interface injection penting dalam testing Go karena ia memisahkan logika yang ingin diuji dari detail I/O atau dependency konkret yang sulit dikendalikan.
 
-**Interface Injection** adalah teknik *Dependency Injection* di mana service Anda tidak bergantung pada tipe konkret (misal: `*sql.DB`), melainkan pada kontrak kelakuan (Interface). Selama pengujian, Anda bisa "menyuntikkan" implementasi palsu (Mock) yang meniru kelakuan objek asli tanpa harus melakukan koneksi jaringan atau database sungguhan.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Small Interfaces**: Prinsip Go untuk membuat interface sekecil mungkin (1-3 method) agar mudah di-mock.
-- **Dependency Inversion**: Prinsip SOLID di mana modul tingkat tinggi tidak boleh bergantung pada modul tingkat rendah.
-- **Stub vs Mock**: Stub hanya mengembalikan data statis, sedangkan Mock bisa memvalidasi apakah sebuah fungsi dipanggil dengan parameter yang benar.
+### Definisi
+Interface injection adalah teknik dependency injection di mana komponen menerima kontrak perilaku dalam bentuk interface, bukan bergantung langsung pada tipe konkret tertentu.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa menggunakan Interface untuk Mocking?
-- **Isolasi**: Anda ingin menguji logika hitung diskon tanpa harus peduli apakah database sedang *down* atau tidak.
-- **Speed**: Menjalankan mock di memory jauh lebih cepat daripada query I/O.
-- **Edge Case Simulation**: Sangat sulit mensimulasikan "Database Error" atau "Network Timeout" dengan objek asli. Dengan Mock, Anda tinggal mengatur: `mock.On("Save").Return(errors.New("connection failed"))`.
+1. **Test bisa diisolasi**  
+   Logic utama dapat diuji tanpa harus menyentuh database, network, atau filesystem sungguhan.
+2. **Edge case lebih mudah disimulasikan**  
+   Error, timeout, atau hasil khusus bisa dimodelkan dengan implementasi mock sederhana.
+3. **Desain kontrak jadi lebih jelas**  
+   Interface kecil membantu menunjukkan perilaku minimum yang benar-benar dibutuhkan.
 
-### Mekanisme Kerja Under-the-Hood
-1. Definisikan interface: `type Fetcher interface { Fetch() string }`.
-2. Service menerima interface: `type Service struct { f Fetcher }`.
-3. Di kode asli, masukkan `RealFetcher`.
-4. Di kode test, masukkan `MockFetcher` (struct yang memiliki method `Fetch()` tapi hanya mengembalikan string buatan).
+### Analogi Model Mental
+Bayangkan colokan listrik universal. Perangkat utama tidak perlu tahu merek pembangkit dayanya. Selama soketnya mengikuti bentuk yang sama, sumber daya bisa diganti untuk kebutuhan berbeda, termasuk simulasi saat pengujian.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Small Interface**: interface kecil yang hanya berisi method yang benar-benar dibutuhkan.
+- **Dependency Injection**: teknik memasok dependency dari luar, bukan membuatnya diam-diam di dalam komponen.
+- **Stub / Mock**: implementasi pengganti untuk testing.
 
-Lihat teknik pemisahan dependensi di [examples/](./examples/).
-1. `01-manual-mock`: Membuat mock secara manual tanpa menggunakan library pihak ketiga (cara paling murni).
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Interface Injection](./assets/interface-injection.svg)
 
-### Interface Injection Pattern
 ```mermaid
 graph LR
-    subgraph "Production Environment"
-    App[Service Logic] -->|implements| I[Interface: Repository]
-    RealDB[Real SQL Database] -->|satisfies| I
-    end
-
-    subgraph "Test Environment"
-    App -->|implements| I
-    MockDB[Mock Object in Memory] -->|satisfies| I
-    end
+    Service[Business logic] --> Contract[Repository interface]
+    Real[Real repository] --> Contract
+    Mock[Mock repository] --> Contract
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, interface dipenuhi secara implisit. Itu membuat kita bisa mendefinisikan interface kecil di sisi consumer, lalu menyuntikkan implementasi nyata atau mock tanpa mengubah logika bisnis inti.
+
+Nilai evolusinya untuk `RAK-03`:
+- testability menjadi bagian dari desain, bukan tempelan belakangan;
+- dependency nyata dan dependency mock memakai kontrak yang sama;
+- perubahan di layer I/O tidak harus memecahkan test unit yang fokus pada logic.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh pemisahan dependency di folder [examples/](./examples):
+- [01-manual-mock](./examples/01-manual-mock) - Implementasi manual mock berbasis interface kecil tanpa library tambahan.
+
 ---
-*Back to [BK-02 Page](../README.md)*
+*Status: [x] Complete*

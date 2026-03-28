@@ -1,23 +1,21 @@
-# Lab 01: Version Retraction Simulation
+# Example 01: Publish Retraction
 
-## Objective
-Mempraktikkan cara menarik kembali versi modul yang memiliki bug kritis.
+## Tujuan
 
-## Workflow
-1. Siapkan modul dengan tag `v1.0.0`.
-2. Temukan "bug" (simulasi).
-3. Tambahkan direktif `retract` di `go.mod`.
-4. Publikasikan versi `v1.0.1`.
-5. Pengguna yang mencoba mengambil `v1.0.0` akan mendapat peringatan.
+Memberi contoh ringkas bagaimana maintainer menandai versi modul yang sebaiknya tidak lagi dipakai.
 
-## Execution
-Contoh penulisan di `go.mod`:
-```go
-module example.com/my-module
+## Isi Folder
 
-go 1.22
+- `README.md` - catatan prosedural untuk simulasi retraction
 
-// v1.0.0 ditarik karena mengandung celah keamanan pada parser.
-retract v1.0.0
-```
-Gunakan `go list -m -u all` untuk melihat apakah ada versi yang pernah Anda gunakan telah ditarik oleh maintainer.
+## Cara Coba
+
+1. Siapkan modul yang sudah memiliki riwayat versi.
+2. Tambahkan direktif `retract` di `go.mod`.
+3. Rilis versi perbaikan berikutnya.
+4. Gunakan `go list -m -u all` untuk melihat sinyal retraction dari sudut pandang consumer.
+
+## Catatan
+
+- Folder ini bersifat konseptual; tidak ada repo tag sungguhan di dalamnya.
+- Cocok dipakai sebagai checklist maintainer, bukan sebagai demo runnable penuh.

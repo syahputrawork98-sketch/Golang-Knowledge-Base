@@ -1,51 +1,57 @@
-# [BK-03-CH-03] Structured Logging (slog)
+# CH-03: Structured Logging with `slog`
 
-**Machine-Readable Observability**
-*Target: Mengubah log teks berantakan menjadi data JSON yang mudah diindeks oleh ELK/Grafana Loki dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [log/slog package](https://pkg.go.dev/log/slog) | [Structured Logging with slog](https://go.dev/blog/slog)
+- **Framing**: Logging modern bukan cuma soal mencetak teks. `slog` membuat log menjadi data terstruktur yang lebih mudah dicari, difilter, dan dihubungkan dengan sinyal observability lain.
 
-**`log/slog`** adalah paket logging terstruktur standar yang diperkenalkan pada Go 1.21. Berbeda dengan paket `log` tradisional yang hanya mencetak string, `slog` memperlakukan log sebagai kumpulan pasangan key-value yang bisa diformat menjadi JSON secara native tanpa bantuan library pihak ketiga (seperti Logrus atau Zap).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Logger**: Objek utama yang digunakan untuk mencatat log dengan level tertentu.
-- **Handler**: Komponen yang menentukan *bagaimana* dan *ke mana* log dikirim (misal: JSON ke stdout, Text ke file).
-- **Attributes (Attr)**: Pasangan key-value yang memberikan konteks tambahan pada pesan log (misal: `user_id=42`).
-- **Group**: Mengelompokkan atribut terkait ke dalam sub-objek (misal: grup `request` berisi `method`, `path`, dan `status`).
+### Definisi
+`log/slog` adalah paket logging terstruktur standar di Go yang merepresentasikan log sebagai record berisi level, message, dan kumpulan atribut key-value.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa `slog` adalah masa depan logging Go?
-- **Performance**: Dirancang dengan alokasi memori yang sangat rendah, seringkali setara atau lebih cepat dari library pihak ketiga yang populer.
-- **Interoperability**: Menjadi standar library berarti seluruh ekosistem Go akan mulai berbicara dalam "bahasa" yang sama untuk logging.
-- **Searchability**: Log JSON sangat mudah di-*parse* oleh sistem log management (Loki, Elasticsearch) untuk pencarian dan pembuatan dashboard.
+1. **Log lebih mudah diproses mesin**  
+   Format JSON dan atribut terstruktur cocok untuk pipeline observability modern.
+2. **Konteks lebih mudah dipertahankan**  
+   Metadata seperti request ID, user ID, atau status bisa dibawa sebagai field, bukan ditempel di string mentah.
+3. **Standar library memudahkan konsistensi**  
+   Ekosistem Go punya titik temu logging yang lebih seragam.
 
-### Mekanisme Kerja Under-the-Hood
-1. User memanggil `logger.Info("pesan", "key", "val")`.
-2. Input tersebut dibentuk menjadi objek `Record`.
-3. `Record` dikirim ke `Handler`.
-4. `Handler` melakukan serialisasi (misal ke JSON) dan menuliskannya ke `io.Writer`.
+### Analogi Model Mental
+Bayangkan arsip kejadian di bandara. Log teks biasa seperti catatan bebas petugas. Structured logging seperti formulir standar dengan kolom waktu, gate, maskapai, dan status, sehingga semua data lebih mudah dicari ulang.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Record**: unit log yang berisi message dan atribut.
+- **Handler**: komponen yang menentukan bagaimana log diserialisasi dan dikirim.
+- **Attributes**: pasangan key-value yang memberi konteks tambahan.
 
-Lihat teknik logging terstruktur di [examples/](./examples/).
-1. `01-slog-json`: Mengonfigurasi logger global dengan JSON Handler, penambahan atribut default (seperti version), dan penggunaan grup atribut.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![slog Pipeline](./assets/slog-pipeline.svg)
 
-### slog Handler Pipeline
 ```mermaid
 graph LR
-    Call[logger.Info] -- context + attrs --> Rec[Record Object]
-    Rec -- process --> Handler[JSON/Text Handler]
-    Handler -- serialize --> Target[Standard Output / File]
-    
-    subgraph "Customization"
-    ReplaceAttr[ReplaceAttr Func] -- mask passwords --> Handler
-    end
+    Call[logger.Info or Error] --> Record[Structured record]
+    Record --> Handler[JSON or text handler]
+    Handler --> Sink[stdout file or collector]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat logger dipanggil, `slog` membentuk record dari message, level, dan atribut yang disuplai. Record ini lalu diteruskan ke handler yang akan memformat dan menulisnya ke sink yang dituju. Karena atribut sudah terstruktur sejak awal, log lebih mudah diintegrasikan dengan sistem pencarian dan agregasi.
+
+Nilai observability-nya untuk `RAK-03`:
+- log berubah dari output teks menjadi data operasional;
+- korelasi antar sistem observability jadi lebih mudah;
+- engineer bisa menjaga konteks log tanpa membanjiri message string dengan format yang berantakan.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian logging terstruktur di folder [examples/](./examples):
+- [01-slog-json](./examples/01-slog-json) - Contoh konfigurasi `slog` dengan output JSON dan atribut terstruktur.
+
 ---
-*Back to [SR-04 Page](../../README.md)*
+*Status: [x] Complete*

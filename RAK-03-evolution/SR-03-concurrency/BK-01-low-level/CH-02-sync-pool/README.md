@@ -1,57 +1,60 @@
-# [BK-01-CH-02] sync.Pool
+# CH-02: `sync.Pool`
 
-**Fighting Garbage Collector Pressure**
-*Target: Memahami cara penggunaan kembali objek (object reuse) untuk optimasi memori dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [sync package](https://pkg.go.dev/sync) | [Go Optimization Guide: Object Pooling](https://go.dev/doc)
+- **Framing**: `sync.Pool` menarik saat biaya alokasi objek kecil mulai terasa, tetapi kita masih ingin membiarkan runtime mengelola hidup-mati objek secara fleksibel.
 
-**`sync.Pool`** adalah cache objek sementara yang bersifat thread-safe. Tujuannya adalah untuk menyimpan objek yang sudah dialokasikan tetapi sudah tidak digunakan, sehingga dapat digunakan kembali oleh goroutine lain di masa depan daripada dibuang ke Garbage Collector (GC).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **GC Pressure**: Beban kerja Garbage Collector dalam membersihkan memori yang dialokasikan secara terus menerus.
-- **Victim Cache**: Objek di dalam pool yang akan dihapus secara otomatis oleh runtime saat siklus GC berjalan (Pool tidak menjamin persistensi).
-- **False Sharing**: Masalah performa CPU cache yang diminimalisir oleh implementasi internal `sync.Pool` menggunakan *per-P (Processor) storage*.
+### Definisi
+`sync.Pool` adalah cache objek sementara yang thread-safe untuk membantu penggunaan ulang objek tertentu dan mengurangi tekanan alokasi berulang.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Kapan harus menggunakan `sync.Pool`?
-- **High Frequency Allocation**: Jika Anda membuat jutaan objek kecil (seperti `bytes.Buffer` atau struct temporer) per detik.
-- **Throughput over Latency**: Untuk aplikasi API atau pemrosesan paket data di mana overhead alokasi memori menjadi bottleneck.
+1. **Tekanan GC bisa dikurangi**  
+   Objek sementara tidak selalu perlu dialokasikan dari nol setiap kali dipakai.
+2. **Throughput aplikasi bisa meningkat**  
+   Pada jalur panas, reuse objek tertentu dapat menurunkan biaya alokasi.
+3. **Pola reuse tetap sederhana**  
+   Engineer mendapat primitive reuse tanpa harus membangun pool manual yang kompleks.
 
-**Peringatan Senior**: Jangan gunakan `sync.Pool` untuk objek yang memegang status penting (seperti koneksi database yang harus di-close manual) karena objek bisa hilang kapan saja saat GC.
+### Analogi Model Mental
+Bayangkan troli belanja di supermarket. Setelah selesai dipakai, troli dikembalikan ke area bersama untuk digunakan pembeli berikutnya. Namun supermarket tidak menjamin troli tertentu akan selalu tersedia persis di tempat yang sama.
 
-### Mekanisme Kerja Under-the-Hood
-1. Go mendistribusikan Pool ke setiap P (Processor) untuk menghindari lock contention.
-2. Saat `Put(x)`, objek masuk ke `private` storage atau `shared` storage milik P tersebut.
-3. Saat `Get()`, Go mencoba mengambil dari `private` P lokal, lalu mencuri dari P lain, baru terakhir memanggil fungsi `New` jika semua kosong.
-4. **Siklus GC**: Pool dibersihkan setiap kali GC berjalan untuk mencegah kebocoran memori (memory leak).
+### Terminologi Teknis
+- **GC Pressure**: tekanan kerja garbage collector karena alokasi yang sering.
+- **Object Reuse**: penggunaan kembali objek yang sudah pernah dibuat.
+- **Pool Eviction**: objek di pool bisa dibersihkan oleh runtime saat dianggap perlu.
 
-## 3. Implementasi Utama (The Lab)
+## 3. Tahap 3: Visualisasi Sistem
 
-Lihat perbedaan performa nyata di [examples/](./examples/).
-1. `01-pool-perf`: Benchmark perbandingan antara alokasi baru vs penggunaan kembali via `sync.Pool`.
+![sync.Pool Architecture](./assets/sync-pool-arch.svg)
 
-## 4. Model Mental Visual (The Assets)
-
-![sync.Pool Arch](./assets/sync-pool-arch.svg)
-
-### sync.Pool Lifecycle & GC Interaction
 ```mermaid
 graph LR
-    User[User Code] --> Get{Get Object}
-    Get -->|Empty| New[Call New Function]
-    Get -->|Exists| Recycled[Retrieve from Pool]
-    New --> Active[Active Use]
-    Recycled --> Active
-    Active --> User
-    User -->|Finished| Put[Put Object back to Pool]
-    Put --> PoolStorage[Internal Buffer per-P]
-    
-    subgraph "Go Runtime"
-    PoolStorage -.-> GC{Garbage Collector}
-    GC -.->|Clean up| Empty[Purge All Objects]
-    end
+    Get[Get object] --> Exists{Available in pool?}
+    Exists -->|Yes| Reuse[Reuse object]
+    Exists -->|No| New[Create new object]
+    Reuse --> Use[Active use]
+    New --> Use
+    Use --> Put[Put back to pool]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`sync.Pool` tidak menjanjikan persistensi objek seperti cache permanen. Runtime bebas membuang isinya, terutama saat GC, sehingga pool lebih cocok untuk objek sementara yang murah dibuat ulang tetapi cukup sering dialokasikan.
+
+Nilai concurrency-nya untuk `RAK-03`:
+- engineer bisa mengurangi biaya alokasi di jalur panas tertentu;
+- object reuse tetap berada dalam kendali primitive standar, bukan pool ad-hoc;
+- keputusan optimasi memori menjadi lebih eksplisit.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-pool-perf](./examples/01-pool-perf) - Eksperimen penggunaan ulang objek dengan `sync.Pool`.
+
 ---
-*Back to [SR-03 Page](../README.md)*
+*Status: [x] Complete*

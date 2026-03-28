@@ -1,58 +1,63 @@
-# [BK-01-CH-02] Test Helpers & Main Setup
+# CH-02: Test Helpers and Main Setup
 
-**Mastering the Test Lifecycle**
-*Target: Memahami cara mengelola setup global dan membuat helper pengujian yang bersih dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [testing package](https://pkg.go.dev/testing) | [Go Blog: Subtests and Sub-benchmarks](https://go.dev/blog/subtests)
+- **Framing**: Saat suite test membesar, kualitas pengujian tidak hanya bergantung pada assertion, tetapi juga pada bagaimana helper, setup, dan cleanup diatur.
 
-Dalam pengujian skala besar, Anda sering membutuhkan fungsi pendukung (Helpers) untuk menyederhanakan kode test, atau mekanisme Setup/Teardown untuk mengelola state eksternal (seperti database atau file temporary). Go menyediakan alat khusus untuk menjamin laporan kesalahan tetap akurat dan lifecycle tetap terjaga.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **`t.Helper()`**: Fungsi untuk menandai bahwa fungsi saat ini adalah "pembantu". Jika terjadi error di dalamnya, Go akan melaporkan baris kode *pemanggil*, bukan baris di dalam helper tersebut.
-- **`TestMain(m *testing.M)`**: Entry point khusus dalam sebuah paket testing yang memungkinkan kontrol penuh atas setup sebelum dan sesudah *semua* test dijalankan.
-- **`t.Cleanup()`**: Cara modern (Go 1.14+) untuk mendaftarkan fungsi pembersihan yang akan dijalankan otomatis setelah test selesai (pengganti `defer` yang lebih aman dalam sub-tests).
+### Definisi
+Test helpers dan main setup adalah pola pengelolaan lifecycle test melalui alat seperti `t.Helper()`, `t.Cleanup()`, dan `TestMain` agar kode pengujian tetap rapi dan error tetap mudah dilacak.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa butuh `t.Helper()`?
-- **Accuracy**: Tanpa ini, jika helper gagal, semua test akan mengarah ke baris yang sama di dalam file helper, membuat Anda bingung mencari test mana yang memicunya.
+1. **Keterbacaan test meningkat**  
+   Helper memindahkan detail berulang tanpa mengaburkan lokasi error utama.
+2. **Lifecycle resource lebih aman**  
+   Setup dan cleanup bisa dikendalikan secara eksplisit.
+3. **Skala suite test lebih mudah dikelola**  
+   Infrastruktur berat tidak perlu ditulis ulang di setiap fungsi test.
 
-Mengapa `TestMain` jarang direkomendasikan jika tidak perlu?
-- **Side Effects**: `TestMain` bersifat global satu paket. Ia bisa membuat test suite Anda sulit diparalelkan jika mengelola state global yang sama. Gunakan hanya untuk setup infrastruktur berat (seperti memicu Testcontainers atau load config).
+### Analogi Model Mental
+Bayangkan panggung teater. Ada kru yang menyiapkan lampu dan properti, lalu ada tim yang membersihkan panggung setelah pertunjukan selesai. Penonton fokus ke drama utamanya, bukan ke kerja teknis di belakang layar.
 
-### Mekanisme Kerja Under-the-Hood
-1. Saat `go test` dijalankan, Go mencari fungsi `TestMain`.
-2. Jika ada, Go menyerahkan kontrol eksekusi (dan exit code) ke `TestMain`. Anda harus memanggil `m.Run()` secara eksplisit.
-3. Untuk `t.Cleanup`, fungsi yang didaftarkan akan disimpan dalam *LIFO stack* dan dijalankan bahkan jika test mengalami panic, menjamin resource bocor dapat dicegah.
+### Terminologi Teknis
+- **`t.Helper()`**: penanda fungsi pembantu agar lokasi error dilaporkan di pemanggil.
+- **`t.Cleanup()`**: registrasi cleanup yang dijalankan setelah test selesai.
+- **`TestMain`**: entry point khusus untuk setup dan teardown tingkat paket.
 
-## 3. Implementasi Utama (The Lab)
-
-Lihat teknik manajemen lifecycle di [examples/](./examples/).
-1. `01-helper-logic`: Membandingkan laporan error dengan vs tanpa `t.Helper()`.
-2. `02-lifecycle-cleanup`: Penggunaan `TestMain` dan `t.Cleanup` untuk simulasi setup DB.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Test Lifecycle](./assets/test-lifecycle.svg)
 
-### Test Lifecycle Overview
 ```mermaid
 graph TD
-    Start[go test] --> TM{TestMain Found?}
-    TM -->|Yes| SetupGlobal[Global Setup]
-    SetupGlobal --> RunAll[m.Run]
-    TM -->|No| RunAll
-    
-    subgraph "Per Test Function"
-    RunAll --> Individual[Test function]
-    Individual --> SetupLocal[Local Setup]
-    Individual --> Execution[Run Test Logic]
-    Individual --> Cleanup[t.Cleanup Stack]
-    end
-    
-    RunAll --> TeardownGlobal[Global Teardown]
-    TeardownGlobal --> End[Exit Code]
+    Start[go test] --> Main{TestMain exists?}
+    Main -->|Yes| Setup[Global setup]
+    Main -->|No| Run[Run tests]
+    Setup --> Run
+    Run --> Test[Test function]
+    Test --> Helper[Helper logic]
+    Test --> Cleanup[Cleanup stack]
+    Cleanup --> End[Finish]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`TestMain` memberi kontrol terhadap lifecycle tingkat paket, tetapi karena sifatnya global, ia sebaiknya dipakai hanya jika memang ada kebutuhan setup berat. Untuk kebutuhan lokal, `t.Helper()` dan `t.Cleanup()` biasanya sudah cukup dan lebih aman.
+
+Yang penting untuk `RAK-03`:
+- test yang baik bukan hanya soal pass/fail;
+- kualitas suite juga ditentukan oleh seberapa jelas lokasi error dan seberapa rapi resource dibersihkan;
+- pola lifecycle ini membuat suite lebih stabil saat tumbuh besar.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian lifecycle test di folder [examples/](./examples):
+- [01-helper-logic](./examples/01-helper-logic) - Perbandingan perilaku helper dengan dan tanpa `t.Helper()`.
+- [02-lifecycle-cleanup](./examples/02-lifecycle-cleanup) - Contoh setup global dan cleanup lokal untuk test.
+
 ---
-*Back to [BK-01 Page](../README.md)*
+*Status: [x] Complete*

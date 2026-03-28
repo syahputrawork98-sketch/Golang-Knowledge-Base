@@ -1,49 +1,59 @@
-# [BK-01-CH-03] Block & Mutex Contention
+# CH-03: Block and Mutex Contention
 
-**Breaking Synchronization Bottlenecks**
-*Target: Menemukan titik di mana goroutine Anda membuang waktu karena antre kunci dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [runtime package](https://pkg.go.dev/runtime) | [Data Race Detector](https://go.dev/doc/articles/race_detector)
+- **Framing**: Aplikasi bisa terlihat "CPU-nya santai" tapi tetap lambat karena goroutine terlalu banyak menunggu lock atau primitif sinkronisasi lain. Di sinilah profiling contention jadi penting.
 
-**Blocking Profile** mencatat di mana goroutine menunggu pada primitif sinkronisasi (seperti channel, select, mutex). **Mutex Profile** secara khusus mencatat waktu yang dihabiskan goroutine menunggu untuk mendapatkan Mutex yang sedang dikunci oleh orang lain (Contention).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Lock Contention**: Kondisi di mana banyak goroutine mencoba mengakses resource yang sama (yang dilindungi Mutex) secara bersamaan, menyebabkan degradasi performa yang signifikan.
-- **`runtime.SetBlockProfileRate`**: Fungsi untuk menentukan seberapa sering blocking event dicatat (default: 0 / tidak dicatat).
-- **`runtime.SetMutexProfileFraction`**: Fungsi untuk menentukan fraksi kejadian contention mutex yang akan dicatat.
+### Definisi
+Contention profiling adalah teknik untuk melihat biaya waktu yang terbuang saat goroutine menunggu lock, channel, atau resource sinkronisasi lain.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa profiling contention itu penting?
-- **Scaling Limit**: Aplikasi Anda mungkin terlihat cepat di laptop, tetapi saat load tinggi di server, "Lock Contention" bisa membuat performa merosot karena goroutine saling menunggu.
-- **Architecture Validation**: Jika Mutex Profiling menunjukkan angka tinggi, mungkin Anda harus menggunakan teknik lain (seperti Sharding Mutex atau Channels) untuk mendistribusikan beban.
-- **Deadlock Prevention**: Membantu mengidentifikasi pola penguncian yang tidak efisien sebelum menjadi deadlock permanen.
+1. **Bottleneck sinkronisasi jadi terlihat**  
+   Masalah performa tidak selalu berasal dari komputasi berat; sering kali masalahnya adalah antrean menunggu.
+2. **Skalabilitas bisa dievaluasi lebih jujur**  
+   Lock contention biasanya baru terlihat jelas saat load mulai naik.
+3. **Keputusan desain lebih terarah**  
+   Data contention membantu menentukan apakah perlu sharding, mengubah granularity lock, atau mengganti pola koordinasi.
 
-### Mekanisme Kerja Under-the-Hood
-1. Saat goroutine mencoba `Lock()` dan gagal, ia masuk ke antrean tunggu.
-2. Runtime mencatat durasi tunggu ini jika profiling aktif.
-3. Event ini dikumpulkan dalam profile yang bisa dianalisis dengan `go tool pprof`.
+### Analogi Model Mental
+Bayangkan loket layanan dengan pintu masuk tunggal. Masalahnya bukan jumlah pegawai di gedung, tetapi panjang antrean di satu pintu yang dipakai semua orang secara bersamaan.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Block Profile**: profil waktu tunggu pada operasi blocking.
+- **Mutex Profile**: profil waktu tunggu untuk memperoleh mutex.
+- **Contention**: kondisi ketika banyak goroutine berebut resource sinkronisasi yang sama.
 
-Lihat visualisasi hambatan sinkronisasi di [examples/](./examples/).
-1. `01-mutex-bottleneck`: Simulasi 1000 goroutine yang memperebutkan satu Mutex global, dan cara menggunakan mutex profiling untuk memvalidasi masalah ini.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Mutex Contention](./assets/mutex-contention.svg)
 
-### Mutex Contention Graph
 ```mermaid
 graph TD
-    Resource[Shared Resource] -- Locked by --> G1[Goroutine A]
-    G2[Goroutine B] -- Waiting... --> Resource
-    G3[Goroutine C] -- Waiting... --> Resource
-    G4[Goroutine D] -- Waiting... --> Resource
-    
-    Resource -- Contention Event --> Profile[Mutex/Block Profile]
-    Profile -- Visualize --> Developer[Critical Path Analysis]
+    G1[Goroutine A] --> Lock[Shared mutex]
+    G2[Goroutine B] --> Lock
+    G3[Goroutine C] --> Lock
+    Lock --> Wait[Accumulated wait time]
+    Wait --> Profile[Contention profile]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat block atau mutex profiling diaktifkan, runtime mulai mencatat event tunggu yang relevan. Dari hasil itu, engineer bisa melihat bagian kode mana yang paling sering menyebabkan antrean sinkronisasi dan seberapa mahal biaya tunggunya.
+
+Nilai observability-nya di `RAK-03`:
+- sinkronisasi diperlakukan sebagai sumber biaya yang bisa diukur;
+- bottleneck load tinggi bisa dideteksi lebih dini;
+- optimasi arsitektur concurrency bisa diarahkan berdasarkan data contention nyata.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-mutex-bottleneck](./examples/01-mutex-bottleneck) - Simulasi lock contention untuk melihat dampak antrean mutex pada performa.
+
 ---
-*Back to [SR-04 Page](../../README.md)*
+*Status: [x] Complete*

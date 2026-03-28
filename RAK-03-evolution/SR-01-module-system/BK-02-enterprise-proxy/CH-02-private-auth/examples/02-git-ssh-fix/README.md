@@ -1,15 +1,21 @@
-# Lab 02: SSH Instead of HTTPS for Private Modules
+# Example 02: Git SSH Rewrite
 
-## Objective
-Mensimulasikan penggunaan SSH Key untuk modul privat tanpa menyentuh `.netrc`.
+## Tujuan
 
-## Workflow
-1. Gunakan konfigurasi global Git untuk memaksa SSH:
-   ```bash
-   git config --global url."git@github.com:".insteadOf "https://github.com/"
-   ```
-2. Setel `GOPRIVATE=github.com/company-org/*`.
-3. Jalankan `go get`.
+Menunjukkan pendekatan umum untuk memaksa Git memakai SSH saat Go mencoba mengambil modul privat.
 
-## Result
-Setiap kali Go mencoba melakukan `clone` via HTTPS, Git akan secara otomatis mengubahnya menjadi SSH (`git@github.com:...`), sehingga menggunakan SSH Key lokal Anda.
+## Isi Folder
+
+- `README.md` - panduan konfigurasi konseptual
+
+## Cara Coba
+
+1. Atur rewrite URL Git dari HTTPS ke SSH dengan `git config`.
+2. Setel `GOPRIVATE` sesuai organisasi atau domain privat.
+3. Pastikan SSH key lokal memang sudah valid untuk host target.
+4. Jalankan ulang operasi modul yang sebelumnya gagal lewat HTTPS.
+
+## Catatan
+
+- Folder ini sengaja tidak menyertakan source code tambahan.
+- Lab ini cocok dipakai saat masalah utamanya ada di transport Git, bukan di `go.mod`.

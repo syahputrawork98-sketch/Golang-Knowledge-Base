@@ -1,26 +1,20 @@
-# Lab 01: GOPROXY Control & Inspection
+# Example 01: Proxy Control
 
-## Objective
-Memahami cara Go mencari modul dan bagaimana memaksa build offline atau menggunakan proxy spesifik.
+## Tujuan
 
-## Struktur Labs
-- `demo/`: Proyek kecil untuk testing.
+Memberi checklist singkat untuk menginspeksi dan mengubah perilaku `GOPROXY` saat debugging dependency resolution.
 
-## Workflow
-1. Cek konfigurasi saat ini: `go env GOPROXY`.
-2. Gunakan `GOPROXY=off` untuk melihat kegagalan build saat dependensi belum ada di cache.
-3. Gunakan `GOPROXY=direct` untuk bypass proxy dan ambil langsung dari source.
+## Isi Folder
 
-## Execution
-```bash
-# Lihat env
-go env GOPROXY GOSUMDB
+- `README.md` - panduan command-only untuk inspeksi environment
 
-# Simulasi build tanpa internet/proxy
-export GOPROXY=off 
-go mod tidy # Akan error jika dependensi tidak ada di cache
+## Cara Coba
 
-# Reset kembali ke default
-export GOPROXY=https://proxy.golang.org,direct
-```
-Lab ini penting untuk debugging masalah koneksi di lingkungan CI/CD perusahaan.
+1. Jalankan `go env GOPROXY GOSUMDB`.
+2. Uji perilaku dengan mode seperti `GOPROXY=off` atau `GOPROXY=direct` sesuai shell yang dipakai.
+3. Bandingkan hasil `go mod tidy` atau perintah modul lain pada tiap mode.
+
+## Catatan
+
+- Folder ini tidak menyertakan source code tambahan; ini memang sidecar konseptual.
+- Gunakan lab ini sebagai panduan operasional, bukan sebagai demo aplikasi mandiri.

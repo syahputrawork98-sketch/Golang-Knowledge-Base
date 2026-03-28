@@ -1,24 +1,22 @@
-# Lab 01: v2 Module Path Implementation
+# Example 01: v2 Module Path
 
-## Objective
-Mempraktikkan cara mendefinisikan dan mengonsumsi modul versi major `v2` secara idiomatik.
+## Tujuan
 
-## Struktur Labs
-- `lib/`: Modul yang sudah naik kelas ke `v2`.
-- `app/`: Aplikasi yang mengonsumsi `lib/v2`.
+Menunjukkan bentuk idiomatik modul major version `v2`, baik di sisi producer maupun consumer.
 
-## Workflow
-1. Inisialisasi library dengan module path `example.com/lib/v2`.
-2. Gunakan `import "example.com/lib/v2"` di aplikasi.
-3. Jalankan aplikasi.
+## Isi Folder
 
-## Execution
-```bash
-cd lib
-go mod init example.com/lib/v2
-cd ../app
-go mod init example.com/app
-# Tambahkan require di go.mod app
-go build
-```
-Perhatikan bahwa meskipun lokasinya di folder `lib/`, identitas modulnya sudah mengandung suffix `/v2`.
+- `lib/` - modul dengan path `example.com/lib/v2`
+- `app/` - consumer yang mengimpor `example.com/lib/v2`
+
+## Cara Coba
+
+1. Lihat `lib/go.mod` untuk memastikan module path memakai suffix `/v2`.
+2. Lihat `app/go.mod` untuk melihat `require` dan `replace` yang menunjuk ke modul lokal.
+3. Masuk ke folder `app/`.
+4. Jalankan `go run .`.
+
+## Catatan
+
+- Lab ini runnable karena consumer sudah memakai `replace example.com/lib/v2 => ../lib`.
+- Poin utamanya adalah identitas modul, bukan nama folder semata.

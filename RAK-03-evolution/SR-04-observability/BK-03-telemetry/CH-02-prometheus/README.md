@@ -1,49 +1,57 @@
-# [BK-03-CH-02] Prometheus Integration
+# CH-02: Prometheus Integration
 
-**Industrial Telemetry Export**
-*Target: Mengekspos metrik aplikasi Anda ke dashboard Grafana menggunakan standar Prometheus dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Prometheus Go client](https://pkg.go.dev/github.com/prometheus/client_golang/prometheus) | [Writing exporters](https://prometheus.io/docs/instrumenting/writing_exporters/)
+- **Framing**: Prometheus penting di ekosistem Go karena ia memberi pola yang jelas untuk mengekspor metrik aplikasi ke sistem monitoring yang bisa di-scrape dan divisualisasikan.
 
-**Prometheus** adalah sistem monitoring berbasis "Pull Model" yang sangat populer di ekosistem Cloud Native. Di Go, kita menggunakan paket `prometheus/client_golang` untuk mendefinisikan metrik custom dan mengeksposnya melalui HTTP endpoint (biasanya `/metrics`).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Registry**: Wadah pusat tempat seluruh metrik didaftarkan agar bisa dikumpulkan bersama.
-- **Pull Model**: Prometheus Server yang mendatangi aplikasi Anda untuk mengambil data, bukan aplikasi yang mengirim data (Push).
-- **Labels (Dimensions)**: Pasangan key-value yang ditambahkan ke metrik untuk memungkinkan filtering dan grouping yang fleksibel (misal: `method="GET"`, `status="200"`).
+### Definisi
+Prometheus integration adalah proses mendefinisikan metrik, mendaftarkannya ke registry, lalu mengeksposnya melalui endpoint seperti `/metrics` agar bisa diambil oleh Prometheus server.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Pola ini dipilih karena:
 
-Mengapa Prometheus menjadi standar de-facto?
-- **Multidimensional Data**: Memungkinkan analisis performa per-endpoint, per-user, atau per-region menggunakan label.
-- **Alerting**: Integrasi mudah dengan Alertmanager untuk memberi tahu tim jika suatu metrik (misal: error rate) melewati ambang batas.
-- **Visualization**: Menjadi sumber data utama bagi Grafana untuk membuat dashboard monitor real-time.
+1. **Metrik aplikasi jadi mudah dikumpulkan**  
+   Counter, gauge, dan histogram bisa diekspos dengan format yang sudah mapan.
+2. **Ekosistem tooling sangat matang**  
+   Dashboard, alerting, dan penyimpanan time-series banyak berputar di sekitar model Prometheus.
+3. **Label memberi dimensi analisis yang kaya**  
+   Request method, status code, atau tenant bisa dipakai untuk slicing data.
 
-### Mekanisme Kerja Under-the-Hood
-1. Aplikasi mendefinisikan variabel global metrik (seperti `CounterVec` atau `HistogramVec`).
-2. Saat event terjadi (misal request selesai), aplikasi memanggil `.Inc()` atau `.Observe()`.
-3. Endpoint `/metrics` dijalankan oleh `promhttp.Handler()`, yang mengonversi seluruh data registry ke format teks Prometheus yang bisa dibaca.
+### Analogi Model Mental
+Bayangkan pos pengukuran cuaca otomatis. Sensor di aplikasi terus mengisi data, lalu stasiun pusat datang secara berkala untuk mengambilnya dan menyusunnya menjadi peta cuaca operasional.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Registry**: tempat seluruh metrik didaftarkan.
+- **Pull Model**: model di mana Prometheus mengambil data dari aplikasi.
+- **Labels**: dimensi tambahan untuk memecah dan mengelompokkan metrik.
 
-Lihat pembuatan exporter metrik di [examples/](./examples/).
-1. `01-prom-exporter`: Menyiapkan HTTP server sederhana yang mengekspos metrik jumlah request dan latensi menggunakan library Prometheus.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Prometheus Pull Model](./assets/prom-pull-model.svg)
 
-### Prometheus Pull Architecture
 ```mermaid
 graph LR
-    App[Go Application] -- Registry --> Handler[/metrics]
-    Prom[Prometheus Server] -- Scrape/Pull Every 15s --> Handler
-    Prom -- Query --> Grafana[Grafana Dashboard]
-    
-    subgraph "Application Logic"
-    Worker[Worker Process] -- Record --> App
-    end
+    App[Go app] --> Metrics[/metrics endpoint]
+    Prom[Prometheus server] -->|scrape| Metrics
+    Prom --> Grafana[Dashboard or alerts]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Aplikasi Go membuat metrik melalui library client, lalu memperbaruinya saat event penting terjadi. Endpoint metrics menyajikan nilai-nilai itu dalam format yang bisa dibaca Prometheus. Prometheus kemudian melakukan scraping berkala dan menyimpan hasilnya untuk query, dashboard, atau alert.
+
+Nilai observability-nya untuk `RAK-03`:
+- telemetry aplikasi bisa dikumpulkan secara konsisten;
+- engineer mendapat jalur standar dari event aplikasi ke dashboard operasional;
+- instrumentasi menjadi bagian rutin dari workflow engineering, bukan tambahan belakangan.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian exporter di folder [examples/](./examples):
+- [01-prom-exporter](./examples/01-prom-exporter) - HTTP server sederhana yang mengekspos metrik Prometheus.
+
 ---
-*Back to [SR-04 Page](../../README.md)*
+*Status: [x] Complete*

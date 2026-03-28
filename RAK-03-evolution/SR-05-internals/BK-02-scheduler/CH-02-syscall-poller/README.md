@@ -1,50 +1,58 @@
-# [BK-02-CH-02] Syscall Handling & Network Poller
+# CH-02: Blocking Syscalls and Netpoller
 
-**The High-Concurrency Secret Sauce**
-*Target: Memahami bagaimana Go menangani ribuan koneksi jaringan tanpa ribuan thread sistem dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [runtime package](https://pkg.go.dev/runtime) | [net package](https://pkg.go.dev/net)
+- **Framing**: Tidak semua operasi blocking diperlakukan sama oleh runtime. Memahami perbedaan blocking syscall biasa dan I/O berbasis netpoller membantu membaca perilaku scheduler dengan lebih realistis.
 
-Aplikasi Go sering melakukan operasi I/O (Jaringan atau File). Go menangani dua jenis blocking ini dengan cara berbeda: **Netpoller** untuk operasi jaringan asinkron dan **Syscall Handoff** untuk operasi file/sistem sinkron.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Netpoller**: Komponen runtime yang menggunakan mekanisme kernel (seperti `epoll`, `kqueue`, atau `iocp`) untuk memantau banyak koneksi jaringan dalam satu thread.
-- **Syscall Handoff**: Proses di mana M (Thread) melepaskan P (Processor) saat melakukan syscall sinkron yang memblokir, sehingga P bisa lanjut menjalankan G (Goroutine) lain dengan M baru.
-- **Re-acquisition**: Saat syscall selesai, M akan mencoba mengambil P kembali atau meletakkan G ke Global Run Queue jika P tidak tersedia.
+### Definisi
+Saat goroutine melakukan operasi yang memblokir, runtime harus memutuskan apakah thread OS akan benar-benar tertahan atau apakah kerja itu bisa dipantau dengan mekanisme seperti netpoller agar scheduler tetap lincah.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Topik ini penting karena:
 
-Mengapa desain ini membuat Go sangat cepat untuk server I/O?
-- **Efficient Network I/O**: Goroutine yang menunggu data jaringan "diparkir" di Netpoller. Thread (M) tidak memblokir, sehingga satu M bisa menangani ribuan G yang sedang menunggu jaringan.
-- **Thread Management**: Go secara otomatis menambah Thread OS (M) jika banyak syscall sinkron (seperti pembacaan file besar) terjadi secara bersamaan, memastikan program tetap responsif.
-- **Resource Savings**: Menghindari overhead memori dan context-switching ribuan thread OS yang memblokir.
+1. **Menjelaskan kenapa network I/O terasa lebih ramah scheduler**  
+   Banyak operasi jaringan tidak memonopoli thread OS dengan cara yang sama seperti blocking syscall biasa.
+2. **Membantu membaca bottleneck I/O**  
+   Tidak semua "macet" di aplikasi berarti scheduler rusak; kadang bentuk blocking-nya memang berbeda.
+3. **Menghubungkan concurrency dengan perilaku runtime nyata**  
+   Goroutine ringan tetap berjalan di atas fondasi OS yang punya batas.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Network Wait**: G memanggil `net.Conn.Read()`. Runtime mengubah G menjadi status `waiting` dan mendaftarkannya ke Netpoller.
-2. **M Handoff**: G memanggil syscall sinkron. M memblokir di kernel. Runtime (sysmon) mendeteksi M memblokir, memisahkan P dari M, dan mencari/membuat M baru untuk P.
-3. **Netpoller Wakeup**: Netpoller mendeteksi data masuk. Dia memindahkan G kembali ke Run Queue agar bisa dijadwalkan lagi oleh P yang tersedia.
+### Analogi Model Mental
+Bayangkan dua jenis antrean bantuan. Satu antrean mengharuskan petugas berdiri dan menunggu pelanggan sampai selesai. Antrean lain cukup mencatat nomor tiket, lalu petugas bisa membantu orang lain sambil menunggu sinyal siap.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Blocking Syscall**: panggilan ke OS yang bisa menahan thread sampai operasi selesai.
+- **Netpoller**: mekanisme runtime untuk memantau readiness I/O tertentu.
+- **Syscall Handoff**: pelepasan `P` agar kerja lain tetap bisa berjalan saat sebuah `M` tertahan.
 
-Lihat perilaku thread saat blocking di [examples/](./examples/).
-1. `01-syscall-blocking`: Eksperimen yang menunjukkan bagaimana jumlah Thread OS meningkat saat banyak goroutine melakukan operasi file yang sinkron secara bersamaan.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
+![IO Management](./assets/io-management.svg)
 
-![I/O Management](./assets/io-management.svg)
-
-### Netpoller vs Syscall Flow
 ```mermaid
 graph TD
-    Gnet[G: Network I/O] -- Read --> NP[Netpoller: epoll/kqueue]
-    NP -- Ready --> LRQ[Back to Run Queue]
-    
-    Gsys[G: File Syscall] -- Open --> M[M: OS Thread]
-    M -- Blocks --> Handoff[P detached from M]
-    Handoff -- New M --> P[P: Processor continues other Gs]
-    
-    M -- Finish --> ReAcq[M tries to steal P back]
+    G[Goroutine does I/O] --> Type{Blocking type?}
+    Type -->|Network readiness| Poll[Netpoller]
+    Type -->|Blocking syscall| Block[OS thread blocks]
+    Block --> Handoff[Release P to another M]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Untuk I/O yang bisa diintegrasikan dengan readiness polling, runtime dapat menahan goroutine tanpa benar-benar mematikan kelincahan scheduler. Namun untuk blocking syscall biasa, thread OS bisa tertahan lebih keras, sehingga runtime perlu melepas `P` agar goroutine lain tetap bisa maju di thread berbeda.
+
+Nilai praktisnya:
+- membantu menjelaskan kenapa workload network dan workload syscall lokal bisa terasa berbeda;
+- memberi konteks pada fenomena "goroutine banyak, tapi progress sedikit";
+- memperjelas hubungan antara runtime scheduler dan dunia OS.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-syscall-blocking](./examples/01-syscall-blocking) - Contoh kecil untuk membaca efek blocking call terhadap aliran eksekusi dan observasi scheduler.
+
 ---
-*Back to [SR-05 Page](../../README.md)*
+*Status: [x] Complete*

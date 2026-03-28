@@ -1,23 +1,24 @@
-# Lab 01: Minimal Version Selection (MVS) Simulation
+# Example 01: MVS Simulation
 
-## Objective
-Membuktikan bahwa Go memilih versi dependensi yang paling 'tua' namun memenuhi syarat minimum (MVS), bukan versi terbaru (Latest).
+## Tujuan
 
-## Struktur Labs
-- `app/`: Aplikasi utama yang membutuhkan `pkg-a`.
-- `pkg-a-v1.1.0/`: Mock modul versi 1.1.0.
-- `pkg-a-v1.2.0/`: Mock modul versi 1.2.0.
+Menunjukkan cara Go menyelesaikan versi modul saat beberapa dependency meminta versi minimum yang berbeda.
 
-## Workflow
-1. Inisialisasi dependensi dengan `go mod tidy`.
-2. Lihat bagaimana Go memilih versi 1.2.0 jika diminta, namun tetap menjaga stabilitas.
-3. Gunakan `go list -m all` untuk melihat hasil final resolusi.
+## Isi Folder
 
-## Execution
-Jalankan di terminal:
-```bash
-cd app
-go mod tidy
-go list -m all
-```
-Anda akan melihat versi yang dipilih adalah versi terendah yang masih memenuhi semua batasan (`require`).
+- `app/` - modul aplikasi utama
+- `lib-a-v11/` - mock modul `lib-a` versi lebih lama
+- `lib-a-v12/` - mock modul `lib-a` versi lebih baru
+- `lib-b/` - modul lain yang ikut memengaruhi resolusi versi
+
+## Cara Coba
+
+1. Masuk ke folder `app/`.
+2. Jalankan `go mod tidy`.
+3. Jalankan `go list -m all`.
+4. Amati versi modul yang akhirnya dipilih oleh resolver.
+
+## Catatan
+
+- Lab ini bersifat runnable dan cocok dipakai untuk membaca hasil resolusi modul secara langsung.
+- Fokusnya bukan pada fetch dari internet, tetapi pada hubungan versi antar modul lokal.

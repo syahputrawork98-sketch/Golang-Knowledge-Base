@@ -1,12 +1,23 @@
-# BK-01: Unit Testing Primitives
+# BK-01: Unit Testing
 
-## Overview
-Bagian ini membahas dasar-dasar pengujian unit di Go yang idiomatik, mulai dari pola desain tabel hingga pengelolaan setup pengujian yang kompleks.
+Buku ini membahas fondasi unit testing idiomatik di Go: table-driven tests, helper dan lifecycle setup, serta golden files untuk output yang kompleks.
 
-## Chapters (CH)
-- [CH-01: Table-Driven Design](./CH-01-table-driven/README.md)
-- [CH-02: Test Helpers & Main Setup](./CH-02-helpers-setup/README.md)
-- [CH-03: Golden Files Matching](./CH-03-golden-files/README.md)
+## Struktur
+
+### [CH-01-table-driven](./CH-01-table-driven/)
+Table-driven tests sebagai pola dasar pengujian yang ringkas dan mudah diperluas.
+
+### [CH-02-helpers-setup](./CH-02-helpers-setup/)
+Penggunaan helper, `TestMain`, dan `t.Cleanup` untuk menjaga lifecycle test tetap rapi.
+
+### [CH-03-golden-files](./CH-03-golden-files/)
+Golden files untuk memvalidasi output besar tanpa mengotori test dengan string raksasa.
+
+## Boundary
+
+- fokus pada pola dasar yang membangun confidence dalam unit test Go;
+- membantu pembaca menulis test yang idiomatik, mudah dirawat, dan jelas dibaca;
+- bukan tempat utama untuk mocking lanjut atau tooling reliabilitas seperti fuzzing dan race detector.
 
 ---
-*Back to [SR-02 Page](../README.md)*
+*Status: [x] Complete*
