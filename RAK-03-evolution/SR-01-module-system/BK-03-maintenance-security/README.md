@@ -1,12 +1,23 @@
-# BK-03: Maintenance & Security
+# BK-03: Maintenance and Security
 
-## Overview
-Bagian ini membahas alat bantu tingkat lanjut untuk memelihara kesehatan grafik dependensi dan menjaga keamanan supply chain modul.
+Buku ini membahas alat dan praktik untuk memelihara kesehatan dependency graph, mengaudit kerentanan, dan menangani kesalahan publikasi versi modul secara lebih aman.
 
-## Chapters (CH)
-- [CH-01: `go list` & `go mod edit`](./CH-01-tooling-automation/README.md)
-- [CH-02: Vulnerability Checking (`govulncheck`)](./CH-02-security-audit/README.md)
-- [CH-03: Version Retraction](./CH-03-retraction/README.md)
+## Struktur
+
+### [CH-01-tooling-automation](./CH-01-tooling-automation/)
+Inspeksi graph modul dan otomasi perubahan metadata dengan toolchain bawaan.
+
+### [CH-02-security-audit](./CH-02-security-audit/)
+Audit kerentanan modul dengan `govulncheck` dan pendekatan yang lebih minim noise.
+
+### [CH-03-retraction](./CH-03-retraction/)
+Penarikan kembali versi modul yang salah rilis melalui mekanisme retraction.
+
+## Boundary
+
+- fokus pada maintenance dan keamanan supply chain modul;
+- membantu pembaca mengelola dependency graph secara lebih aman dan terukur;
+- bukan tempat utama untuk proxy privat atau lifecycle dasar modul.
 
 ---
-*Back to [SR-01 Page](../README.md)*
+*Status: [x] Complete*

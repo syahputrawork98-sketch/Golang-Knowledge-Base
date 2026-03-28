@@ -1,48 +1,58 @@
-# [BK-03-CH-02] Vulnerability Checking (`govulncheck`)
+# CH-02: Vulnerability Checking with `govulncheck`
 
-**Defense in Depth for Go Applications**
-*Target: Memahami cara mendeteksi kerentanan keamanan yang benar-benar memengaruhi kode Anda dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) | [vuln.go.dev](https://vuln.go.dev/)
+- **Framing**: `govulncheck` penting karena audit keamanan dependency tidak cukup hanya melihat versi modul. Yang lebih penting adalah apakah simbol rentan itu benar-benar terjangkau oleh kode kita.
 
-`govulncheck` adalah alat bantu resmi dari tim Go untuk memindai dependensi proyek terhadap **Go Vulnerability Database**. Berbeda dengan pemindai statis biasa yang hanya melihat versi di `go.mod`, `govulncheck` melakukan analisis grafik panggilan (*call graph*) untuk menentukan apakah kode Anda benar-benar memanggil fungsi yang memiliki kerentanan tersebut.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Vulnerability Database (vuln.go.dev)**: Sumber data terpercaya yang dikelola oleh tim Go untuk CVE (Common Vulnerabilities and Exposures) pada ekosistem Go.
-- **Affects Symbols**: Indikasi bahwa fungsi atau variabel spesifik yang rentan benar-benar digunakan dalam kode.
-- **Transitive Vulnerability**: Kerentanan yang ada pada dependensi dari dependensi Anda.
+### Definisi
+`govulncheck` adalah alat resmi Go untuk memeriksa apakah aplikasi, package, atau binary menggunakan dependency yang memiliki kerentanan yang relevan.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Mengapa menggunakan `govulncheck` alih-alih `npm audit` atau tool sejenis?
-- **Low Noise/False Positives**: Banyak tool lain memberikan peringatan hanya karena versi modul "tua". `govulncheck` hanya memberikan peringatan jika fungsi yang rentan tersebut **terjangkau** (*reachable*) oleh eksekusi aplikasi Anda.
-- **Binary Scanning**: Anda bisa memindai file binary `.exe` atau ELF yang sudah di-compile untuk mengetahui apakah ia mengandung kerentanan yang belum di-patch.
+1. **Noise audit lebih rendah**  
+   Temuan menjadi lebih berguna karena tidak semua kerentanan transitif langsung dianggap actionable.
+2. **Keamanan dependency lebih dekat ke kode nyata**  
+   Fokusnya bukan hanya pada versi, tetapi juga pada jalur pemakaian simbol yang rentan.
+3. **Tooling resmi lebih mudah diintegrasikan**  
+   Audit keamanan menjadi bagian alami dari workflow Go modern.
 
-### Mekanisme Kerja Under-the-Hood
-1. Go membangun *Typed AST (Abstract Syntax Tree)* dan *Call Graph* dari aplikasi Anda.
-2. Go mencocokkan setiap pemanggilan fungsi dengan daftar simbol yang teridentifikasi rentan di database.
-3. Hasilnya dikategorikan: **Informational** (ada di modul tapi tidak dipakai) vs **Actionable** (dipakai dalam kode).
+### Analogi Model Mental
+Bayangkan inspeksi gedung. Bukan semua kabel tua langsung dianggap bahaya kritis, tetapi yang diperiksa adalah kabel mana yang benar-benar masih tersambung ke ruangan aktif dan bisa memicu risiko nyata.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Vulnerability Database**: sumber data resmi kerentanan ekosistem Go.
+- **Reachable Symbol**: fungsi atau simbol rentan yang benar-benar bisa dicapai oleh alur eksekusi aplikasi.
+- **Actionable Finding**: temuan yang relevan dan patut ditindaklanjuti.
 
-Lihat teknik audit keamanan di [examples/](./examples/).
-1. `01-vuln-scan`: Simulasi deteksi kerentanan pada modul lama yang memiliki celah keamanan terkenal.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Vulnerability Call Graph](./assets/vulnerability-graph.svg)
 
-### Call Graph Analysis
 ```mermaid
 graph TD
-    App[Main Code] -->|Calls| Safe[Func A]
-    App -->|Calls| Entry[Func B]
-    Entry -->|Triggers| Vulnerable[Vulnerable Symbol in Lib X]
-    
-    subgraph "govulncheck logic"
-    Vulnerable --- Alert[ALERT: Vulnerability REACHABLE]
-    end
+    App[Main code] --> Entry[Used symbol]
+    Entry --> Vulnerable[Vulnerable symbol]
+    DB[Vulnerability DB] --> Match[Match vulnerable symbols]
+    Match --> Report[Reachable or informational result]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`govulncheck` membangun pemahaman terhadap package dan call graph program, lalu mencocokkannya dengan data kerentanan dari database Go. Dengan begitu, hasilnya tidak berhenti di "versi ini punya CVE", tetapi bergerak ke "apakah aplikasi ini benar-benar menyentuh bagian yang rentan".
+
+Nilai evolusinya untuk `RAK-03`:
+- audit keamanan menjadi lebih presisi;
+- dependency graph dinilai dari sisi risiko nyata, bukan sekadar daftar versi;
+- workflow keamanan lebih cocok untuk engineer yang perlu bertindak cepat tanpa tenggelam di false positive.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh audit di folder [examples/](./examples):
+- [01-vuln-scan](./examples/01-vuln-scan) - Demonstrasi audit kerentanan pada dependency yang punya isu keamanan.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

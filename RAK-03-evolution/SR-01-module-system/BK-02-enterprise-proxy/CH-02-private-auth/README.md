@@ -1,49 +1,57 @@
-# [BK-02-CH-02] Private Module Authentication
+# CH-02: Private Module Authentication
 
-**Securing Proprietary Codebases**
-*Target: Memahami cara Go mengakses repository privat di dalam jaringan korporat secara aman dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Modules Reference: Private modules](https://go.dev/ref/mod#private-modules) | [Go FAQ: git_https](https://go.dev/doc/faq#git_https)
+- **Framing**: Modul privat butuh alur yang berbeda dari modul publik karena kode, nama modul, dan aksesnya tidak boleh bocor ke infrastruktur publik.
 
-Secara default, Go mencoba memvalidasi setiap modul melalui Proxy dan SumDB publik. Untuk modul privat yang berada di GitHub Enterprise, GitLab Self-managed, atau Bitbucket internal, mekanisme default ini akan gagal (404/403). Go menyediakan variabel lingkungan khusus untuk mem-bypass infrastruktur publik bagi domain tertentu.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **GOPRIVATE**: Daftar pola domain (seperti `github.company.com`) yang tidak boleh menggunakan Proxy atau SumDB.
-- **GONOPROXY**: Bagian dari GOPRIVATE yang spesifik mematikan Proxy.
-- **GONOSUMDB**: Bagian dari GOPRIVATE yang spesifik mematikan verifikasi Checksum Database.
-- **.netrc / _netrc**: File kredensial standar industri untuk menyimpan username/password (token) untuk akses mesin-ke-mesin.
+### Definisi
+Private module authentication adalah rangkaian konfigurasi yang membuat toolchain Go mengambil modul privat langsung dari VCS atau infrastruktur internal dengan aturan akses yang sesuai.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Mengapa dependensi privat tidak bisa via Proxy?
-- **Security**: Kode perusahaan tidak boleh meninggalkan jaringan internal atau masuk ke cache server publik.
-- **Privacy**: Nama modul dan versi privat tidak boleh terdaftar di log publik (GOSUMDB).
+1. **Privasi organisasi tetap terjaga**  
+   Nama modul dan metadata privat tidak perlu dikirim ke proxy atau checksum service publik.
+2. **Akses dependency jadi eksplisit**  
+   Variabel seperti `GOPRIVATE` memberi tahu toolchain domain mana yang harus diperlakukan berbeda.
+3. **Workflow korporat lebih dapat diprediksi**  
+   Git credential, SSH, atau `.netrc` bisa diatur sebagai jalur autentikasi yang konsisten.
 
-### Mekanisme Kerja Under-the-Hood
-Jika modul cocok dengan pola di `GOPRIVATE`:
-1. Go mendeteksi bahwa modul ini "privat".
-2. Go langsung memanggil terminal `git` (atau VCS lain) untuk melakukan `clone`.
-3. Go menyerahkan proses autentikasi (SSH Key atau HTTP Basic Auth) sepenuhnya ke konfigurasi Git sistem.
+### Analogi Model Mental
+Bayangkan dokumen internal perusahaan. Dokumen publik bisa lewat jalur logistik umum, tetapi dokumen rahasia harus masuk melalui gerbang khusus dengan pemeriksaan identitas yang berbeda.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **`GOPRIVATE`**: pola domain modul yang harus diperlakukan sebagai privat.
+- **`GONOPROXY`**: override untuk menonaktifkan proxy pada domain tertentu.
+- **`GONOSUMDB`**: override untuk menonaktifkan checksum database pada domain tertentu.
 
-Lihat panduan konfigurasi autentikasi di [examples/](./examples/).
-1. `01-corporate-setup`: Langkah demi langkah menyetel `GOPRIVATE` dan `.netrc` untuk token GitLab/GitHub.
-2. `02-git-ssh-fix`: Trik menggunakan SSH alih-alih HTTPS untuk modul privat melalui konfigurasi global Git.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
-
-### Private vs Public Flow
 ```mermaid
 graph TD
-    A[Go Get Module] --> B{Matches GOPRIVATE?}
-    B -->|Yes| C[Direct VCS Clone]
-    C --> D[Git/SSH Auth]
-    B -->|No| E[GOPROXY]
-    E --> F[GOSUMDB]
-    D --> G[Success]
-    F --> G
+    Request[go get private module] --> Match{Matches GOPRIVATE?}
+    Match -->|Yes| Direct[Direct VCS access]
+    Direct --> Auth[Git SSH or HTTPS credentials]
+    Match -->|No| PublicFlow[Normal GOPROXY and GOSUMDB flow]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat path modul cocok dengan pola di `GOPRIVATE`, toolchain Go menyesuaikan alur resolusi sehingga dependency itu tidak diperlakukan seperti modul publik biasa. Dalam praktiknya, autentikasi lalu diserahkan ke konfigurasi Git, SSH key, token, atau mekanisme kredensial mesin yang dipakai organisasi.
+
+Yang penting untuk `RAK-03`:
+- private module workflow adalah evolusi nyata dari engineering di tim modern;
+- konfigurasi environment bukan detail sampingan, tetapi bagian inti dari keberhasilan supply chain privat;
+- perbedaan public vs private flow harus jelas sejak awal agar debugging dependency tidak membingungkan.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh konfigurasi di folder [examples/](./examples):
+- [01-corporate-setup](./examples/01-corporate-setup) - Setup dasar `GOPRIVATE` dan kredensial untuk lingkungan korporat.
+- [02-git-ssh-fix](./examples/02-git-ssh-fix) - Contoh pendekatan SSH untuk memperbaiki akses modul privat.
+
 ---
-*Back to [BK-02 Page](../README.md)*
+*Status: [x] Complete*

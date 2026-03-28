@@ -1,53 +1,60 @@
-# [BK-01-CH-01] Anatomy of `go.mod` & `go.sum`
+# CH-01: Anatomy of `go.mod` and `go.sum`
 
-**The Dependency Manifest & Integrity Lock**
-*Target: Memahami struktur, direktif, dan mekanisme keamanan di balik sistem manajemen paket Go dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Using Go Modules](https://go.dev/blog/using-go-modules) | [Go Modules Reference](https://go.dev/ref/mod)
+- **Framing**: `go.mod` dan `go.sum` adalah dua file inti yang membuat dependency workflow Go terasa eksplisit, bisa diaudit, dan bisa diulang dengan lebih aman.
 
-`go.mod` adalah manifest resmi yang mendefinisikan identitas modul, versi Go yang digunakan, dan grafik dependensi proyek. Sementara `go.sum` berfungsi sebagai *lock file* yang menyimpan *checksum* (SHA-256) dari semua dependensi untuk menjamin integritas dan keamanan supply chain.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **MVS (Minimal Version Selection)**: Algoritma Go untuk memilih versi dependensi yang paling 'tua' namun memenuhi syarat minimum, guna menghindari *dependency hell*.
-- **Module Path**: Identitas unik modul (biasanya URL repository).
-- **Direct vs Indirect**: Dependensi yang diimpor langsung dalam kode vs dependensi dari dependensi (transitif).
-- **Checksum DB (GOSUMDB)**: Database global untuk memvalidasi isi `go.sum`.
+### Definisi
+`go.mod` adalah manifest modul yang menyimpan identitas modul, versi Go, dan requirement dependency. `go.sum` adalah catatan checksum yang membantu memverifikasi integritas dependency yang pernah dipakai saat build.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Sebelum era Modul (pre-Go 1.11), Go bergantung pada `$GOPATH` dan `vendor/` yang rapuh terhadap perubahan versi. `go.mod` memperkenalkan **Reproducible Builds**.
+1. **Build jadi reproducible**  
+   Tim tidak lagi bergantung pada isi lokal `$GOPATH` atau dependency yang kebetulan terpasang di mesin tertentu.
+2. **Resolusi dependency lebih terukur**  
+   Toolchain memakai aturan seperti Minimal Version Selection untuk menentukan graph dependency yang stabil.
+3. **Integritas supply chain lebih terjaga**  
+   Checksum membantu memastikan dependency yang diunduh cocok dengan catatan yang diharapkan.
 
-### Mekanisme Kerja Under-the-Hood
-1. **Resolution**: Saat Anda menjalankan `go build`, Go membaca `go.mod` dan membangun *Requirement Graph*.
-2. **Verification**: Go mengunduh file `.zip` dan file `.mod` dari dependensi, lalu menghitung checksum-nya.
-3. **Validation**: Checksum tersebut dibandingkan dengan `go.sum` lokal dan `GOSUMDB`. Jika tidak cocok, build gagal (mencegah *Man-in-the-Middle* atau modifikasi paket di server).
+### Analogi Model Mental
+Bayangkan dapur profesional. `go.mod` adalah daftar bahan dan takaran resep, sementara `go.sum` adalah stempel pemeriksaan kualitas bahan yang memastikan isi paket yang datang memang sesuai dengan yang dipesan.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Module Path**: identitas unik modul.
+- **MVS (Minimal Version Selection)**: strategi Go untuk memilih versi dependency yang dipakai di graph final.
+- **Checksum Database**: layanan verifikasi yang membantu memvalidasi integritas modul.
 
-Lihat pembuktian kode fungsional dan simulasi error di [examples/](./examples/).
-1. `01-mvs-simulation`: Simulasi bagaimana Go memilih versi terendah yang kompatibel.
-2. `02-checksum-fail`: Eksperimen sengaja merusak `go.sum` untuk melihat proteksi terminal.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![MVS Resolution](./assets/mvs-resolution.svg)
 
-### MVS vs SemVer Resolution
 ```mermaid
 graph TD
-    A[Root Project] -->|requires| B(pkg-X v1.2.0)
-    A -->|requires| C(pkg-Y v1.0.0)
-    C -->|requires| B2(pkg-X v1.1.0)
-    
-    subgraph MVS_Decision
-    B
-    B2
-    Final[Final Version chosen: v1.2.0]
-    end
-    
-    B ---|Higher priority| Final
-    B2 ---|Lowest common denominator| Final
+    Root[Root go.mod] --> A[Dependency A]
+    Root --> B[Dependency B]
+    A --> C[Common module v1.1.0]
+    B --> D[Common module v1.1.5]
+    D --> Final[Version selected in final graph]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat `go build`, `go test`, atau `go mod tidy` dijalankan, toolchain membaca `go.mod`, menyusun requirement graph, lalu menentukan versi modul yang dipakai. Dependency yang diunduh akan dicek integritasnya terhadap `go.sum`.
+
+Yang penting untuk `RAK-03`:
+- module system adalah evolusi workflow engineering, bukan sekadar file konfigurasi;
+- dependency diperlakukan sebagai graph yang eksplisit;
+- integritas dependency menjadi bagian dari proses kerja, bukan tambahan opsional.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01-mvs-simulation](./examples/01-mvs-simulation) - Simulasi pemilihan versi dependency dengan MVS.
+- [02-checksum-fail](./examples/02-checksum-fail) - Eksperimen untuk melihat bagaimana checksum melindungi workflow modul.
+
 ---
-*Back to [BK-01 Page](../README.md)*
+*Status: [x] Complete*

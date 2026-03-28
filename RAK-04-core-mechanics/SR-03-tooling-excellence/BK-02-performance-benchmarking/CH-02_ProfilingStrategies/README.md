@@ -1,47 +1,56 @@
-# CH-02: Profiling Strategies (Pprof & Traces)
+# CH-02: Profiling Strategies
 
-> **Source Link**: [Go Packages: net/http/pprof](https://golang.org/pkg/net/http/pprof/) | [Go Blog: Profiling Go Programs](https://blog.golang.org/profiling-go-programs)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Go Blog: Profiling Go Programs](https://go.dev/blog/profiling-go-programs) | [runtime/pprof package](https://pkg.go.dev/runtime/pprof)
+- **Framing**: Profiling dipakai saat benchmark sudah menunjukkan ada masalah, lalu kita perlu tahu bagian mana dari program yang benar-benar menghabiskan waktu atau resource.
 
-### Definisi ("Apa itu?")
-Profiling adalah proses pengumpulan data statistik tentang penggunaan sumber daya selama program berjalan, seperti CPU, Memori, Blokir Goroutine, dan Mutex Contention. Go menyediakan tool `pprof` (visualisasi) dan `trace` (linimasa).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Identify Bottlenecks**: Mengetahui fungsi mana yang paling banyak memakan waktu CPU ("Hot Spots").
-2. **GC Pressure Analysis**: Menemukan objek mana yang paling banyak dialokasikan dan menyebabkan jeda Garbage Collection.
-3. **Deadlock Detection**: Menganalisis alasan goroutine menunggu terlalu lama (blocking analysis).
+### Definisi
+Profiling adalah proses mengumpulkan data runtime tentang CPU, memori, blocking, atau perilaku eksekusi lain untuk menemukan bottleneck nyata di program.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Hot spot bisa ditemukan lebih cepat**  
+   Kita tidak perlu menebak-nebak fungsi mana yang paling mahal.
+2. **Biaya resource jadi terlihat**  
+   Profil membantu menunjukkan apakah masalah datang dari CPU, alokasi, atau pola blocking.
+3. **Optimasi jadi lebih terarah**  
+   Perubahan dilakukan pada titik yang benar-benar terbukti bermasalah.
 
 ### Analogi Model Mental
-Bayangkan **Pemeriksaan Kesehatan (Check-up) di Rumah Sakit**.
-- **CPU Profile**: Seperti **Treadmill Test** (Melihat jantung saat bekerja keras).
-- **Heap Profile**: Seperti **X-Ray** (Melihat apa yang ada di dalam perut/memori).
-- **Execution Trace**: Seperti **Rekaman CCTV 24 Jam** (Melihat setiap pergerakan prajurit/goroutine dari detik ke detik).
+Bayangkan pemeriksaan kesehatan lengkap. Benchmark memberi tahu bahwa pasien "terasa lambat", tetapi profiling menunjukkan apakah penyebabnya ada di jantung, paru-paru, atau pola gerak hariannya.
 
----
+### Terminologi Teknis
+- **CPU Profile**: sampel penggunaan CPU selama program berjalan.
+- **Heap Profile**: gambaran alokasi atau objek yang hidup di memori.
+- **Trace**: rekaman event runtime yang menunjukkan alur eksekusi lebih detail.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph LR
-    P[Program Running] --> D[Data Collection: pprof]
-    D --> V[Visualization: Browser]
-    V --> F[Flame Graph]
-    V --> G[Call Graph]
-    V --> T[Top Functions List]
+    Program[Running program] --> Collect[Collect profile data]
+    Collect --> Analyze[Analyze with pprof]
+    Analyze --> Hotspots[Find hotspots]
+    Analyze --> Actions[Decide targeted optimization]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Profiling di Go umumnya bekerja dengan sampling atau pencatatan event runtime. Hasilnya kemudian dianalisis lewat tool seperti `pprof` untuk melihat fungsi yang paling sering muncul dalam jalur eksekusi mahal.
+
+Yang perlu dijaga di `RAK-04`:
+- profiling dipakai sebagai strategi engineering;
+- fokusnya adalah menemukan bottleneck yang relevan untuk keputusan desain;
+- kita belum masuk ke runtime forensics yang lebih cocok dibahas di `RAK-06`.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_cpu_profiling.go](./examples/01_cpu_profiling.go) - Contoh pengambilan CPU profile sederhana menggunakan `runtime/pprof`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Profiling bekerja dengan melakukan sampling (pengambilan sampel) tumpukan stack secara berkala (default 100 kali per detik untuk CPU). Tool `trace` bekerja berbeda dengan mencatat setiap event perubahan status goroutine (Create, Context Switch, Block) secara presisi.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_collect_cpu_profile.go`: Cara membuat file profile CPU.
-- `02_analyze_heap.go`: Mendeteksi "In-use" vs "Alloc" memory.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

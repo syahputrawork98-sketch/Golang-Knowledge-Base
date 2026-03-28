@@ -1,49 +1,55 @@
-# [BK-01-CH-02] Workspace Workflow (`go.work`)
+# CH-02: Workspace Workflow with `go.work`
 
-**Orchestrating Multi-Module Development**
-*Target: Memahami manajemen pengembangan multi-repo secara lokal tanpa merusak file `go.mod` dalam waktu < 3 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Get familiar with workspaces](https://go.dev/doc/tutorial/workspaces) | [Go Modules Reference: Workspaces](https://go.dev/ref/mod#workspaces)
+- **Framing**: `go.work` membuat pengembangan multi-module lokal jauh lebih rapi karena wiring antar modul tidak lagi perlu disisipkan sebagai `replace` sementara di setiap `go.mod`.
 
-`go.work` adalah file konfigurasi workspace yang diperkenalkan pada Go 1.18. Ia memungkinkan developer untuk mengerjakan beberapa modul dalam direktori yang berbeda secara bersamaan, di mana setiap modul dapat saling mereferensikan secara lokal tanpa perlu mengubah direktif `replace` di masing-masing file `go.mod`.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **Workspace Mode**: Mode di mana variabel lingkungan `GOWORK` menunjuk ke file `go.work` yang valid.
-- **`use` Directive**: Instruksi dalam `go.work` untuk menyertakan modul spesifik ke dalam workspace.
-- **Main Module**: Modul utama tempat Anda menjalankan perintah Go; dalam workspace, semua modul `use` dianggap sebagai modul utama.
+### Definisi
+`go.work` adalah file workspace yang menyatukan beberapa modul lokal ke dalam satu workspace view agar toolchain Go bisa memperlakukan semuanya sebagai bagian dari lingkungan kerja yang sama.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Sebelum ada `go.work`, jika Anda ingin mengubah `Library-A` saat mengerjakan `App-B`, Anda harus:
-1. Menambahkan `replace example.com/lib-a => ../lib-a` di `App-B/go.mod`.
-2. **Bahaya**: Seringkali developer lupa menghapus `replace` ini sebelum melakukan *commit*, sehingga merusak build di CI/CD atau bagi developer lain.
+1. **Pengembangan multi-module jadi lebih aman**  
+   Developer tidak perlu bolak-balik menambah dan menghapus `replace` lokal di setiap modul.
+2. **Kolaborasi lokal lebih bersih**  
+   Library dan aplikasi bisa dikerjakan bersamaan tanpa mencemari metadata modul utama.
+3. **Workflow lokal lebih dekat ke struktur nyata sistem**  
+   Beberapa modul terkait bisa diuji bersama dalam satu ruang kerja yang eksplisit.
 
-### Mekanisme Kerja Under-the-Hood
-Saat Go dijalankan dalam direktori yang memiliki `go.work` (atau di sub-direktorinya), Go akan:
-- Menggabungkan semua modul yang ada di direktif `use` ke dalam satu **Workspace View**.
-- Prioritas resolusi dependensi akan beralih ke folder lokal yang ada di workspace sebelum mencari di GOMODCACHE atau Proxy.
+### Analogi Model Mental
+Bayangkan satu meja kerja besar tempat beberapa prototipe diletakkan berdampingan. Selama semua prototipe ada di meja yang sama, teknisi bisa merangkainya bersama tanpa harus mengubah label permanen di tiap komponen.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **Workspace Mode**: mode ketika toolchain membaca `go.work`.
+- **`use` Directive**: deklarasi modul yang dimasukkan ke workspace.
+- **Workspace View**: pandangan gabungan terhadap beberapa modul lokal.
 
-Lihat pembuktian workspace fungsional di [examples/](./examples/).
-1. `01-multi-module-sync`: Cara menghubungkan project aplikasi dengan library lokal secara seamless menggunakan `go work init` and `go work use`.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
-
-### Workspace vs Single-Module Mode
 ```mermaid
 graph LR
-    subgraph "Single Module Mode (Old / Without go.work)"
-    A[App-B] -->|replace| B[Local Lib-A]
-    A -->|require| C[Remote Lib-C]
-    end
-
-    subgraph "Workspace Mode (New / With go.work)"
-    W[go.work] --> U1(use ./lib-a)
-    W --> U2(use ./app-b)
-    U2 -.->|Auto-resolve| U1
-    end
+    W[go.work] --> U1[use ./lib-a]
+    W --> U2[use ./app-b]
+    U2 -->|local resolution| U1
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat `go.work` aktif, toolchain membentuk workspace view dari semua modul yang ada di directive `use`. Resolusi dependency akan memprioritaskan modul lokal yang ada di workspace sebelum jatuh ke cache atau proxy modul biasa.
+
+Nilai evolusinya untuk `RAK-03`:
+- workflow lokal menjadi bagian resmi dari toolchain;
+- dependency antar modul bisa dikelola tanpa trik sementara yang mudah terlupa;
+- pengembangan sistem multi-module jadi lebih dapat diprediksi.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian workspace di folder [examples/](./examples):
+- [01-multi-module-sync](./examples/01-multi-module-sync) - Contoh beberapa modul lokal yang disatukan dalam satu workspace menggunakan `go work`.
+
 ---
-*Back to [BK-01 Page](../README.md)*
+*Status: [x] Complete*

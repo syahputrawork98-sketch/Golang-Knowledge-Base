@@ -1,45 +1,55 @@
-# CH-01: Micro Benchmarking (Performance Testing)
+# CH-01: Micro Benchmarking
 
-> **Source Link**: [Go Packages: testing - Benchmarks](https://golang.org/pkg/testing/#hdr-Benchmarks) | [Dave Cheney: High Performance Go Workshop](https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [testing package: Benchmarks](https://pkg.go.dev/testing#hdr-Benchmarks) | [Go Wiki: Performance](https://go.dev/wiki/Performance)
+- **Framing**: Microbenchmark dipakai saat kita ingin membuktikan apakah perubahan kecil di kode benar-benar memperbaiki performa, bukan cuma terasa lebih cepat.
 
-### Definisi ("Apa itu?")
-Micro Benchmarking adalah teknik untuk mengukur waktu eksekusi dan alokasi memori dari sebuah unit kode kecil menggunakan toolchain bawaan Go (`go test -bench`).
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Optimization Evidence**: Membuktikan secara matematis bahwa sebuah refactor benar-benar meningkatkan performa.
-2. **Allocation Monitoring**: Mendeteksi alokasi memori yang tidak perlu (Escape Analysis issues) yang bisa membebani Garbage Collector.
-3. **Regression Prevention**: Memastikan fitur baru tidak memperlambat area kritis sistem.
+### Definisi
+Microbenchmark adalah pengukuran performa pada unit kode kecil menggunakan benchmark runner bawaan Go melalui `go test -bench`.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Optimasi bisa dibuktikan dengan angka**  
+   Perubahan implementasi bisa dibandingkan lewat `ns/op`, `B/op`, dan `allocs/op`.
+2. **Regresi performa lebih mudah terlihat**  
+   Area sensitif bisa dipantau sebelum perubahan menyebar ke sistem yang lebih besar.
+3. **Keputusan teknis jadi lebih objektif**  
+   Diskusi performa tidak berhenti di asumsi atau rasa-rasa.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Balapan Formula 1**.
-`go test` biasa adalah tes kelaikan jalan (Apakah rem berfungsi? Apakah setir bisa belok?). Sementara **Benchmarking** adalah tes kecepatan di sirkuit. Kita mengukur berapa milidetik yang dibutuhkan untuk satu lap (**b.N**) dan berapa banyak bensin yang dihabiskan (**Allocs/op**).
+Bayangkan dua mobil diuji di lintasan yang sama berulang kali. Yang dicatat bukan cuma siapa yang menang sekali, tetapi rata-rata waktu tempuh dan konsumsi bahan bakarnya dalam kondisi yang setara.
 
----
+### Terminologi Teknis
+- **`b.N`**: jumlah iterasi yang disesuaikan otomatis oleh benchmark runner.
+- **`ns/op`**: rata-rata waktu per operasi.
+- **`allocs/op`**: jumlah alokasi per operasi benchmark.
 
-## 2. Visualisasi Sistem (Mermaid)
+## 3. Tahap 3: Visualisasi Sistem
 
 ```mermaid
 graph TD
-    S[Start Benchmark: b.N] --> L[Loop N Times]
-    L --> F[Execute Function]
-    F --> L
-    L --> E[Calculate Average: ns/op]
-    E --> R[Report Allocation: B/op]
+    Start[Benchmark Start] --> Loop[Run code b.N times]
+    Loop --> Measure[Collect timing and allocations]
+    Measure --> Report[Report ns/op B/op allocs/op]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Tool benchmark Go menaikkan nilai `b.N` secara otomatis sampai hasil pengukuran dianggap cukup stabil. Dengan begitu, pembandingan tidak bergantung pada satu eksekusi pendek yang mudah dipengaruhi noise.
+
+Nilai arsitekturnya di `RAK-04`:
+- benchmark membantu memilih implementasi berdasarkan data;
+- pengukuran kecil bisa mencegah salah arah optimasi;
+- alokasi dan waktu eksekusi bisa dilihat sejak level unit, sebelum masalah membesar di sistem penuh.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian kode di folder [examples/](./examples):
+- [01_string_concat_test.go](./examples/01_string_concat_test.go) - Benchmark perbandingan konkatenasi string biasa dengan `strings.Builder`.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menjalankan benchmark beberapa kali dengan nilai `b.N` yang terus bertambah secara otomatis hingga durasi total mencapai target (biasanya 1 detik). Ini memastikan hasil rata-rata yang stabil dari noise sistem operasi.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_string_concat.go`: Perbandingan `+` vs `strings.Builder`.
-- `02_slice_prealloc.go`: Dampak `make([]T, n, c)` terhadap performa.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*

@@ -1,45 +1,55 @@
-# [BK-03-CH-03] Version Retraction
+# CH-03: Version Retraction
 
-**Fixing 'Mistakes' in Production**
-*Target: Memahami cara menarik kembali versi modul yang sudah terlanjur dipublikasikan tanpa merusak sistem orang lain dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Modules Reference: retract directive](https://go.dev/ref/mod#go-mod-file-retract) | [Go Modules: v2 and Beyond](https://go.dev/blog/v2-go-modules)
+- **Framing**: Setelah versi modul dipublikasikan, isinya tidak bisa dianggap mudah dihapus begitu saja. Karena itu, Go menyediakan cara resmi untuk menandai versi yang seharusnya tidak dipakai lagi.
 
-Versi modul Go bersifat **immutable** (tidak dapat diubah) setelah masuk ke Proxy server. Namun, terkadang seorang maintainer melakukan kesalahan fatal (misal: kebocoran API Key atau bug kritis). Versi tersebut tidak bisa dihapus dari Proxy, tetapi bisa di-**retract** (ditarik kembali) menggunakan direktif khusus di file `go.mod`.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **`retract` Directive**: Instruksi di `go.mod` yang menyatakan bahwa satu atau rentang versi tertentu tidak boleh digunakan.
-- **Retraction Rationale**: Komentar di atas direktif `retract` yang akan ditampilkan oleh Go CLI saat pengguna mencoba mengunduh versi tersebut.
-- **Version Pinning**: Praktik tetap menggunakan versi tertentu meskipun sudah di-retract (tidak disarankan, tapi dimungkinkan).
+### Definisi
+Version retraction adalah mekanisme di `go.mod` yang memungkinkan maintainer menandai satu versi atau rentang versi modul sebagai versi yang sebaiknya tidak digunakan lagi.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Mengapa tidak di-delete saja tag Git-nya?
-- **Proxy Cache**: Menghapus tag di GitHub tidak menghapus zip di `proxy.golang.org`. Orang lain akan tetap bisa mengunduhnya.
-- **Transparency**: Retraction memberikan alasan yang jelas bagi pengguna mengapa versi tersebut ditarik, sehingga mereka tahu harus pindah ke versi mana.
+1. **Kesalahan rilis bisa diumumkan secara resmi**  
+   Maintainer tetap punya cara memperingatkan pengguna tanpa memalsukan sejarah publikasi.
+2. **Transparansi lebih baik**  
+   Pengguna tahu versi mana yang bermasalah dan kenapa versi itu ditarik.
+3. **Ekosistem tetap stabil**  
+   Karena artefak publik sudah terlanjur tersebar, solusi yang realistis adalah memberi sinyal resmi, bukan berpura-pura versi itu tidak pernah ada.
 
-### Mekanisme Kerja Under-the-Hood
-1. Maintainer merilis versi baru (misal `v1.0.1`) yang file `go.mod`-nya berisi `retract v1.0.0`.
-2. Saat pengguna menjalankan `go get`, Go CLI akan melihat manifes terbaru dari Proxy.
-3. Jika modul pengguna saat ini adalah `v1.0.0`, Go CLI akan memberikan peringatan (Warning) bahwa versi tersebut telah ditarik dan menyarankan upgrade.
+### Analogi Model Mental
+Bayangkan penerbit buku mencetak edisi yang salah. Buku itu mungkin sudah telanjur beredar, tetapi penerbit masih bisa mengeluarkan pemberitahuan resmi bahwa edisi tertentu cacat dan pembaca sebaiknya beralih ke cetakan revisi.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **`retract` Directive**: instruksi untuk menandai versi yang ditarik.
+- **Retraction Rationale**: penjelasan mengapa versi itu ditarik.
+- **Immutable Release Artifact**: artefak versi yang sudah dipublikasikan dan tidak diasumsikan bisa diubah sesuka hati.
 
-Lihat simulasi penarikan versi di [examples/](./examples/).
-1. `01-publish-retraction`: Panduan cara menulis direktif `retract` dan pesan alasannya.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
-
-### Retraction Lifecycle
 ```mermaid
 graph LR
-    V1[v1.0.0 - Published with BUG]
-    V2[v1.0.1 - New version with retract v1.0.0]
-    
-    User[User running go get] -->|Checks Proxy| V2
-    V2 -->|Informs| User
-    User -->|Alerted| Warning["Warning: v1.0.0 is retracted: contains critical bug"]
+    Bad[Published bad version] --> New[New release with retract]
+    User[go get or upgrade] --> New
+    New --> Warn[Warning about retracted version]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Retraction bekerja dengan menerbitkan versi baru yang berisi directive `retract` untuk versi bermasalah. Saat toolchain membaca metadata modul terbaru, ia bisa memberi sinyal bahwa versi lama sudah ditarik dan tidak layak dipilih sebagai upgrade target.
+
+Nilai evolusinya untuk `RAK-03`:
+- maintenance modul diperlakukan sebagai lifecycle nyata, bukan proses sekali rilis lalu selesai;
+- kesalahan publikasi punya jalur remediasi yang resmi;
+- ekosistem dependency menjadi lebih transparan saat terjadi insiden.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat simulasi penarikan versi di folder [examples/](./examples):
+- [01-publish-retraction](./examples/01-publish-retraction) - Contoh penulisan directive `retract` dan cara mengomunikasikan alasan penarikannya.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

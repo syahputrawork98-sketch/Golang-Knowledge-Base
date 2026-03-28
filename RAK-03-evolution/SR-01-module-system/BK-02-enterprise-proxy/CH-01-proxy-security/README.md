@@ -1,51 +1,58 @@
-# [BK-02-CH-01] GOPROXY & GOSUMDB
+# CH-01: `GOPROXY` and `GOSUMDB`
 
-**Infrastructure for Trusted Supply Chains**
-*Target: Memahami infrastruktur distribusi modul Go dan mekanisme verifikasi integritas global dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [Go Modules Reference: Environment variables](https://go.dev/ref/mod#environment-variables) | [Modules mirror, index, and checksum database](https://go.dev/ref/mod#module-proxy)
+- **Framing**: Sistem modul Go bukan cuma soal Git repository. Ada lapisan distribusi dan verifikasi yang membuat dependency publik lebih stabil, cepat, dan lebih sulit dimanipulasi diam-diam.
 
-Sistem modul Go tidak hanya bergantung pada Git, tetapi pada jaringan **Proxy** dan **Checksum Database**. Ini memastikan bahwa modul yang Anda unduh hari ini akan tetap identik selamanya, bahkan jika penulis aslinya menghapus repository-nya atau mengubah tag-nya.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **GOPROXY**: URL server yang menyimpan cache modul (default: `https://proxy.golang.org`).
-- **GOSUMDB**: Checksum Database global untuk memverifikasi isi `go.sum` (default: `sum.golang.org`).
-- **Direct Mode**: Mengunduh langsung dari source control (VCS) tanpa perantara proxy.
-- **`off` Mode**: Mematikan akses jaringan untuk resolusi modul.
+### Definisi
+`GOPROXY` adalah mekanisme distribusi modul melalui proxy cache, sedangkan `GOSUMDB` adalah layanan verifikasi checksum yang membantu memastikan integritas modul yang diunduh.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Mengapa kita butuh Proxy?
-- **Availability**: Menghindari kegagalan build jika GitHub/GitLab *down*.
-- **Immutability**: Proxy menyimpan snapshot permanen. Sekali versi dipublikasikan ke Proxy, isinya tidak bisa diubah (mencegah *Social Engineering* atau *VCS injection*).
-- **Speed**: Mengunduh file `.zip` statis dari Proxy jauh lebih cepat daripada melakukan `git clone` rekursif.
+1. **Availability lebih baik**  
+   Build tidak langsung bergantung pada server Git asli setiap saat.
+2. **Distribusi lebih konsisten**  
+   Proxy menyajikan artefak modul yang lebih stabil daripada mengandalkan clone VCS penuh berulang kali.
+3. **Integritas lebih mudah diverifikasi**  
+   Checksum membantu mendeteksi dependency yang berubah tidak semestinya.
 
-### Mekanisme Kerja Under-the-Hood
-1. Saat menjalankan `go get`, Go memeriksa variabel `$GOPROXY`.
-2. Jika disetel ke `https://proxy.golang.org,direct`, Go akan mencoba Proxy dulu, lalu jatuh ke VCS asli jika tidak ada.
-3. Setelah unduhan selesai, Go meminta hash ke `GOSUMDB` untuk memastikan file yang diterima dari Proxy valid dan belum dimanipulasi.
+### Analogi Model Mental
+Bayangkan gudang logistik resmi dan pos pemeriksaan kualitas. Proxy berperan sebagai gudang distribusi yang menyimpan paket yang siap diambil, sedangkan sum database berperan sebagai pos validasi yang memastikan isi paket belum diganti di tengah jalan.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **`GOPROXY`**: daftar endpoint proxy modul.
+- **`GOSUMDB`**: checksum database untuk verifikasi integritas modul publik.
+- **Direct Mode**: fallback untuk mengambil modul langsung dari VCS.
 
-Lihat eksperimen kontrol trafik modul di [examples/](./examples/).
-1. `01-proxy-control`: Cara mengubah perilaku `GOPROXY` untuk mempercepat build lokal atau lingkungan yang terisolasi.
-
-## 4. Model Mental Visual (The Assets)
+## 3. Tahap 3: Visualisasi Sistem
 
 ![Proxy Handshake](./assets/proxy-handshake.svg)
 
-### Hierarchy of Module Resolution
 ```mermaid
-graph TD
-    A[Go CLI] -->|1. Request| B{GOPROXY?}
-    B -->|Found| C[Proxy Server]
-    B -->|Not Found / direct| D[VCS: GitHub/GitLab]
-    C -->|Deliver Zip| E[GOMODCACHE]
-    D -->|Git Clone| E
-    E -->|2. Verify| F[GOSUMDB]
-    F -->|Match| G[Build Success]
-    F -->|Mismatch| H[Build FAILED!]
+graph LR
+    Client[go get or go mod tidy] --> Proxy[GOPROXY]
+    Proxy --> SumDB[GOSUMDB]
+    Proxy --> ModuleZip[Module archive]
+    SumDB --> Verify[Checksum verification]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Saat toolchain Go membutuhkan modul publik, ia biasanya mencoba proxy sesuai urutan di `GOPROXY`. Jika modul ditemukan, metadata dan arsip modul diambil dari sana. Setelah itu, checksum modul diverifikasi terhadap catatan yang relevan.
+
+Nilai evolusinya untuk `RAK-03`:
+- workflow dependency publik menjadi lebih terukur;
+- distribusi modul tidak bergantung penuh pada ketersediaan VCS asli;
+- integritas dependency ikut menjadi bagian dari alur kerja harian, bukan langkah terpisah.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh alur kontrol proxy di folder [examples/](./examples):
+- [01-proxy-control](./examples/01-proxy-control) - Eksperimen pengaturan mode proxy dan dampaknya pada resolusi modul.
+
 ---
-*Back to [BK-02 Page](../README.md)*
+*Status: [x] Complete*

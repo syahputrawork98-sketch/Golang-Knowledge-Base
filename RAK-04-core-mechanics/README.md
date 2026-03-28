@@ -20,4 +20,4 @@ Tooling, dependency management, benchmarking, dan area pendukung yang memperkuat
 - bukan tempat utama untuk tutorial sintaks dasar atau bedah source code runtime secara detail.
 
 ---
-*Status: [/] Partial*
+*Status: [x] Complete*

@@ -1,46 +1,56 @@
-# [BK-03-CH-01] `go list` & `go mod edit`
+# CH-01: Tooling Automation with `go list` and `go mod edit`
 
-**The Invisible Power Tooling**
-*Target: Memahami cara menginspeksi grafik dependensi dan melakukan otomasi modifikasi `go.mod` dalam waktu < 4 menit.*
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Definisi & Konsep (The Logic)
+- **Source Link**: [go list](https://pkg.go.dev/cmd/go#hdr-List_packages_or_modules) | [go mod edit](https://pkg.go.dev/cmd/go#hdr-Edit_go_mod_from_tools_or_scripts)
+- **Framing**: Toolchain Go menyediakan alat yang tidak hanya untuk build, tetapi juga untuk inspeksi dan otomasi metadata modul. Ini penting saat dependency graph mulai besar dan perlu dikelola lewat script atau CI.
 
-Selain perintah standar seperti `tidy` dan `get`, Go menyediakan alat untuk inspeksi mendalam (`go list`) dan manipulasi programmatik (`go mod edit`). Ini sangat berguna untuk skrip CI/CD atau saat Anda perlu mencari tahu mengapa sebuah paket tertentu ikut diunduh.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Terminologi Utama (Senior Terms)
-- **JSON Output (`-json`)**: Mode output `go list` yang mudah diparsing oleh skrip.
-- **Dependency Graph**: Struktur pohon yang menunjukkan hubungan antar modul.
-- **`go mod why`**: Perintah untuk melacak jalur dari modul utama ke dependensi transitif tertentu.
+### Definisi
+`go list` adalah alat untuk menampilkan informasi terstruktur tentang package atau modul, sedangkan `go mod edit` adalah alat untuk memodifikasi `go.mod` secara programmatik dengan tetap menjaga format dan validitasnya.
 
-## 2. Rasionalitas (Why & How?)
+### Rasionalitas
+Mekanisme ini dipilih karena:
 
-Mengapa butuh tool ini?
-- **Otomasi**: Bayangkan Anda harus meng-update versi 100 microservices secara bersamaan via skrip; Anda akan menggunakan `go mod edit`.
-- **Debugging Bloat**: Menemukan alasan mengapa binary membengkak karena dependensi yang tidak diinginkan (`go mod why`).
+1. **Inspeksi graph jadi lebih mudah diautomasi**  
+   Output JSON dari toolchain bisa dipakai untuk analisis atau pipeline CI.
+2. **Perubahan metadata lebih aman**  
+   `go mod edit` mengurangi risiko salah edit manual pada `go.mod`.
+3. **Debugging dependency lebih terarah**  
+   Tool seperti `go mod why` dan `go list -m` membantu melacak asal dependency transitif.
 
-### Mekanisme Kerja Under-the-Hood
-1. **`go list -m -json all`**: Membaca seluruh database modul di cache dan workspace, lalu membuangnya dalam format objek terstruktur.
-2. **`go mod edit`**: Tidak seperti mengedit manual dengan Text Editor, perintah ini menjamin file `go.mod` tetap valid secara sintaksis dan mengikuti aturan penulisan resmi.
+### Analogi Model Mental
+Bayangkan panel kontrol teknis sebuah gudang. Bukan cuma ada tombol buka-tutup pintu, tetapi juga dashboard untuk melihat alur barang dan alat khusus untuk memperbarui daftar inventaris secara resmi.
 
-## 3. Implementasi Utama (The Lab)
+### Terminologi Teknis
+- **JSON Output**: mode output terstruktur yang mudah diproses script.
+- **Dependency Graph**: hubungan antara modul utama dan dependency transitifnya.
+- **Programmatic Edit**: perubahan metadata melalui tool, bukan editor teks biasa.
 
-Lihat teknik otomasi manifest di [examples/](./examples/).
-1. `01-graph-inspection`: Skrip untuk mengekstrak informasi versi dependensi secara massal.
-2. `02-programmatic-edit`: Simulasi mengubah dependensi via terminal tanpa membuka file.
+## 3. Tahap 3: Visualisasi Sistem
 
-## 4. Model Mental Visual (The Assets)
-
-### Tracking Dependency Roots
 ```mermaid
 graph TD
-    A[Your App] --> B[Direct: pkg/A]
-    B --> C[Indirect: pkg/B]
-    C --> D[Target: pkg/C]
-    
-    subgraph "go mod why -m pkg/C"
-    Final[Path: Your App -> pkg/A -> pkg/B -> pkg/C]
-    end
+    App[Main module] --> Direct[Direct dependency]
+    Direct --> Indirect[Indirect dependency]
+    Inspect[go list or go mod why] --> Trace[Trace path through graph]
+    Edit[go mod edit] --> Manifest[Updated go.mod]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+`go list` membaca metadata package atau modul dari workspace, cache, dan module graph lalu menyajikannya dalam format yang bisa dikonsumsi manusia atau script. `go mod edit` bekerja langsung pada struktur `go.mod`, sehingga perubahan tetap sesuai aturan sintaks toolchain.
+
+Nilai evolusinya untuk `RAK-03`:
+- dependency graph tidak diperlakukan sebagai sesuatu yang gelap dan tak terlihat;
+- otomatisasi maintenance menjadi bagian resmi workflow;
+- debugging dependency bisa dilakukan dengan alat yang disediakan langsung oleh ekosistem Go.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat contoh otomasi di folder [examples/](./examples):
+- [01-tooling-automation](./examples/01-tooling-automation) - Eksperimen inspeksi graph dan perubahan metadata modul lewat CLI Go.
+
 ---
-*Back to [BK-03 Page](../README.md)*
+*Status: [x] Complete*

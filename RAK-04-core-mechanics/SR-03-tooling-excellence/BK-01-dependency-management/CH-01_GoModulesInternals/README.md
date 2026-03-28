@@ -1,51 +1,62 @@
-# CH-01: Go Modules Internals (Dependency Management)
+# CH-01: Go Modules Internals
 
-> **Source Link**: [Go Blog: Go Modules](https://blog.golang.org/using-go-modules) | [Go Reference: Go Modules Reference](https://golang.org/ref/mod)
+## 1. Tahap 1: Source Alignment dan Judul
 
-## 1. Konsep & Esensi (Definisi & Rasionalitas)
+- **Source Link**: [Using Go Modules](https://go.dev/blog/using-go-modules) | [Go Modules Reference](https://go.dev/ref/mod)
+- **Framing**: Go modules membuat dependency workflow di Go terasa rapi karena identitas modul, versi, dan integritas dependency dicatat dengan aturan yang jelas.
 
-### Definisi ("Apa itu?")
-Go Modules adalah sistem manajemen dependensi resmi Go sejak versi 1.11. Ia mengelola versi library, memastikan build yang reproduktif, dan memutus ketergantungan pada variabel lingkungan `$GOPATH`.
+## 2. Tahap 2: Konsep dan Rasionalitas
 
-### Rasionalitas ("Why & How?")
-1. **Reproducibility**: File `go.sum` memastikan semua orang di tim menggunakan kode yang sama dengan checksum yang identik (Anti-Fraud).
-2. **MVS (Minimal Version Selection)**: Algoritma unik Go untuk memilih versi dependensi tertua yang masih memenuhi syarat (paling stabil), bukannya versi terbaru yang berisiko breaking changes.
-3. **Semantic Import Versioning**: Memungkinkan penggunaan v2 atau v3 dari library yang sama dalam satu proyek dengan path import yang berbeda.
+### Definisi
+Go modules adalah sistem resmi Go untuk mendefinisikan identitas project, mengelola versi dependency, dan menjaga build tetap reproducible melalui file seperti `go.mod` dan `go.sum`.
+
+### Rasionalitas
+Pola ini dipilih karena:
+
+1. **Build jadi reproducible**  
+   Tim bisa membangun project dengan dependency graph yang konsisten, bukan bergantung pada isi folder lokal masing-masing.
+2. **Versi dependency dikelola dengan aturan jelas**  
+   Toolchain memakai mekanisme seperti Minimal Version Selection agar pemilihan versi tidak berubah-ubah secara liar.
+3. **Workflow engineering lebih aman**  
+   Checksum dan metadata module membantu menjaga integritas dependency yang dipakai dalam build.
 
 ### Analogi Model Mental
-Bayangkan sebuah **Resep Masakan**.
-- **GOPATH era**: Resep hanya bilang "Gunakan Garam". Anda bisa saja pakai Garam Laut atau Garam Meja, terserah apa yang ada di dapur. Hasilnya rasa masakan bisa beda-beda.
-- **Go Modules**: Resep bilang "Gunakan Garam Merek X, Versi 1.2, Batch #55". Jika garamnya beda sedikit saja (**Checksum mismatch**), masak tidak akan dimulai. Hasil masakan pasti sama persis di mana pun.
+Bayangkan resep dapur profesional. Bukan cuma daftar bahan yang dicatat, tetapi juga takaran dan pemasoknya. Dengan begitu, hasil masakan bisa diulang dengan rasa yang sama di dapur yang berbeda.
 
----
+### Terminologi Teknis
+- **Module Path**: identitas unik modul.
+- **Minimal Version Selection (MVS)**: strategi Go untuk memilih versi dependency yang dipakai dalam graph.
+- **Checksum Verification**: validasi integritas isi dependency terhadap catatan checksum.
 
-## 2. Visualisasi Sistem (Mermaid & SVG)
+## 3. Tahap 3: Visualisasi Sistem
 
-### Resolusi Versi (SVG)
 ![Visualisasi: Minimal Version Selection Logic](./assets/mvs_logic.svg)
 
-### Alur Dependency (Mermaid)
 ```mermaid
 graph TD
-
-    M[Project: go.mod] --> D1[Library A v1.0.0]
-    M --> D2[Library B v1.2.3]
-    D1 --> D3[Common Lib v1.1.0]
-    D2 --> D4[Common Lib v1.1.5]
-    Note over M: MVS selects Common Lib v1.1.5
+    Root[go.mod project utama] --> A[Dependency A]
+    Root --> B[Dependency B]
+    A --> C[Common module v1.1.0]
+    B --> D[Common module v1.1.5]
+    D --> Final[Selected version in build graph]
 ```
 
+## 4. Tahap 4: Mekanisme Pembuktian
+
+Di Go, `go.mod` menyimpan identitas modul dan requirement utama. Saat build atau test dijalankan, toolchain menyusun dependency graph lalu memutuskan versi yang dipakai berdasarkan aturan module system.
+
+Yang penting untuk `RAK-04`:
+- module workflow adalah bagian dari engineering architecture, bukan sekadar file konfigurasi;
+- dependency resolution dibuat eksplisit dan bisa diaudit;
+- perubahan dependency tidak dibiarkan menjadi efek samping yang tersembunyi.
+
+`go.sum` berperan sebagai bukti integritas dependency yang pernah dipakai. Jadi walaupun contoh di bawah fokus pada struktur `go.mod` dan `replace` lokal, model mentalnya tetap sama: dependency harus eksplisit, bisa diverifikasi, dan mudah diulang.
+
+## 5. Tahap 5: Lab Praktis
+
+Lihat pembuktian di folder [examples/](./examples):
+- [01_basic_module](./examples/01_basic_module) - Modul Go paling sederhana untuk melihat peran `module` dan `go` directive.
+- [02_local_replace](./examples/02_local_replace) - Dua modul lokal dengan `require` dan `replace` untuk menunjukkan wiring dependency yang eksplisit.
+
 ---
-
-## 3. Mekanisme Pembuktian (Algoritma Detil)
-Go menggunakan file `go.mod` untuk deklarasi meta-data dan `go.sum` untuk integritas data. Saat `go build` dijalankan, toolchain Go akan men-download modul ke cache lokal (`$GOPATH/pkg/mod`) dan memverifikasi isinya terhadap `go.sum`.
-
----
-
-## 4. Lab Praktis (Examples)
-Silakan tinjau folder [examples/](./examples) untuk eksperimen berikut:
-- `01_mod_init.go`: Memulai modul dan menambah dependensi.
-- `02_version_conflict.go`: Melihat bagaimana Go menangani perbedaan versi dependensi.
-
----
-*Unit ini memenuhi standar Platinum Gold (PPM V4).*
+*Status: [x] Complete*
